@@ -1,0 +1,1279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 3 Problems</title>
+<style>
+:root {
+  color-scheme: light;
+  --surface-1: #ffffff;
+  --page: #ffffff;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11,11,11,0.12);
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page); color: var(--text-primary);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px; line-height: 1.55;
+}
+.wrap { max-width: 860px; margin: 0 auto; padding: 28px 16px 48px; }
+h1 { font-size: 1.45rem; margin: 0 0 4px; }
+.subtitle { color: var(--text-secondary); margin: 0 0 20px; }
+.subtitle a { color: var(--series-1); text-decoration: none; }
+.subtitle a:hover { text-decoration: underline; }
+.card {
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 18px; margin-bottom: 14px;
+}
+.card h2 { font-size: 0.98rem; margin: 0 0 8px; }
+.card p { margin: 0.45em 0; }
+ol.parts { list-style-type: lower-alpha; padding-left: 1.5em; margin: 0.4em 0; }
+ol.parts li { margin: 0.4em 0; }
+.eqs { border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; margin: 10px 0; overflow-x: auto; background: #fcfcfb; }
+.eq { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 7px 0; }
+.eq .num { color: var(--muted); font-size: 0.78rem; white-space: nowrap; text-align: right; }
+table { border-collapse: collapse; width: auto; min-width: 50%; font-size: 0.88rem; margin: 10px 0; }
+th, td { padding: 5px 10px; text-align: right; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--text-secondary); font-weight: 600; }
+.tag {
+  display: inline-block; font-size: 0.7rem; border: 1px solid var(--border);
+  border-radius: 4px; padding: 0 6px; color: var(--muted); margin-left: 6px;
+  vertical-align: 1px; white-space: nowrap;
+}
+.tag.warn { color: #9a5b00; border-color: #e0b36a; background: #fdf6ea; }
+.note { color: var(--muted); font-size: 0.86rem; }
+.xref { color: var(--text-secondary); font-size: 0.86rem; margin-top: 6px; }
+.xref a { color: var(--series-1); }
+.footnote { font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--grid); margin-top: 20px; padding-top: 10px; }
+.footnote p { margin: 0.4em 0; }
+
+.isogrid { margin: 12px 0; }
+.isogrid .toolbar { display: flex; gap: 8px; align-items: center; margin: 8px 0; font-size: 0.78rem; color: var(--muted); }
+.isogrid .toolbar button { font: inherit; font-size: 0.78rem; padding: 3px 10px; border: 1px solid var(--axis); background: var(--surface-1); border-radius: 6px; cursor: pointer; color: var(--text-secondary); }
+.isogrid .toolbar button:hover { border-color: var(--series-1); color: var(--series-1); }
+.isogrid .params { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 8px 0; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.85rem; }
+.isogrid .params .p { display: flex; align-items: center; gap: 7px; }
+.isogrid .params .pname { font-weight: 600; color: var(--text-secondary); }
+.isogrid .params input { width: 90px; font: inherit; font-size: 0.85rem; padding: 2px 6px; border: 1px solid var(--axis); border-radius: 5px; }
+.isogrid table { table-layout: fixed; width: 100%; min-width: 640px; border: 1px solid var(--grid); margin: 8px 0 0; }
+.isogrid th.cl { font-weight: 600; color: var(--muted); text-align: center; font-size: 0.72rem; background: #fafaf8; border: 1px solid var(--grid); padding: 2px 4px; }
+.isogrid th.rh { width: 30px; text-align: center; color: var(--muted); font-size: 0.72rem; background: #fafaf8; border: 1px solid var(--grid); padding: 2px 4px; }
+.isogrid thead tr + tr th { font-size: 0.78rem; border: 1px solid var(--grid); }
+.isogrid td { padding: 0; border: 1px solid var(--grid); text-align: right; }
+.isogrid td.locked { padding: 4px 8px; background: #fafaf8; font-variant-numeric: tabular-nums; }
+.isogrid input.cell { width: 100%; border: 0; padding: 4px 8px; font: inherit; font-size: 0.85rem; text-align: right; background: transparent; outline: none; font-variant-numeric: tabular-nums; }
+.isogrid input.cell:focus { background: #eef5fd; outline: 2px solid var(--series-1); outline-offset: -2px; text-align: left; }
+.isogrid input.cell.err { color: #b4231f; }
+.isogrid .ghint { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+.isogrid .fbar { display: flex; align-items: center; gap: 8px; margin: 8px 0 0; }
+.isogrid .fbar .fcell { min-width: 42px; text-align: center; font-size: 0.8rem; color: var(--text-secondary); border: 1px solid var(--axis); border-radius: 5px; padding: 4px 6px; background: #fafaf8; font-variant-numeric: tabular-nums; }
+.isogrid .fbar input { flex: 1; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.82rem; padding: 5px 8px; border: 1px solid var(--axis); border-radius: 6px; }
+.isogrid .fbar input:focus { outline: 2px solid var(--series-1); outline-offset: -1px; }
+.isogrid .gplot { margin-top: 14px; }
+.isogrid .gplot .ctls { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; font-size: 0.8rem; color: var(--text-secondary); padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; }
+.isogrid .gplot select { font: inherit; font-size: 0.8rem; padding: 2px 4px; border: 1px solid var(--axis); border-radius: 5px; background: var(--surface-1); }
+.isogrid .gplot input[type="checkbox"] { accent-color: var(--series-1); }
+.isogrid .gplot svg { width: 100%; height: auto; display: block; border: 1px solid var(--border); border-radius: 8px; }
+.isogrid .gplot .stats { font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px; font-variant-numeric: tabular-nums; }
+details.scratch { margin: 10px 0 2px; }
+details.scratch > summary { cursor: pointer; font-size: 0.85rem; color: var(--series-1); user-select: none; }
+details.scratch[open] > summary { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Chapter 3 &middot; Equilibrium Isotope Fractionation</h1>
+<p class="subtitle">Problem set &middot; Sharp, <i>Principles of Stable Isotope Geochemistry</i>, 1st ed. (2007) &middot; <a href="Ch03_answers.html">Answers &rarr;</a></p>
+<script>
+/* IsoGrid: tiny Excel-like worksheet for S_G_2026 problem sets.
+   Formulas start with "=", support + - * / ^ ( ), cell refs (B1),
+   ranges in function args (A1:A6), named parameter cells, and the
+   functions listed in FUNCS. No external dependencies. */
+(function (global) {
+  "use strict";
+
+  /* ---------- tokenizer ---------- */
+  function tokenize(src) {
+    var toks = [], i = 0, m;
+    while (i < src.length) {
+      var c = src[i];
+      if (c === " " || c === "\t") { i++; continue; }
+      if (/[0-9.]/.test(c)) {
+        m = /^[0-9]*\.?[0-9]+(?:[eE][+-]?[0-9]+)?/.exec(src.slice(i));
+        if (!m) throw new Error("number");
+        toks.push({ t: "num", v: parseFloat(m[0]) }); i += m[0].length; continue;
+      }
+      if (/[A-Za-z_]/.test(c)) {
+        m = /^[A-Za-z_][A-Za-z0-9_]*/.exec(src.slice(i));
+        toks.push({ t: "id", v: m[0].toUpperCase() }); i += m[0].length; continue;
+      }
+      if ("+-*/^(),:".indexOf(c) >= 0) { toks.push({ t: c }); i++; continue; }
+      throw new Error("bad character " + c);
+    }
+    return toks;
+  }
+
+  var CELLREF = /^([A-Z]+)([1-9][0-9]*)$/;
+  function colIdx(letters) {
+    var n = 0;
+    for (var i = 0; i < letters.length; i++) n = n * 26 + (letters.charCodeAt(i) - 64);
+    return n - 1;
+  }
+  function colName(idx) {
+    var s = "";
+    idx = idx + 1;
+    while (idx > 0) { var r = (idx - 1) % 26; s = String.fromCharCode(65 + r) + s; idx = Math.floor((idx - 1) / 26); }
+    return s;
+  }
+
+  /* ---------- parser ---------- */
+  function parse(toks) {
+    var p = 0;
+    function peek() { return toks[p]; }
+    function take(t) {
+      var tok = toks[p];
+      if (!tok || (t && tok.t !== t)) throw new Error("expected " + t);
+      p++; return tok;
+    }
+    function refNode(id) {
+      var m = CELLREF.exec(id);
+      return m ? { k: "ref", c: colIdx(m[1]), r: parseInt(m[2], 10) - 1 } : null;
+    }
+    function parseArg() {
+      var tok = peek();
+      if (tok && tok.t === "id") {
+        var rn = refNode(tok.v);
+        if (rn && toks[p + 1] && toks[p + 1].t === ":") {
+          take("id"); take(":");
+          var tok2 = take("id");
+          var rn2 = refNode(tok2.v);
+          if (!rn2) throw new Error("bad range");
+          return { k: "range", a: rn, b: rn2 };
+        }
+      }
+      return expr();
+    }
+    function primary() {
+      var tok = peek();
+      if (!tok) throw new Error("unexpected end");
+      if (tok.t === "num") { take(); return { k: "num", v: tok.v }; }
+      if (tok.t === "(") { take("("); var e = expr(); take(")"); return e; }
+      if (tok.t === "id") {
+        take();
+        if (peek() && peek().t === "(") {
+          take("(");
+          var args = [];
+          if (peek() && peek().t !== ")") {
+            args.push(parseArg());
+            while (peek() && peek().t === ",") { take(","); args.push(parseArg()); }
+          }
+          take(")");
+          return { k: "call", name: tok.v, args: args };
+        }
+        var rn = refNode(tok.v);
+        if (rn) return rn;
+        return { k: "id", name: tok.v };
+      }
+      throw new Error("unexpected token");
+    }
+    function factor() {
+      var tok = peek();
+      if (tok && (tok.t === "-" || tok.t === "+")) {
+        take();
+        var x = factor();
+        return tok.t === "-" ? { k: "neg", x: x } : x;
+      }
+      var base = primary();
+      if (peek() && peek().t === "^") {
+        take("^");
+        var e = factor(); /* right-assoc */
+        return { k: "bin", op: "^", l: base, r: e };
+      }
+      return base;
+    }
+    function term() {
+      var n = factor();
+      while (peek() && (peek().t === "*" || peek().t === "/")) {
+        var op = take().t;
+        n = { k: "bin", op: op, l: n, r: factor() };
+      }
+      return n;
+    }
+    function expr() {
+      var n = term();
+      while (peek() && (peek().t === "+" || peek().t === "-")) {
+        var op = take().t;
+        n = { k: "bin", op: op, l: n, r: term() };
+      }
+      return n;
+    }
+    var root = expr();
+    if (p !== toks.length) throw new Error("trailing input");
+    return root;
+  }
+
+  /* ---------- evaluation ---------- */
+  function nums(vals) {
+    var out = [];
+    for (var i = 0; i < vals.length; i++)
+      if (typeof vals[i] === "number" && isFinite(vals[i])) out.push(vals[i]);
+    return out;
+  }
+  function pairs(ys, xs) {
+    var out = [], n = Math.min(ys.length, xs.length);
+    for (var i = 0; i < n; i++)
+      if (typeof ys[i] === "number" && isFinite(ys[i]) &&
+          typeof xs[i] === "number" && isFinite(xs[i])) out.push([ys[i], xs[i]]);
+    return out;
+  }
+  function linfit(ys, xs) {
+    var pr = pairs(ys, xs);
+    if (pr.length < 2) return [NaN, NaN];
+    var n = pr.length, sx = 0, sy = 0, sxx = 0, sxy = 0;
+    for (var i = 0; i < n; i++) {
+      sx += pr[i][1]; sy += pr[i][0];
+      sxx += pr[i][1] * pr[i][1]; sxy += pr[i][1] * pr[i][0];
+    }
+    var slope = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+    return [slope, (sy - slope * sx) / n];
+  }
+  var FUNCS = {
+    SUM: function (a) { return nums(a.flatVals).reduce(function (s, v) { return s + v; }, 0); },
+    AVERAGE: function (a) { var v = nums(a.flatVals); return v.length ? v.reduce(function (s, x) { return s + x; }, 0) / v.length : NaN; },
+    MIN: function (a) { var v = nums(a.flatVals); return v.length ? Math.min.apply(null, v) : NaN; },
+    MAX: function (a) { var v = nums(a.flatVals); return v.length ? Math.max.apply(null, v) : NaN; },
+    COUNT: function (a) { return nums(a.flatVals).length; },
+    ABS: function (a) { return Math.abs(a.scalars[0]); },
+    LN: function (a) { return Math.log(a.scalars[0]); },
+    LOG10: function (a) { return Math.log(a.scalars[0]) / Math.LN10; },
+    LOG: function (a) { var b = a.scalars.length > 1 ? a.scalars[1] : 10; return Math.log(a.scalars[0]) / Math.log(b); },
+    EXP: function (a) { return Math.exp(a.scalars[0]); },
+    SQRT: function (a) { return Math.sqrt(a.scalars[0]); },
+    POWER: function (a) { return Math.pow(a.scalars[0], a.scalars[1]); },
+    ROUND: function (a) { var d = a.scalars.length > 1 ? a.scalars[1] : 0, f = Math.pow(10, d); return Math.round(a.scalars[0] * f) / f; },
+    PI: function () { return Math.PI; },
+    SLOPE: function (a) { return linfit(a.rangeVals[0] || [], a.rangeVals[1] || [])[0]; },
+    INTERCEPT: function (a) { return linfit(a.rangeVals[0] || [], a.rangeVals[1] || [])[1]; }
+  };
+
+  function evalNode(node, ctx) {
+    switch (node.k) {
+      case "num": return node.v;
+      case "neg": return -evalNode(node.x, ctx);
+      case "ref": return ctx.cell(node.c, node.r);
+      case "id":
+        var pv = ctx.param(node.name);
+        if (pv === undefined) throw new Error("unknown name " + node.name);
+        return pv;
+      case "range": throw new Error("range outside function");
+      case "bin": {
+        var l = evalNode(node.l, ctx), r = evalNode(node.r, ctx);
+        if (node.op === "+") return l + r;
+        if (node.op === "-") return l - r;
+        if (node.op === "*") return l * r;
+        if (node.op === "/") return l / r;
+        if (node.op === "^") return Math.pow(l, r);
+      }
+      /* falls through only on bug */
+      case "call": {
+        var fn = FUNCS[node.name];
+        if (!fn) throw new Error("unknown function " + node.name);
+        var scalars = [], rangeVals = [], flatVals = [];
+        for (var i = 0; i < node.args.length; i++) {
+          var a = node.args[i];
+          if (a.k === "range") {
+            var vals = ctx.range(a);
+            rangeVals.push(vals);
+            flatVals = flatVals.concat(vals);
+          } else {
+            var v = evalNode(a, ctx);
+            scalars.push(v);
+            rangeVals.push(null);
+            flatVals.push(v);
+          }
+        }
+        return fn({ scalars: scalars, rangeVals: rangeVals.filter(function (x) { return x !== null; }), flatVals: flatVals });
+      }
+    }
+    throw new Error("bad node");
+  }
+
+  function evalFormula(src, ctx) {
+    return evalNode(parse(tokenize(src)), ctx);
+  }
+
+  /* ---------- number display ---------- */
+  function fmt(v) {
+    if (v === null || v === undefined || v === "") return "";
+    if (typeof v === "string") return v;
+    if (typeof v !== "number" || !isFinite(v)) return "#ERR";
+    if (v === 0) return "0";
+    var a = Math.abs(v);
+    if (a >= 1e7 || a < 1e-4) return v.toExponential(4);
+    return String(parseFloat(v.toPrecision(6)));
+  }
+
+  /* ---------- the widget (browser only) ---------- */
+  function IsoGrid(container, spec, presetState) {
+    (spec.params || []).forEach(function (p) {
+      if (CELLREF.test(String(p.name).toUpperCase()) && typeof console !== "undefined")
+        console.warn("IsoGrid: param name '" + p.name + "' looks like a cell reference and will not resolve; rename it.");
+    });
+    var nRows = spec.rows.length, nCols = spec.cols.length;
+    var dataRows = spec.dataRows || nRows;
+    var state = (presetState && presetState.cells) ? presetState : { cells: {}, params: {} };
+    var CIRC = {};
+
+    function cellSpec(c, r) { return spec.rows[r][c] || {}; }
+    function key(c, r) { return c + "," + r; }
+    function isLocked(c, r) { return !!cellSpec(c, r).locked; }
+    function rawOf(c, r) {
+      if (isLocked(c, r)) return String(cellSpec(c, r).v);
+      var v = state.cells[key(c, r)];
+      return v === undefined ? (cellSpec(c, r).v !== undefined ? String(cellSpec(c, r).v) : "") : v;
+    }
+
+    var memo, visiting;
+    function valueOf(c, r) {
+      if (c < 0 || r < 0 || c >= nCols || r >= nRows) return NaN;
+      var k = key(c, r);
+      if (memo.hasOwnProperty(k)) return memo[k] === CIRC ? NaN : memo[k];
+      if (visiting[k]) { memo[k] = CIRC; throw { circ: true }; }
+      visiting[k] = true;
+      var v;
+      var raw = rawOf(c, r).trim();
+      try {
+        if (raw === "") v = null;
+        else if (raw.charAt(0) === "=") v = evalFormula(raw.slice(1), ctx);
+        else { var n = Number(raw); v = isNaN(n) ? NaN : n; }
+      } catch (e) {
+        v = e && e.circ ? CIRC : NaN;
+      }
+      delete visiting[k];
+      memo[k] = v;
+      return v === CIRC ? NaN : v;
+    }
+    var ctx = {
+      cell: function (c, r) { var v = valueOf(c, r); return v === null ? 0 : v; },
+      param: function (name) {
+        for (var i = 0; i < (spec.params || []).length; i++) {
+          var p = spec.params[i];
+          if (p.name.toUpperCase() === name) {
+            var raw = p.locked ? String(p.value) : (state.params[p.name] !== undefined ? state.params[p.name] : String(p.value || ""));
+            var n = Number(String(raw).trim());
+            return isNaN(n) ? NaN : n;
+          }
+        }
+        return undefined;
+      },
+      range: function (rg) {
+        var vals = [];
+        var c0 = Math.min(rg.a.c, rg.b.c), c1 = Math.max(rg.a.c, rg.b.c);
+        var r0 = Math.min(rg.a.r, rg.b.r), r1 = Math.max(rg.a.r, rg.b.r);
+        for (var c = c0; c <= c1; c++)
+          for (var r = r0; r <= r1; r++) vals.push(valueOf(c, r));
+        return vals;
+      }
+    };
+
+    /* persistence */
+    var skey = "isogrid:" + (spec.id || "grid");
+    function save() {
+      try { localStorage.setItem(skey, JSON.stringify(state)); } catch (e) {}
+    }
+    function load() {
+      if (presetState && presetState.cells) { save(); return; }
+      try {
+        var s = localStorage.getItem(skey);
+        if (s) { var st = JSON.parse(s); if (st && st.cells) state = st; }
+      } catch (e) {}
+    }
+    load();
+
+    /* DOM */
+    container.innerHTML = "";
+    var inputs = {};
+    var tds = {};
+    var active = null; /* {c, r, k} of the cell being edited */
+    var barName, barInput;
+    var HL = ["#2a78d6", "#eb6834", "#1baf7a", "#8a5fd1"];
+    function clearHL() {
+      for (var k in tds) { tds[k].style.boxShadow = ""; tds[k].style.background = ""; }
+    }
+    function scanRefs(raw) {
+      var out = [], up = String(raw).toUpperCase();
+      if (up.charAt(0) !== "=") return out;
+      var re = /([A-Z]+[1-9][0-9]*)(\s*:\s*([A-Z]+[1-9][0-9]*))?/g, m;
+      while ((m = re.exec(up))) {
+        var pre = m.index > 0 ? up.charAt(m.index - 1) : "";
+        var post = up.charAt(re.lastIndex) || "";
+        if (/[A-Z0-9_]/.test(pre)) continue;        /* inside an identifier */
+        if (/[A-Z_(]/.test(post)) continue;         /* function call such as LOG10( */
+        out.push({ a: m[1], b: m[3] || null, text: m[1] + (m[3] ? ":" + m[3] : "") });
+      }
+      return out;
+    }
+    function shiftRefs(raw, dr) {
+      raw = String(raw);
+      if (raw.charAt(0) !== "=") return raw;
+      var re = /[A-Za-z_][A-Za-z0-9_]*/g, m, out = "", last = 0;
+      while ((m = re.exec(raw))) {
+        var mm = CELLREF.exec(m[0].toUpperCase());
+        var post = raw.charAt(re.lastIndex) || "";
+        if (mm && post !== "(") {
+          var nr = parseInt(mm[2], 10) + dr;
+          if (nr >= 1) {
+            out += raw.slice(last, m.index) + mm[1] + nr;
+            last = re.lastIndex;
+          }
+        }
+      }
+      return out + raw.slice(last);
+    }
+    function showHL(raw) {
+      clearHL();
+      function paint(c, r, color, isRange) {
+        var td = tds[key(c, r)];
+        if (!td) return;
+        td.style.boxShadow = "inset 0 0 0 2px " + color;
+        if (isRange) td.style.background = color + "14";
+      }
+      var refs = scanRefs(raw), seen = {}, ci = 0;
+      for (var i = 0; i < refs.length; i++) {
+        var t = refs[i].text;
+        if (seen[t] === undefined) seen[t] = ci++ % HL.length;
+        var color = HL[seen[t]];
+        var ma = CELLREF.exec(refs[i].a);
+        if (!ma) continue;
+        var c1 = colIdx(ma[1]), r1 = parseInt(ma[2], 10) - 1;
+        if (refs[i].b) {
+          var mb = CELLREF.exec(refs[i].b);
+          if (!mb) continue;
+          var c2 = colIdx(mb[1]), r2 = parseInt(mb[2], 10) - 1;
+          for (var cc = Math.min(c1, c2); cc <= Math.max(c1, c2); cc++)
+            for (var rr = Math.min(r1, r2); rr <= Math.max(r1, r2); rr++) paint(cc, rr, color, true);
+        } else paint(c1, r1, color, false);
+      }
+    }
+    if (spec.params && spec.params.length) {
+      var pbox = document.createElement("div");
+      pbox.className = "params";
+      spec.params.forEach(function (p) {
+        var d = document.createElement("span");
+        d.className = "p";
+        var lab = document.createElement("span");
+        lab.className = "pname";
+        lab.innerHTML = (p.label || p.name) + " (" + p.name + ")";
+        d.appendChild(lab);
+        if (p.locked) {
+          var s = document.createElement("span");
+          s.textContent = fmt(Number(p.value));
+          d.appendChild(s);
+        } else {
+          var inp = document.createElement("input");
+          inp.value = state.params[p.name] !== undefined ? state.params[p.name] : (p.value || "");
+          inp.addEventListener("input", function () {
+            state.params[p.name] = inp.value; save(); recompute();
+          });
+          d.appendChild(inp);
+        }
+        pbox.appendChild(d);
+      });
+      container.appendChild(pbox);
+    }
+
+    /* formula bar */
+    var fbar = document.createElement("div");
+    fbar.className = "fbar";
+    barName = document.createElement("span");
+    barName.className = "fcell";
+    barName.textContent = "—";
+    barInput = document.createElement("input");
+    barInput.setAttribute("placeholder", "select a cell, then edit its value or =formula here");
+    barInput.setAttribute("spellcheck", "false");
+    fbar.appendChild(barName);
+    fbar.appendChild(barInput);
+    container.appendChild(fbar);
+    function commitActive(raw) {
+      if (!active) return;
+      raw = raw.trim();
+      if (raw === "") delete state.cells[active.k];
+      else state.cells[active.k] = raw;
+      save();
+    }
+    barInput.addEventListener("input", function () {
+      if (!active) return;
+      var raw = barInput.value;
+      if (raw.trim() === "") delete state.cells[active.k];
+      else state.cells[active.k] = raw;
+      if (inputs[active.k]) inputs[active.k].value = raw;
+      save();
+      showHL(raw);
+    });
+    barInput.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter") {
+        ev.preventDefault();
+        commitActive(barInput.value);
+        recompute();
+        clearHL();
+        if (active) {
+          var nxt = inputs[active.c + "," + (active.r + 1)];
+          if (nxt) nxt.focus(); else barInput.blur();
+        }
+      }
+    });
+    barInput.addEventListener("blur", function (ev) {
+      commitActive(barInput.value);
+      recompute();
+      if (!ev.relatedTarget || !(ev.relatedTarget.classList && ev.relatedTarget.classList.contains("cell"))) clearHL();
+    });
+
+    var gwrap = document.createElement("div");
+    gwrap.style.overflowX = "auto";
+    var tbl = document.createElement("table");
+    var cg = document.createElement("colgroup");
+    var c0 = document.createElement("col");
+    c0.style.width = "30px";
+    cg.appendChild(c0);
+    for (var ci = 0; ci < nCols; ci++) {
+      var cel = document.createElement("col");
+      if (spec.cols[ci].w) cel.style.width = spec.cols[ci].w;
+      cg.appendChild(cel);
+    }
+    tbl.appendChild(cg);
+    var thead = document.createElement("thead");
+    var tr1 = document.createElement("tr");
+    tr1.appendChild(Object.assign(document.createElement("th"), { className: "rh" }));
+    for (var c = 0; c < nCols; c++) {
+      var th = document.createElement("th");
+      th.className = "cl"; th.textContent = colName(c);
+      (function (c) {
+        th.title = "Double-click to fill this column down";
+        th.style.cursor = "pointer";
+        th.addEventListener("dblclick", function () {
+          var srcRow = -1, rr;
+          for (rr = 0; rr < dataRows; rr++)
+            if (!isLocked(c, rr) && rawOf(c, rr).trim() !== "") { srcRow = rr; break; }
+          if (srcRow < 0) return;
+          var src = rawOf(c, srcRow);
+          for (rr = srcRow + 1; rr < dataRows; rr++) {
+            if (isLocked(c, rr)) continue;
+            state.cells[key(c, rr)] = shiftRefs(src, rr - srcRow);
+          }
+          save(); recompute();
+        });
+      })(c);
+      tr1.appendChild(th);
+    }
+    thead.appendChild(tr1);
+    var tr2 = document.createElement("tr");
+    tr2.appendChild(Object.assign(document.createElement("th"), { className: "rh" }));
+    for (c = 0; c < nCols; c++) {
+      th = document.createElement("th");
+      th.innerHTML = spec.cols[c].label || "";
+      tr2.appendChild(th);
+    }
+    thead.appendChild(tr2);
+    tbl.appendChild(thead);
+    var tbody = document.createElement("tbody");
+    for (var r = 0; r < nRows; r++) {
+      var tr = document.createElement("tr");
+      var rh = document.createElement("th");
+      rh.className = "rh"; rh.textContent = r + 1;
+      tr.appendChild(rh);
+      for (c = 0; c < nCols; c++) {
+        var td = document.createElement("td");
+        if (isLocked(c, r)) {
+          td.className = "locked";
+          var v = cellSpec(c, r).v;
+          td.textContent = typeof v === "number" ? fmt(v) : v;
+        } else {
+          var inp = document.createElement("input");
+          inp.className = "cell";
+          inp.setAttribute("data-c", c);
+          inp.setAttribute("data-r", r);
+          (function (inp, c, r) {
+            inp.addEventListener("focus", function () {
+              active = { c: c, r: r, k: key(c, r) };
+              var raw = rawOf(c, r);
+              inp.value = raw;
+              inp.select && inp.select();
+              barName.textContent = colName(c) + (r + 1);
+              barInput.value = raw;
+              showHL(raw);
+            });
+            inp.addEventListener("input", function () {
+              barInput.value = inp.value;
+              showHL(inp.value);
+            });
+            inp.addEventListener("blur", function (ev) {
+              var raw = inp.value.trim();
+              if (raw === "") delete state.cells[key(c, r)];
+              else state.cells[key(c, r)] = raw;
+              save();
+              if (ev.relatedTarget === barInput) return; /* continue editing in the bar */
+              recompute();
+              clearHL();
+            });
+            inp.addEventListener("keydown", function (ev) {
+              function go(cc, rr) {
+                var nxt = inputs[key(cc, rr)];
+                if (nxt) { ev.preventDefault(); nxt.focus(); }
+              }
+              if (ev.key === "Enter") {
+                ev.preventDefault();
+                inp.blur();
+                var nxt = inputs[key(c, r + 1)];
+                if (nxt) nxt.focus();
+                return;
+              }
+              if ((ev.key === "d" || ev.key === "D") && (ev.ctrlKey || ev.metaKey)) {
+                ev.preventDefault();
+                if (r > 0) {
+                  var src = rawOf(c, r - 1);
+                  if (src.trim() !== "") {
+                    var nv = shiftRefs(src, 1);
+                    state.cells[key(c, r)] = nv;
+                    inp.value = nv;
+                    barInput.value = nv;
+                    save(); recompute(); showHL(nv);
+                  }
+                }
+                return;
+              }
+              if (ev.key === "ArrowDown") { go(c, r + 1); return; }
+              if (ev.key === "ArrowUp") { go(c, r - 1); return; }
+              var fullSel = inp.selectionStart === 0 && inp.selectionEnd === inp.value.length;
+              if (ev.key === "ArrowRight" && fullSel) { go(c + 1, r); return; }
+              if (ev.key === "ArrowLeft" && fullSel) { go(c - 1, r); return; }
+            });
+          })(inp, c, r);
+          inputs[key(c, r)] = inp;
+          td.appendChild(inp);
+        }
+        td.setAttribute("data-c", c);
+        td.setAttribute("data-r", r);
+        tds[key(c, r)] = td;
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+    tbl.appendChild(tbody);
+    /* click-to-insert references while a formula ends with an operator */
+    tbl.addEventListener("mousedown", function (ev) {
+      var editor = null;
+      if (document.activeElement === barInput) editor = barInput;
+      else if (active && document.activeElement === inputs[active.k]) editor = inputs[active.k];
+      if (!editor) return;
+      var val = editor.value;
+      if (val.charAt(0) !== "=" || !/[+\-*/^(,:=]\s*$/.test(val)) return;
+      var tgt = ev.target;
+      while (tgt && tgt !== tbl && tgt.tagName !== "TD") tgt = tgt.parentNode;
+      if (!tgt || tgt.tagName !== "TD" || tgt.getAttribute("data-c") === null) return;
+      var c2 = +tgt.getAttribute("data-c"), r2 = +tgt.getAttribute("data-r");
+      if (active && c2 === active.c && r2 === active.r) return;
+      ev.preventDefault();
+      editor.value = val + colName(c2) + (r2 + 1);
+      editor.dispatchEvent(new Event("input"));
+    });
+    gwrap.appendChild(tbl);
+    container.appendChild(gwrap);
+
+    var bar = document.createElement("div");
+    bar.className = "toolbar";
+    var bReset = document.createElement("button");
+    bReset.textContent = "Reset";
+    bReset.addEventListener("click", function () {
+      state = { cells: {}, params: {} };
+      try { localStorage.removeItem(skey); } catch (e) {}
+      IsoGrid(container, spec);
+    });
+    var hint = document.createElement("span");
+    hint.textContent = "Entries autosave in this browser.";
+    bar.appendChild(bReset); bar.appendChild(hint);
+    container.appendChild(bar);
+
+    if (spec.note) {
+      var nt = document.createElement("p");
+      nt.className = "ghint";
+      nt.innerHTML = spec.note;
+      container.appendChild(nt);
+    }
+
+    /* ---------- optional X-Y biplot ---------- */
+    var redrawPlot = null;
+    if (spec.plot) {
+      var P = spec.plot;
+      if (!state.plot) state.plot = {};
+      var psel = {
+        x: state.plot.x || P.x || "A",
+        y: state.plot.y || P.y || "B",
+        y2: state.plot.y2 !== undefined ? state.plot.y2 : (P.y2 || ""),
+        fit: state.plot.fit !== undefined ? state.plot.fit : (P.fit || ""),
+        logx: state.plot.logx !== undefined ? !!state.plot.logx : !!P.logx,
+        logy: state.plot.logy !== undefined ? !!state.plot.logy : !!P.logy,
+        model: state.plot.model !== undefined ? !!state.plot.model : !!P.model
+      };
+      if (psel.fit === true) psel.fit = "lin";
+      if (psel.fit === false) psel.fit = "";
+      var plotRows = P.rows || dataRows;
+      var models = P.models || [];
+      var plain = function (h) { var d = document.createElement("span"); d.innerHTML = h; return d.textContent; };
+      var box = document.createElement("div");
+      box.className = "gplot";
+      var ctls = document.createElement("div");
+      ctls.className = "ctls";
+      function mkSel(label, cur, allowNone) {
+        var wrap = document.createElement("label");
+        wrap.appendChild(document.createTextNode(label + " "));
+        var s = document.createElement("select");
+        if (allowNone) {
+          var o0 = document.createElement("option");
+          o0.value = ""; o0.textContent = "none";
+          s.appendChild(o0);
+        }
+        for (var c = 0; c < nCols; c++) {
+          var o = document.createElement("option");
+          o.value = colName(c);
+          o.textContent = colName(c) + " · " + plain(spec.cols[c].label || "");
+          s.appendChild(o);
+        }
+        s.value = cur;
+        wrap.appendChild(s);
+        ctls.appendChild(wrap);
+        return s;
+      }
+      var sx = mkSel("X", psel.x, false);
+      var sy = mkSel("Y", psel.y, false);
+      var sy2 = mkSel("Y₂", psel.y2, true);
+      var fitWrap = document.createElement("label");
+      fitWrap.appendChild(document.createTextNode("fit of Y vs X "));
+      var fitSel = document.createElement("select");
+      [["", "none"], ["lin", "linear"], ["exp", "exponential"], ["pow", "power law"]].forEach(function (o) {
+        var op = document.createElement("option");
+        op.value = o[0]; op.textContent = o[1];
+        fitSel.appendChild(op);
+      });
+      fitSel.value = psel.fit;
+      fitWrap.appendChild(fitSel);
+      ctls.appendChild(fitWrap);
+      function mkChk(label, checked) {
+        var w = document.createElement("label");
+        var cb = document.createElement("input");
+        cb.type = "checkbox"; cb.checked = checked;
+        w.appendChild(cb);
+        w.appendChild(document.createTextNode(" " + label));
+        ctls.appendChild(w);
+        return cb;
+      }
+      var cbLogX = mkChk("log X", psel.logx);
+      var cbLogY = mkChk("log Y", psel.logy);
+      var cbModel = models.length ? mkChk("model curve", psel.model) : null;
+      box.appendChild(ctls);
+      var svgHolder = document.createElement("div");
+      box.appendChild(svgHolder);
+      var stats = document.createElement("p");
+      stats.className = "stats";
+      box.appendChild(stats);
+      container.appendChild(box);
+      function onCtl() {
+        psel = { x: sx.value, y: sy.value, y2: sy2.value, fit: fitSel.value,
+                 logx: cbLogX.checked, logy: cbLogY.checked,
+                 model: cbModel ? cbModel.checked : false };
+        state.plot = psel; save(); recompute();
+      }
+      sx.addEventListener("change", onCtl);
+      sy.addEventListener("change", onCtl);
+      sy2.addEventListener("change", onCtl);
+      fitSel.addEventListener("change", onCtl);
+      cbLogX.addEventListener("change", onCtl);
+      cbLogY.addEventListener("change", onCtl);
+      if (cbModel) cbModel.addEventListener("change", onCtl);
+
+      var NS = "http://www.w3.org/2000/svg";
+      function el(tag, attrs, parent) {
+        var e = document.createElementNS(NS, tag);
+        for (var k in attrs) e.setAttribute(k, attrs[k]);
+        if (parent) parent.appendChild(e);
+        return e;
+      }
+      function txt(parent, x, y, s, attrs) {
+        var a = { x: x, y: y, "font-size": 11, fill: "#52514e", "font-family": "system-ui, sans-serif" };
+        for (var k in (attrs || {})) a[k] = attrs[k];
+        var t = el("text", a, parent);
+        t.textContent = s;
+        return t;
+      }
+      function fmtTick(v) { return String(parseFloat(v.toPrecision(4))); }
+      function niceTicks(lo, hi, n) {
+        var raw = (hi - lo) / n;
+        if (!(raw > 0)) return [lo];
+        var mag = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+        var norm = raw / mag;
+        var step = (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag;
+        var t = [], v = Math.ceil(lo / step) * step;
+        for (; v <= hi + step * 1e-9; v += step) t.push(parseFloat(v.toPrecision(10)));
+        return t;
+      }
+      redrawPlot = function () {
+        var cx = colIdx(psel.x), cy = colIdx(psel.y);
+        var cy2 = psel.y2 ? colIdx(psel.y2) : -1;
+        var logx = psel.logx, logy = psel.logy;
+        var excluded = 0;
+        function usable(x, y) {
+          if (typeof x !== "number" || !isFinite(x) || typeof y !== "number" || !isFinite(y)) return false;
+          if ((logx && x <= 0) || (logy && y <= 0)) { excluded++; return false; }
+          return true;
+        }
+        var pts = [], pts2 = [];
+        for (var r = 0; r < plotRows; r++) {
+          var xv = valueOf(cx, r);
+          if (typeof xv !== "number" || !isFinite(xv)) continue;
+          var yv = valueOf(cy, r);
+          if (usable(xv, yv)) pts.push([xv, yv]);
+          if (cy2 >= 0) {
+            var y2v = valueOf(cy2, r);
+            if (usable(xv, y2v)) pts2.push([xv, y2v]);
+          }
+        }
+        svgHolder.innerHTML = "";
+        stats.textContent = "";
+        var W = 640, H = 380, L = 62, Rm = 16, T = 18, B = 48;
+        var svg = el("svg", { viewBox: "0 0 " + W + " " + H }, svgHolder);
+        el("rect", { x: 0, y: 0, width: W, height: H, fill: "#ffffff" }, svg);
+        var all = pts.concat(pts2);
+        if (all.length < 1) {
+          var msg = excluded ? "No plottable points (log axes need positive values)." :
+            "Fill columns " + psel.x + " and " + psel.y + " to plot.";
+          txt(svg, W / 2, H / 2, msg, { "text-anchor": "middle", "font-size": 13, fill: "#898781" });
+          return;
+        }
+        function txf(v) { return logx ? Math.log(v) / Math.LN10 : v; }
+        function tyf(v) { return logy ? Math.log(v) / Math.LN10 : v; }
+        var t0x = Infinity, t1x = -Infinity, t0y = Infinity, t1y = -Infinity, i;
+        for (i = 0; i < all.length; i++) {
+          var tx = txf(all[i][0]), ty = tyf(all[i][1]);
+          if (tx < t0x) t0x = tx; if (tx > t1x) t1x = tx;
+          if (ty < t0y) t0y = ty; if (ty > t1y) t1y = ty;
+        }
+        var xpad = (t1x - t0x) * 0.07 || Math.abs(t0x) * 0.1 || 1;
+        var ypad = (t1y - t0y) * 0.07 || Math.abs(t0y) * 0.1 || 1;
+        t0x -= xpad; t1x += xpad; t0y -= ypad; t1y += ypad;
+        function Xt(t) { return L + (t - t0x) / (t1x - t0x) * (W - L - Rm); }
+        function Yt(t) { return H - B - (t - t0y) / (t1y - t0y) * (H - T - B); }
+        function X(v) { return Xt(txf(v)); }
+        function Y(v) { return Yt(tyf(v)); }
+        function axisTicks(ta, tb, isLog, n) {
+          var out = [], i2;
+          if (!isLog) {
+            var tt = niceTicks(ta, tb, n);
+            for (i2 = 0; i2 < tt.length; i2++) out.push({ t: tt[i2], label: fmtTick(tt[i2]) });
+            return out;
+          }
+          if (tb - ta >= 1) {
+            var subs = (tb - ta <= 2.5) ? [1, 2, 5] : [1];
+            for (var e = Math.floor(ta); e <= Math.ceil(tb); e++)
+              for (i2 = 0; i2 < subs.length; i2++) {
+                var v = subs[i2] * Math.pow(10, e);
+                var t = Math.log(v) / Math.LN10;
+                if (t >= ta && t <= tb) out.push({ t: t, label: fmtTick(v) });
+              }
+            return out;
+          }
+          var vt = niceTicks(Math.pow(10, ta), Math.pow(10, tb), n);
+          for (i2 = 0; i2 < vt.length; i2++)
+            if (vt[i2] > 0) out.push({ t: Math.log(vt[i2]) / Math.LN10, label: fmtTick(vt[i2]) });
+          return out;
+        }
+        var xt = axisTicks(t0x, t1x, logx, 6), yt = axisTicks(t0y, t1y, logy, 5);
+        for (i = 0; i < xt.length; i++) {
+          el("line", { x1: Xt(xt[i].t), y1: T, x2: Xt(xt[i].t), y2: H - B, stroke: "#e1e0d9" }, svg);
+          txt(svg, Xt(xt[i].t), H - B + 16, xt[i].label, { "text-anchor": "middle" });
+        }
+        for (i = 0; i < yt.length; i++) {
+          el("line", { x1: L, y1: Yt(yt[i].t), x2: W - Rm, y2: Yt(yt[i].t), stroke: "#e1e0d9" }, svg);
+          txt(svg, L - 7, Yt(yt[i].t) + 4, yt[i].label, { "text-anchor": "end" });
+        }
+        el("rect", { x: L, y: T, width: W - L - Rm, height: H - T - B, fill: "none", stroke: "#c3c2b7" }, svg);
+        var xlab = plain(spec.cols[cx].label || psel.x) + (logx ? " (log)" : "");
+        var ylab = plain(spec.cols[cy].label || psel.y) + (cy2 >= 0 ? " / " + plain(spec.cols[cy2].label || psel.y2) : "") + (logy ? " (log)" : "");
+        txt(svg, L + (W - L - Rm) / 2, H - 10, xlab, { "text-anchor": "middle", "font-size": 12, fill: "#0b0b0b" });
+        var yl = txt(svg, 16, T + (H - T - B) / 2, ylab, { "text-anchor": "middle", "font-size": 12, fill: "#0b0b0b" });
+        yl.setAttribute("transform", "rotate(-90 16 " + (T + (H - T - B) / 2) + ")");
+        var clipId = (spec.id || "g") + "-clip";
+        var defs = el("defs", {}, svg);
+        var cp = el("clipPath", { id: clipId }, defs);
+        el("rect", { x: L, y: T, width: W - L - Rm, height: H - T - B }, cp);
+        var fitG = el("g", { "clip-path": "url(#" + clipId + ")" }, svg);
+        function drawCurve(fn, attrs) {
+          var seg = [], n2 = 160;
+          function flush() {
+            if (seg.length > 1) {
+              var a2 = { points: seg.join(" "), fill: "none" };
+              for (var kk2 in attrs) a2[kk2] = attrs[kk2];
+              el("polyline", a2, fitG);
+            }
+            seg = [];
+          }
+          for (var j = 0; j <= n2; j++) {
+            var t = t0x + (t1x - t0x) * j / n2;
+            var x = logx ? Math.pow(10, t) : t;
+            var y = fn(x);
+            if (typeof y === "number" && isFinite(y) && !(logy && y <= 0)) {
+              var py = Yt(tyf(y));
+              if (isFinite(py) && Math.abs(py) < 1e6) { seg.push(Xt(t) + "," + py); continue; }
+            }
+            flush();
+          }
+          flush();
+        }
+        function r2of(fn, set, inLog) {
+          var m2 = 0, ssr = 0, sst = 0, j, yv2;
+          for (j = 0; j < set.length; j++) m2 += inLog ? Math.log(set[j][1]) : set[j][1];
+          m2 /= set.length;
+          for (j = 0; j < set.length; j++) {
+            yv2 = inLog ? Math.log(set[j][1]) : set[j][1];
+            ssr += Math.pow(yv2 - fn(set[j]), 2);
+            sst += Math.pow(yv2 - m2, 2);
+          }
+          return sst > 0 ? 1 - ssr / sst : NaN;
+        }
+        var fitText = "", noteText = "";
+        var rangeHint = "(" + psel.y + "1:" + psel.y + plotRows + "," + psel.x + "1:" + psel.x + plotRows + ")";
+        var dash = { stroke: "#1baf7a", "stroke-width": 2, "stroke-dasharray": "6 5" };
+        if (psel.fit === "lin") {
+          if (pts.length >= 2) {
+            var fv = linfit(pts.map(function (p) { return p[1]; }), pts.map(function (p) { return p[0]; }));
+            var s = fv[0], b2 = fv[1];
+            if (isFinite(s)) {
+              drawCurve(function (x) { return s * x + b2; }, dash);
+              var r2 = r2of(function (p) { return s * p[0] + b2; }, pts, false);
+              fitText = "linear fit of " + psel.y + " vs " + psel.x + ": slope = " + fmt(s) +
+                ", intercept = " + fmt(b2) + ", R² = " + fmt(r2) +
+                ". Same numbers as =SLOPE" + rangeHint + " and =INTERCEPT" + rangeHint + ".";
+            }
+          }
+          if (!fitText) fitText = "linear fit needs at least two plotted points.";
+        } else if (psel.fit === "exp") {
+          var pos = [];
+          for (i = 0; i < pts.length; i++) if (pts[i][1] > 0) pos.push(pts[i]);
+          if (pos.length >= 2) {
+            var lf = linfit(pos.map(function (p) { return Math.log(p[1]); }), pos.map(function (p) { return p[0]; }));
+            var kk = lf[0], lnA = lf[1], A = Math.exp(lnA);
+            if (isFinite(kk) && isFinite(A)) {
+              drawCurve(function (x) { return A * Math.exp(kk * x); }, dash);
+              var r2e = r2of(function (p) { return kk * p[0] + lnA; }, pos, true);
+              fitText = "exponential fit of " + psel.y + " vs " + psel.x + ": y = A·e^(k·x) with A = " + fmt(A) +
+                ", k = " + fmt(kk) + ", R² (on ln y) = " + fmt(r2e) +
+                ". k and ln(A) are what =SLOPE and =INTERCEPT return with LN(" + psel.y + ") as Y; the curve plots straight with log Y on." +
+                (pos.length < pts.length ? " " + (pts.length - pos.length) + " point(s) with y ≤ 0 left out of the fit." : "");
+            }
+          }
+          if (!fitText) fitText = "exponential fit needs at least two plotted points with y > 0.";
+        } else if (psel.fit === "pow") {
+          var pp = [];
+          for (i = 0; i < pts.length; i++) if (pts[i][0] > 0 && pts[i][1] > 0) pp.push(pts[i]);
+          if (pp.length >= 2) {
+            var lp = linfit(pp.map(function (p) { return Math.log(p[1]); }), pp.map(function (p) { return Math.log(p[0]); }));
+            var kp = lp[0], lnAp = lp[1], Ap = Math.exp(lnAp);
+            if (isFinite(kp) && isFinite(Ap)) {
+              drawCurve(function (x) { return x > 0 ? Ap * Math.pow(x, kp) : NaN; }, dash);
+              var r2p = r2of(function (p) { return kp * Math.log(p[0]) + lnAp; }, pp, true);
+              fitText = "power-law fit of " + psel.y + " vs " + psel.x + ": y = A·x^k with A = " + fmt(Ap) +
+                ", k = " + fmt(kp) + ", R² (on ln y) = " + fmt(r2p) +
+                ". k and ln(A) are what =SLOPE and =INTERCEPT return with LN(" + psel.y + ") vs LN(" + psel.x + "); the curve plots straight on log-log axes." +
+                (pp.length < pts.length ? " " + (pts.length - pp.length) + " point(s) with x ≤ 0 or y ≤ 0 left out of the fit." : "");
+            }
+          }
+          if (!fitText) fitText = "power-law fit needs at least two plotted points with x > 0 and y > 0.";
+        }
+        var modelDef = null;
+        for (i = 0; i < models.length; i++)
+          if (models[i].x === psel.x && models[i].y === psel.y) { modelDef = models[i]; break; }
+        if (cbModel) cbModel.disabled = !modelDef;
+        if (cbModel && psel.model && modelDef) {
+          var mast = null;
+          try { mast = parse(tokenize(modelDef.expr)); } catch (e) {}
+          if (mast) {
+            var mx = 0;
+            var mctx = {
+              cell: ctx.cell,
+              param: function (n) { return n === "X" ? mx : ctx.param(n); },
+              range: ctx.range
+            };
+            drawCurve(function (x) {
+              mx = x;
+              try { return evalNode(mast, mctx); } catch (e) { return NaN; }
+            }, { stroke: "#8a5fd1", "stroke-width": 2 });
+            noteText = "model curve (solid purple), y = " + modelDef.expr +
+              ", drawn live from the parameter cells" + (modelDef.label ? " (" + modelDef.label + ")" : "") + ".";
+          }
+        }
+        for (i = 0; i < pts2.length; i++)
+          el("circle", { cx: X(pts2[i][0]), cy: Y(pts2[i][1]), r: 4.5, fill: "#ffffff", stroke: "#eb6834", "stroke-width": 2 }, svg);
+        for (i = 0; i < pts.length; i++)
+          el("circle", { cx: X(pts[i][0]), cy: Y(pts[i][1]), r: 4, fill: "#2a78d6" }, svg);
+        if (cy2 >= 0 && pts2.length) {
+          el("circle", { cx: W - Rm - 150, cy: T + 12, r: 4, fill: "#2a78d6" }, svg);
+          txt(svg, W - Rm - 142, T + 16, plain(spec.cols[cy].label || psel.y), {});
+          el("circle", { cx: W - Rm - 150, cy: T + 28, r: 4.5, fill: "#ffffff", stroke: "#eb6834", "stroke-width": 2 }, svg);
+          txt(svg, W - Rm - 142, T + 32, plain(spec.cols[cy2].label || psel.y2), {});
+        }
+        if (excluded) noteText += (noteText ? " " : "") + excluded + " point(s) hidden by log axes (non-positive values).";
+        stats.textContent = fitText + (noteText ? (fitText ? " " : "") + noteText : "");
+      };
+    }
+
+    function recompute() {
+      memo = {}; visiting = {};
+      var focusedEl = document.activeElement;
+      var barEdit = active && focusedEl === barInput;
+      for (var k in inputs) {
+        if (inputs[k] === focusedEl) continue;
+        if (barEdit && k === active.k) continue;
+        var parts = k.split(",");
+        var c = +parts[0], r = +parts[1];
+        var v = valueOf(c, r);
+        var raw = rawOf(c, r);
+        if (raw.trim().charAt(0) === "=") {
+          inputs[k].value = (typeof v === "number" && isFinite(v)) ? fmt(v) : (memo[k] === CIRC ? "#CIRC" : "#ERR");
+          inputs[k].classList.toggle("err", !(typeof v === "number" && isFinite(v)));
+        } else {
+          inputs[k].value = raw;
+          inputs[k].classList.remove("err");
+        }
+      }
+      if (redrawPlot) redrawPlot();
+    }
+    recompute();
+  }
+
+  /* blank scratch worksheet */
+  function IsoScratch(container, opts) {
+    opts = opts || {};
+    var nr = opts.rows || 8, nc = opts.cols || 6;
+    var rows = [], r, c;
+    for (r = 0; r < nr; r++) {
+      var row = [];
+      for (c = 0; c < nc; c++) row.push({});
+      rows.push(row);
+    }
+    var cols = [];
+    for (c = 0; c < nc; c++) cols.push({ label: (opts.labels && opts.labels[c]) || "" });
+    IsoGrid(container, {
+      id: opts.id,
+      cols: cols,
+      rows: rows,
+      params: opts.params || [],
+      dataRows: nr,
+      plot: opts.plot ? { x: "A", y: "B" } : undefined,
+      note: opts.note !== undefined ? opts.note :
+        "Scratch worksheet. Cells accept numbers or =formulas (SUM, AVERAGE, ABS, LN, LOG10, EXP, SQRT, POWER, SLOPE, INTERCEPT &hellip;); arrow keys move, Ctrl+D fills down, entries autosave in this browser."
+    });
+  }
+
+  /* exports */
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = { tokenize: tokenize, parse: parse, evalFormula: evalFormula };
+  }
+  global.IsoGrid = IsoGrid;
+  global.IsoScratch = IsoScratch;
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<section class="card">
+<h2>Problem 1</h2>
+<ol class="parts">
+<li>Why do anhydrous mineral&ndash;mineral fractionation data take the form 10&sup3;ln&alpha;<sub>m&ndash;n</sub> = a&middot;10&#8310;/T&sup2;, whereas mineral&ndash;water fractionations have the additional b term, given in 10&sup3;ln&alpha;<sub>m&ndash;n</sub> = a&middot;10&#8310;/T&sup2; + b?</li>
+<li>Why does the relationship change to 10&sup3;ln&alpha;<sub>m&ndash;n</sub> &prop; 1/T at low temperatures?</li>
+</ol>
+</section>
+
+<section class="card">
+<h2>Problem 2</h2>
+<p>Mineral&ndash;water, mineral&ndash;calcite, and mineral&ndash;gas exchange experiments have all been used in the experimental calibration of fractionation factors. What are the advantages and disadvantages of each?</p>
+</section>
+
+<section class="card">
+<h2>Problem 3</h2>
+<p>Deuterium hydride is the name of the diatomic gas HD and is available commercially.</p>
+<ol class="parts">
+<li>What is the free-energy change for the formation of 1 mole of HD gas by the reaction &frac12;D<sub>2</sub>(g) + &frac12;H<sub>2</sub>(g) &rarr; HD(g), given that &Delta;G&deg;<sub>f</sub> for HD(g), H<sub>2</sub>(g) and D<sub>2</sub>(g) are &minus;1.464, 0.0, and 0.0 kJ/mole, respectively?</li>
+<li>What fraction of the gas will be HD at equilibrium?</li>
+<li>Why is HD(g) commercially available while HDO(l) is not?</li>
+</ol>
+<div class="isogrid" id="ch03p3"></div>
+<p class="note">[Worksheet constructed.]</p>
+</section>
+
+<section class="card">
+<h2>Problem 4</h2>
+<p>What is the equilibrium &delta;D value of water vapor (H<sub>2</sub>O gas) in equilibrium with H<sub>2</sub> gas (at 25&nbsp;&deg;C) if the &delta;D value of the H<sub>2</sub> gas is &minus;600&permil;? Use the following information:</p>
+<table>
+<tr><th>Phase</th><th>&Delta;G&deg;<sub>f</sub> (kJ/mol)</th></tr>
+<tr><td>H<sub>2</sub>(g)</td><td>0.0</td></tr>
+<tr><td>HD(g)</td><td>&minus;0.350</td></tr>
+<tr><td>H<sub>2</sub>O(g)</td><td>&minus;54.634</td></tr>
+<tr><td>HDO(g)</td><td>&minus;55.719</td></tr>
+</table>
+<div class="isogrid" id="ch03p4"></div>
+<p class="note">[Worksheet constructed. The &alpha; row is taken as printed (0.289 via equation (3.4)); the printed step from K to &alpha; is lost in the extraction, check vs print.]</p>
+</section>
+
+<section class="card">
+<h2>Problem 5</h2>
+<p>Calculate the spring constant k<sub>s</sub> for <sup>12</sup>C<sup>16</sup>O, given that, for <sup>12</sup>C<sup>16</sup>O, the wave number is 2167.4 cm<sup>&minus;1</sup>.</p>
+<div class="isogrid" id="ch03p5"></div>
+<p class="note">[Worksheet constructed. The last row answers the printed answer&rsquo;s own closing question about the units of k<sub>s</sub>.]</p>
+</section>
+
+<section class="card">
+<h2>Problem 6</h2>
+<p>Ferrosilite (Fe<sub>2</sub>Si<sub>2</sub>O<sub>6</sub>) is a pyroxene that is stable only at high pressures. If ferrosilite is heated at low pressure, it breaks down to fayalite (Fe<sub>2</sub>SiO<sub>4</sub>) and quartz (ignoring potential kinetic effects). Likewise, heating calcite to high temperatures produces lime (CaO) and CO<sub>2</sub>. Comment on whether laboratory reactions in which these products are produced could be used for calibrating the fractionations between fayalite and quartz, on the one hand, and lime and CO<sub>2</sub>, on the other.</p>
+</section>
+
+<section class="card">
+<h2>Problem 7</h2>
+<p>Suppose the general enrichment of <sup>18</sup>O is more strongly concentrated in Si&ndash;O bonds, then Al&ndash;O bonds, and, finally, M<sup>2+</sup>&ndash;O = M<sup>1+</sup>&ndash;O bonds. For the following mineral triplets, which would you expect to have the higher <sup>18</sup>O/<sup>16</sup>O ratio? (a) albite (NaAlSi<sub>3</sub>O<sub>8</sub>), microcline (KAlSi<sub>3</sub>O<sub>8</sub>), and anorthite (CaAl<sub>2</sub>Si<sub>2</sub>O<sub>8</sub>); (b) mullite (Al<sub>6</sub>Si<sub>2</sub>O<sub>13</sub>), sillimanite (Al<sub>2</sub>SiO<sub>5</sub>), and corundum (Al<sub>2</sub>O<sub>3</sub>).</p>
+</section>
+
+<section class="card">
+<h2>Problem 8</h2>
+<p>The fundamental vibrational frequency of <sup>16</sup>O<sup>16</sup>O is 1580.4 cm<sup>&minus;1</sup>. Calculate the fundamental vibrational frequency of <sup>18</sup>O<sup>18</sup>O.</p>
+<div class="isogrid" id="ch03p8"></div>
+<p class="note">[Worksheet constructed.]</p>
+</section>
+
+<section class="card">
+<h2>Problem 9</h2>
+<p>Twelve mg of calcite (&delta;<sup>18</sup>O = 24.32&permil;) and 50 mg of water (&delta;<sup>18</sup>O = &minus;3.65&permil;) are equilibrated in a sealed gold capsule at 350&nbsp;&deg;C. At this temperature, &alpha;<sup>18</sup>O(calcite&ndash;water) = 1.00490. What are the &delta;<sup>18</sup>O values of the calcite and water after the equilibration? <span class="tag">reconstructed</span> <span class="note">[The assignment of the two printed starting values to calcite and water was reconstructed; check vs print.]</span></p>
+<div class="isogrid" id="ch03p9"></div>
+<p class="note">[Worksheet constructed.]</p>
+</section>
+
+<p class="xref">Related interactive plot in this chapter's package: <a href="../plots/01_thermometer_1T2.html">1/T&sup2; thermometer</a>.</p>
+
+<script>
+IsoGrid(document.getElementById('ch03p3'), {
+  id: 'sg2026-ch03-p3',
+  params: [
+    {name: 'DGF', label: '&#916;G&deg;f HD (kJ/mol)', value: -1.464, locked: true},
+    {name: 'RGAS', label: 'R (J/mol/K)', value: 8.314, locked: true},
+    {name: 'TK', label: 'T (K)', value: 298.15, locked: true}
+  ],
+  cols: [{label: '', w: '280px'}, {label: ''}],
+  rows: [
+    [{v: 'ΔG°r (kJ), part a', locked: true}, {}],
+    [{v: 'K = exp(−1000·ΔG°r/(R·T))', locked: true}, {}],
+    [{v: 'x, from 2x/(0.5−x) = K', locked: true}, {}],
+    [{v: 'mole fraction HD = 2x, part b', locked: true}, {}]
+  ],
+  note: '&#916;G&deg;r equals &#916;G&deg;f of HD here, since the reactants are both zero. For x, rearrange 2x/(0.5&#8722;x) = K to x = 0.5&#183;K/(2+K).'
+});
+
+IsoGrid(document.getElementById('ch03p4'), {
+  id: 'sg2026-ch03-p4',
+  params: [
+    {name: 'GHH', label: '&#916;G&deg;f H₂ (kJ/mol)', value: 0, locked: true},
+    {name: 'GHD', label: '&#916;G&deg;f HD', value: -0.350, locked: true},
+    {name: 'GH2O', label: '&#916;G&deg;f H₂O', value: -54.634, locked: true},
+    {name: 'GHDO', label: '&#916;G&deg;f HDO', value: -55.719, locked: true},
+    {name: 'RGAS', label: 'R (J/mol/K)', value: 8.314, locked: true},
+    {name: 'TK', label: 'T (K)', value: 298.15, locked: true},
+    {name: 'DHYD', label: '&#948;D of H₂ (&#8240;)', value: -600, locked: true}
+  ],
+  cols: [{label: '', w: '280px'}, {label: ''}],
+  rows: [
+    [{v: 'ΔG°r (kJ), H₂ + HDO = HD + H₂O', locked: true}, {}],
+    [{v: 'K = exp(−1000·ΔG°r/(R·T))', locked: true}, {}],
+    [{v: 'α(H₂–H₂O(g)), printed via eq 3.4', locked: true}, {v: 0.289, locked: true}],
+    [{v: 'δD of H₂O(g) (‰)', locked: true}, {}]
+  ],
+  note: '&#916;G&deg;r from products minus reactants. With the printed &#945; in B3, the water vapor follows from &#948;D(H₂O) = (1000+&#948;D(H₂))/&#945; &#8722; 1000.'
+});
+
+IsoGrid(document.getElementById('ch03p5'), {
+  id: 'sg2026-ch03-p5',
+  params: [
+    {name: 'CLIGHT', label: 'c (cm/s)', value: 2.998e10, locked: true},
+    {name: 'WN', label: 'wave number (cm⁻¹)', value: 2167.4, locked: true},
+    {name: 'MA', label: 'm(¹²C)', value: 12, locked: true},
+    {name: 'MB', label: 'm(¹⁶O)', value: 16, locked: true},
+    {name: 'AMU', label: 'amu (kg)', value: 1.66054e-27, locked: true}
+  ],
+  cols: [{label: '', w: '240px'}, {label: ''}],
+  rows: [
+    [{v: 'ν (s⁻¹) = c·wave number', locked: true}, {}],
+    [{v: 'μ = ma·mb/(ma+mb) (amu)', locked: true}, {}],
+    [{v: 'ks = (2πν)²·μ (amu·s⁻²)', locked: true}, {}],
+    [{v: 'ks in kg·s⁻², i.e. N/m', locked: true}, {}]
+  ],
+  note: 'PI() is available, e.g. =(2*PI()*B1)^2*B2 in B3.'
+});
+
+IsoGrid(document.getElementById('ch03p8'), {
+  id: 'sg2026-ch03-p8',
+  params: [
+    {name: 'WNO', label: 'wave number ¹⁶O₂ (cm⁻¹)', value: 1580.4, locked: true}
+  ],
+  cols: [{label: '', w: '240px'}, {label: ''}],
+  rows: [
+    [{v: 'μ(¹⁶O¹⁶O)', locked: true}, {}],
+    [{v: 'μ(¹⁸O¹⁸O)', locked: true}, {}],
+    [{v: 'ν(¹⁸O¹⁸O) (cm⁻¹)', locked: true}, {}]
+  ],
+  note: 'Equation (3.13): the frequency scales as the square root of the reduced-mass ratio.'
+});
+
+IsoGrid(document.getElementById('ch03p9'), {
+  id: 'sg2026-ch03-p9',
+  params: [
+    {name: 'ALPHC', label: '&#945;(calcite&ndash;water) at 350 &deg;C', value: 1.00490, locked: true},
+    {name: 'MWO', label: 'MW of O', value: 15.9994, locked: true}
+  ],
+  cols: [
+    {label: 'Phase', w: '140px'},
+    {label: 'mg'},
+    {label: 'MW'},
+    {label: 'n(O)'},
+    {label: 'frac O'},
+    {label: 'mg O'},
+    {label: '&#948;¹⁸O (&#8240;)'}
+  ],
+  rows: [
+    [{v: 'calcite', locked: true}, {v: 12, locked: true}, {v: 100.087, locked: true}, {v: 3, locked: true}, {}, {}, {v: 24.32, locked: true}],
+    [{v: 'water', locked: true}, {v: 50, locked: true}, {v: 18.015, locked: true}, {v: 1, locked: true}, {}, {}, {v: -3.65, locked: true}],
+    [{v: 'δ mix (‰)', locked: true}, {}, {}, {}, {}, {}, {}],
+    [{v: 'δ¹⁸O water, final', locked: true}, {}, {}, {}, {}, {}, {}],
+    [{v: 'δ¹⁸O calcite, final', locked: true}, {}, {}, {}, {}, {}, {}]
+  ],
+  dataRows: 2,
+  note: 'frac O = n(O)&#183;MWO/MW (=D1*MWO/C1 in E1), mg O = mg&#183;frac O. Put the mg-O-weighted mixture &#948; in G3; it does not change during exchange. Combine it with &#948;cal = ALPHC&#183;&#948;w + 1000&#183;(ALPHC&#8722;1) and solve for the final water in G4, then the final calcite in G5.'
+});
+</script>
+
+<div class="footnote">
+<p>Transcribed from Z. Sharp, <i>Principles of Stable Isotope
+Geochemistry</i>, 1st ed. (Pearson Prentice Hall, 2007), end-of-chapter problem set
+(published source). Reference-scale names are written VSMOW, VPDB and VCDT where the
+original used SMOW, PDB and CDT, with the original numerical constants unchanged;
+historical usages (e.g. Craig's definition of SMOW) are kept as printed.</p>
+<p>The source PDF's text layer scrambles mathematics, so equations and some values were
+reconstructed during transcription. Bracketed notes and anything tagged
+<span class="tag">reconstructed</span> or <span class="tag warn">check vs print</span>
+are editorial (constructed), not part of the original, and the warn-tagged items should
+be verified against the print copy.</p>
+</div>
+</div>
+</body>
+</html>

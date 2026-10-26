@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ch 12 Problems</title>
+<style>
+:root {
+  color-scheme: light;
+  --surface-1: #ffffff;
+  --page: #ffffff;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11,11,11,0.12);
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page); color: var(--text-primary);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px; line-height: 1.55;
+}
+.wrap { max-width: 860px; margin: 0 auto; padding: 28px 16px 48px; }
+h1 { font-size: 1.45rem; margin: 0 0 4px; }
+.subtitle { color: var(--text-secondary); margin: 0 0 20px; }
+.subtitle a { color: var(--series-1); text-decoration: none; }
+.subtitle a:hover { text-decoration: underline; }
+.card {
+  background: var(--surface-1); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 18px; margin-bottom: 14px;
+}
+.card h2 { font-size: 0.98rem; margin: 0 0 8px; }
+.card p { margin: 0.45em 0; }
+ol.parts { list-style-type: lower-alpha; padding-left: 1.5em; margin: 0.4em 0; }
+ol.parts li { margin: 0.4em 0; }
+.eqs { border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; margin: 10px 0; overflow-x: auto; background: #fcfcfb; }
+.eq { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 7px 0; }
+.eq .num { color: var(--muted); font-size: 0.78rem; white-space: nowrap; text-align: right; }
+table { border-collapse: collapse; width: auto; min-width: 50%; font-size: 0.88rem; margin: 10px 0; }
+th, td { padding: 5px 10px; text-align: right; border-bottom: 1px solid var(--grid); font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--text-secondary); font-weight: 600; }
+.tag {
+  display: inline-block; font-size: 0.7rem; border: 1px solid var(--border);
+  border-radius: 4px; padding: 0 6px; color: var(--muted); margin-left: 6px;
+  vertical-align: 1px; white-space: nowrap;
+}
+.tag.warn { color: #9a5b00; border-color: #e0b36a; background: #fdf6ea; }
+.note { color: var(--muted); font-size: 0.86rem; }
+.xref { color: var(--text-secondary); font-size: 0.86rem; margin-top: 6px; }
+.xref a { color: var(--series-1); }
+.footnote { font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--grid); margin-top: 20px; padding-top: 10px; }
+.footnote p { margin: 0.4em 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Chapter 12 &middot; Metamorphic Petrology</h1>
+<p class="subtitle">Problem set &middot; Sharp, <i>Principles of Stable Isotope Geochemistry</i>, 1st ed. (2007) &middot; <a href="Ch12_answers.html">Answers &rarr;</a></p>
+<section class="card">
+<h2>Problem 1</h2>
+<p>Measured &delta;<sup>18</sup>O values of mineral separates from a single sample are listed in Table 12.P2.</p>
+<table>
+<tr><th>Mineral</th><th>&delta;<sup>18</sup>O value</th></tr>
+<tr><td>Quartz</td><td>10</td></tr>
+<tr><td>Plag (An 30)</td><td>8</td></tr>
+<tr><td>Garnet</td><td>5</td></tr>
+<tr><td>Muscovite</td><td>4.5</td></tr>
+<tr><td>Biotite</td><td>4.4</td></tr>
+<tr><td>Magnetite</td><td>1.8</td></tr>
+</table>
+<ol class="parts">
+<li>Which phase is out of equilibrium with the others?</li>
+<li>Excluding that phase, what is the temperature of equilibration?</li>
+<li>What is the temperature of equilibration between quartz and the phase that is out of equilibrium with the other phases? Fractionation factors are given in Table 12.P1.</li>
+</ol>
+<p>Table 12.P1. Some commonly used coefficients of oxygen isotope fractionation relative to quartz, in the form of equation (12.11) (after Javoy, 1977). &beta; is the fraction of anorthite in plagioclase.</p>
+<table>
+<tr><th>Mineral</th><th>a</th><th>b</th></tr>
+<tr><td>Plagioclase</td><td>0.97 + 1.04&beta;</td><td>0</td></tr>
+<tr><td>Olivine</td><td>2.75</td><td>0</td></tr>
+<tr><td>Muscovite</td><td>2.2</td><td>&minus;0.6</td></tr>
+<tr><td>Biotite</td><td>3.69</td><td>&minus;0.6</td></tr>
+<tr><td>Amphibole</td><td>3.15</td><td>&minus;0.3</td></tr>
+<tr><td>Ilmenite</td><td>5.29</td><td>0</td></tr>
+<tr><td>Magnetite</td><td>5.57</td><td>0</td></tr>
+<tr><td>Garnet</td><td>2.88</td><td>0</td></tr>
+<tr><td>Chlorite</td><td>5.44</td><td>&minus;1.63</td></tr>
+</table>
+<p class="note">[The b-column pairings were re-assembled from the scrambled extraction and match the standard Javoy (1977) compilation; check vs print.]</p>
+</section>
+
+<section class="card">
+<h2>Problem 2</h2>
+<ol class="parts">
+<li>What is the cooling rate of a bimineralic quartz&ndash;magnetite rock, given the information in Table 12.P3? (Hint: assume that the closure temperature is defined by the fractionation between the two phases.)</li>
+<li>The preceding calculations are made using the diffusion coefficients assuming the presence of an aqueous fluid. Under anhydrous conditions, the preexponential factor is two orders of magnitude smaller. What is the cooling rate, assuming anhydrous (dry) cooling?</li>
+</ol>
+<table>
+<tr><th>Mineral</th><th>&delta;<sup>18</sup>O value</th><th>Grain radius</th><th>D<sub>0</sub> (cm&sup2;/sec)</th><th>Q (kJ/mole)</th></tr>
+<tr><td>Quartz</td><td>10</td><td>1.2 mm</td><td>190</td><td>284</td></tr>
+<tr><td>Magnetite</td><td>2</td><td>0.5 mm</td><td>2.7&middot;10<sup>&minus;5</sup></td><td>203</td></tr>
+</table>
+<p class="note">[Table 12.P3. The pairing of the quartz D<sub>0</sub> and Q values was reconstructed from the scrambled extraction; check vs print.]</p>
+</section>
+
+<section class="card">
+<h2>Problem 3</h2>
+<p>The &delta;<sup>18</sup>O<sub>whole rock</sub> values of adjacent gabbro and mica schist are 8&permil; and 12&permil;, respectively. Could the two lithologies be in isotopic equilibrium? How could you test this hypothesis?</p>
+</section>
+
+<section class="card">
+<h2>Problem 4</h2>
+<p>A thin layer of quartzite is sandwiched between layers of metasediments. You measure the &delta;<sup>18</sup>O values of quartz in the quartzite and metasediment (pelite) in order to address the question whether the quartzite protolith was a chert or sandstone. The &delta;<sup>18</sup>O value of both lithologies is 13.4&permil;. What can you conclude?</p>
+</section>
+
+<section class="card">
+<h2>Problem 5</h2>
+<p>Cavosie et al. (2002) measured the &delta;<sup>18</sup>O values of quartz, andalusite, and sillimanite from a metamorphic vein. If all phases were in equilibrium at the temperature of their formation (both isotopically and in terms of phase equilibria), what is the temperature and pressure of vein formation? Use the quartz&ndash;aluminum silicate relationship (where AS stands for aluminum silicate) and Fig. 12.P5, the phase equilibrium diagram for the three aluminum silicates kyanite, andalusite, and sillimanite. <span class="tag warn">check vs print</span> <span class="note">[The quartz&ndash;AS fractionation equation and the measured values are lost in the extraction; the printed figure is not reproduced.]</span></p>
+</section>
+
+<section class="card">
+<h2>Problem 6</h2>
+<p>One volume of calcitic limestone underwent complete oxygen isotope exchange with three volumes of meteoric water at 370&nbsp;&deg;C and 1 kbar to produce an isotopically homogeneous marble. What is the &delta;<sup>18</sup>O value of this marble? The problem supplies the average limestone and meteoric water &delta;<sup>18</sup>O values, densities at 1 kbar, and molecular weights. <span class="tag warn">check vs print</span> <span class="note">[The numerical givens are lost in the extraction.]</span></p>
+</section>
+
+<div class="footnote">
+<p>Transcribed from Z. Sharp, <i>Principles of Stable Isotope
+Geochemistry</i>, 1st ed. (Pearson Prentice Hall, 2007), end-of-chapter problem set
+(published source). Reference-scale names are written VSMOW, VPDB and VCDT where the
+original used SMOW, PDB and CDT, with the original numerical constants unchanged;
+historical usages (e.g. Craig's definition of SMOW) are kept as printed.</p>
+<p>The source PDF's text layer scrambles mathematics, so equations and some values were
+reconstructed during transcription. Bracketed notes and anything tagged
+<span class="tag">reconstructed</span> or <span class="tag warn">check vs print</span>
+are editorial (constructed), not part of the original, and the warn-tagged items should
+be verified against the print copy.</p>
+</div>
+</div>
+</body>
+</html>
