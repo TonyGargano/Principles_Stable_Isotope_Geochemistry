@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Devolatilization Limits</title>
+<style>
+:root {
+  color-scheme: light;
+  --surface-1: #ffffff;
+  --page: #ffffff;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11,11,11,0.12);
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-7: #6250d6;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page); color: var(--text-primary);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px; line-height: 1.5;
+}
+.wrap { max-width: 920px; margin: 0 auto; padding: 28px 16px 48px; }
+h1 { font-size: 1.45rem; margin: 0 0 4px; }
+h2 { font-size: 1.05rem; margin: 0 0 10px; }
+.subtitle { color: var(--text-secondary); margin: 0 0 8px; }
+.colorkey { font-size: 0.8rem; color: var(--text-secondary); margin: 0 0 20px; }
+.badge {
+  display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em;
+  color: #fff; padding: 2px 8px; border-radius: 999px; vertical-align: 1px;
+}
+.badge.model { background: var(--series-2); }
+.badge.view { background: var(--series-1); }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 18px; }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 10px; }
+.legend .chip { display: inline-block; width: 18px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+.legend .bandchip { display: inline-block; width: 14px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 6px; opacity: 0.35; }
+.legend .dotchip { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 6px; }
+svg { width: 100%; height: auto; display: block; }
+.figure { border: 1.5px solid var(--axis); border-radius: 8px; background: #fbfaf7; padding: 10px 12px 6px; margin: 12px 0 4px; }
+.figure .legend { margin: 0 0 8px; padding: 0 0 8px; border-bottom: 1px solid var(--grid); }
+.winrow, .paramrow {
+  display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center;
+  font-size: 0.8rem; color: var(--text-secondary);
+}
+.paramrow {
+  margin: 10px 0 4px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+}
+.winrow { padding: 10px 12px; border-top: 1px solid var(--grid); }
+.wlabel { font-weight: 600; margin-right: 2px; display: flex; align-items: center; gap: 8px; }
+.ctl { display: flex; align-items: center; gap: 6px; }
+input[type="range"] { width: 120px; accent-color: var(--series-1); }
+.paramrow input[type="range"] { width: 130px; accent-color: var(--series-2); }
+input[type="number"] {
+  width: 74px; border: 1px solid var(--border); border-radius: 6px; padding: 2px 6px;
+  font-size: 0.8rem; font-variant-numeric: tabular-nums;
+  color: var(--text-primary); background: var(--surface-1);
+}
+input[type="number"]:focus { outline: 2px solid var(--series-1); outline-offset: 0; }
+.unit { color: var(--muted); }
+.btn {
+  border: 1px solid var(--border); background: var(--surface-1); border-radius: 6px;
+  padding: 3px 10px; font-size: 0.75rem; color: var(--text-secondary); cursor: pointer;
+}
+.btn:hover { border-color: var(--axis); color: var(--text-primary); }
+details.viewbox { border: 1px solid var(--border); border-radius: 8px; margin: 10px 0 4px; }
+details.viewbox summary {
+  cursor: pointer; padding: 8px 12px; font-size: 0.8rem; color: var(--text-secondary);
+  display: flex; align-items: center; gap: 8px; list-style: none; user-select: none;
+}
+details.viewbox summary::-webkit-details-marker { display: none; }
+details.viewbox summary::before { content: "\25B8"; color: var(--muted); transition: transform 0.15s; }
+details.viewbox[open] summary::before { transform: rotate(90deg); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-top: 12px; }
+.tile { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.tile .k { font-size: 0.75rem; color: var(--text-secondary); }
+.tile .v { font-size: 1.1rem; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.tile .u { font-size: 0.75rem; color: var(--muted); }
+.prose p { margin: 0.5em 0; }
+.footnote { font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--grid); margin-top: 16px; padding-top: 10px; }
+.eqs { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin: 0 0 12px; overflow-x: auto; }
+.eq { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 7px 0; }
+.eq .num { color: var(--muted); font-size: 0.78rem; white-space: nowrap; text-align: right; }
+.tooltip {
+  position: fixed; pointer-events: none; background: var(--surface-1);
+  border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px;
+  font-size: 0.8rem; color: var(--text-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: none; z-index: 10; white-space: nowrap; line-height: 1.45;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Devolatilization, Batch vs. Rayleigh, and the Limits</h1>
+  <p class="subtitle">Companion to Chapter 12, &sect;12.2.2, Eqs. 12.1&ndash;12.5 and Figs. 12.2&ndash;12.4. Why volatilization cannot move a rock's &delta;&sup1;&#8312;O more than a few per mil, while carbon can run away.</p>
+  <p class="colorkey"><span class="badge model">MODEL</span> orange sliders set the physics. <span class="badge view">VIEW</span> blue sliders only change the plotting window, in the drawer under each chart.</p>
+
+  <div class="card">
+    <h2>Fig. 12.2 live, rock and fluid vs. reaction progress</h2>
+    <div class="eqs">
+      <div class="eq"><span>batch, &delta;<sub>initial rock</sub> = x&middot;&delta;<sub>final rock</sub> + (1&minus;x)&middot;&delta;<sub>fluid</sub>, &nbsp;&delta;<sub>rock</sub> &minus; &delta;<sub>fluid</sub> = &minus;1000ln&alpha;<sub>f&ndash;r</sub></span><span class="num">Eqs 12.1&ndash;12.3</span></div>
+      <div class="eq"><span>Rayleigh, &delta;<sub>f</sub> = (&delta;<sub>i</sub> + 1000)&middot;F<sup>(&alpha;&minus;1)</sup> &minus; 1000</span><span class="num">Eq 12.4</span></div>
+      <div class="eq"><span>CaCO&#8323; + SiO&#8322; &rarr; CaSiO&#8323; + CO&#8322;, at most 40% of the oxygen leaves, F &ge; 0.6</span><span class="num">Eq 12.5, calc-silicate limit</span></div>
+    </div>
+    <div class="legend">
+      <span><span class="chip" style="background:var(--series-1)"></span>rock, Rayleigh</span>
+      <span><span class="chip" style="background:var(--series-2)"></span>rock, batch</span>
+      <span><span class="chip" style="background:var(--series-3); height:0; border-top:3px dashed var(--series-3); border-radius:0"></span>instantaneous fluid, Rayleigh</span>
+      <span><span class="chip" style="background:var(--series-4); height:0; border-top:3px dashed var(--series-4); border-radius:0"></span>fluid, batch</span>
+      <span><span class="bandchip" style="background:var(--series-7)"></span>inaccessible beyond the F limit</span>
+    </div>
+    <div class="paramrow"><span class="wlabel"><span class="badge model">MODEL</span> Parameters</span>
+      <span class="ctl">&delta;&sup1;&#8312;O initial rock
+        <input type="range" id="p-d0" min="10" max="30" step="0.5" value="20">
+        <input type="number" id="p-d0n" min="10" max="30" step="0.5" value="20">
+        <span class="unit">‰</span></span>
+      <span class="ctl">1000ln&alpha; (fluid &minus; rock)
+        <input type="range" id="p-al" min="1" max="12" step="0.1" value="6">
+        <input type="number" id="p-aln" min="1" max="12" step="0.1" value="6">
+        <span class="unit">‰</span></span>
+      <span class="ctl">F limit for this element
+        <input type="range" id="p-lim" min="0" max="0.95" step="0.01" value="0.6">
+        <input type="number" id="p-limn" min="0" max="0.95" step="0.01" value="0.6"></span>
+      <span class="ctl">F, fraction remaining
+        <input type="range" id="p-f" min="0.02" max="1" step="0.01" value="0.7">
+        <input type="number" id="p-fn" min="0.02" max="1" step="0.01" value="0.7"></span>
+      <span class="ctl"><button class="btn" data-reset type="button">reset model</button></span>
+    </div>
+    <div class="figure">
+    <svg id="c1" viewBox="0 0 880 420" role="img" aria-label="delta 18O of rock and fluid versus fraction of element remaining for batch and Rayleigh devolatilization"></svg>
+    </div>
+    <details class="viewbox">
+      <summary><span class="badge view">VIEW</span> Plot window, view only, does not change the model</summary>
+      <div class="winrow" id="c1-win"></div>
+    </details>
+    <div class="tiles">
+      <div class="tile"><div class="k">rock at chosen F, Rayleigh</div><div class="v" id="t-ray"></div></div>
+      <div class="tile"><div class="k">rock at chosen F, batch</div><div class="v" id="t-bat"></div></div>
+      <div class="tile"><div class="k">maximum rock shift at the F limit, Rayleigh</div><div class="v" id="t-max"></div></div>
+      <div class="tile"><div class="k">dehydration limits</div><div class="v">F &ge; 0.92&ndash;0.93 <span class="u">talc, muscovite (Eqs 12.6&ndash;12.7)</span></div></div>
+    </div>
+    <p class="footnote">Published inputs, Eqs 12.1&ndash;12.5 with &alpha; = 1.006 as drawn in Fig. 12.2, the calc-silicate limit F &ge; 0.6, the dehydration limits F &ge; 0.93 (muscovite + quartz) and 0.92 (talc), and the chapter's conclusion, volatilization reactions cannot change &delta;&sup1;&#8312;O<sub>WR</sub> by more than several per mil under any conditions, larger shifts require infiltration of a fluid or melt. Constructed, the slider defaults. Set the F limit toward 0 to see the carbon or hydrogen case, where the element can be driven out entirely and the residual delta runs away.</p>
+  </div>
+
+  <div class="card">
+    <h2>Coupled &delta;&sup1;&sup3;C&ndash;&delta;&sup1;&#8312;O during decarbonation, Figs. 12.3&ndash;12.4</h2>
+    <div class="legend">
+      <span><span class="chip" style="background:var(--series-1)"></span>Rayleigh decarbonation path</span>
+      <span><span class="chip" style="background:var(--series-2)"></span>batch decarbonation path</span>
+      <span><span class="dotchip" style="background:var(--series-7)"></span>sample needing infiltration</span>
+    </div>
+    <div class="paramrow"><span class="wlabel"><span class="badge model">MODEL</span> Parameters</span>
+      <span class="ctl">&delta;&sup1;&sup3;C initial carbonate
+        <input type="range" id="p-c0" min="-4" max="4" step="0.1" value="0">
+        <input type="number" id="p-c0n" min="-4" max="4" step="0.1" value="0">
+        <span class="unit">‰</span></span>
+      <span class="ctl">&Delta;&sup1;&sup3;C (CO&#8322; &minus; calcite)
+        <input type="range" id="p-dc" min="1" max="5" step="0.1" value="3">
+        <input type="number" id="p-dcn" min="1" max="5" step="0.1" value="3">
+        <span class="unit">‰</span></span>
+      <span class="ctl">sample &delta;&sup1;&#8312;O
+        <input type="range" id="p-sx" min="2" max="22" step="0.1" value="8">
+        <input type="number" id="p-sxn" min="2" max="22" step="0.1" value="8">
+        <span class="unit">‰</span></span>
+      <span class="ctl">sample &delta;&sup1;&sup3;C
+        <input type="range" id="p-sy" min="-16" max="2" step="0.1" value="-10">
+        <input type="number" id="p-syn" min="-16" max="2" step="0.1" value="-10">
+        <span class="unit">‰</span></span>
+      <span class="ctl"><button class="btn" data-reset type="button">reset model</button></span>
+    </div>
+    <div class="figure">
+    <svg id="c2" viewBox="0 0 880 440" role="img" aria-label="delta 13C versus delta 18O decarbonation trajectories with a sample requiring fluid infiltration"></svg>
+    </div>
+    <details class="viewbox">
+      <summary><span class="badge view">VIEW</span> Plot window, view only, does not change the model</summary>
+      <div class="winrow" id="c2-win"></div>
+    </details>
+    <div class="tiles">
+      <div class="tile"><div class="k">&delta;&sup1;&#8312;O floor of pure decarbonation, Rayleigh at F<sub>C</sub> &rarr; 0</div><div class="v" id="t-floor"></div></div>
+      <div class="tile"><div class="k">sample inside the envelope?</div><div class="v" id="t-verdict"></div></div>
+    </div>
+    <p class="footnote">Published inputs, the coupling, carbon F<sub>C</sub> runs 1 &rarr; 0 while oxygen can lose at most 40% (F<sub>O</sub> = 1 &minus; 0.4(1&minus;F<sub>C</sub>) for reaction 12.5), the &Delta;&sup1;&sup3;C(CO&#8322;&ndash;calcite) of 2&ndash;4&permil; at high temperature (Fig. 11.4), and the two field anchors, Notch Peak argillites where &delta;&sup1;&sup3;C drops ~12&permil; inside the decarbonation envelope while &delta;&sup1;&#8312;O falls 12&permil;, far beyond the &le;2&permil; decarbonation allows (Nabelek et al., 1984), and the Elkhorn two-stage fit, Rayleigh decarbonation then magmatic-fluid mixing (Bowman et al., 1985). Constructed, the oxygen 1000ln&alpha; shared with the top panel, the sample point, and the exact trajectory parametrization. Valley (1986) found no contact aureole whose coupled trend is explained by volatilization alone.</p>
+  </div>
+
+  <div class="card prose">
+    <p><strong>Reading the plots.</strong> Two controls do all the work. The fractionation sets the slope of the exit path, and the F limit sets how far down it a rock can travel. For oxygen the limit arrives almost immediately, stoichiometry caps decarbonation at 40% loss and dehydration near 8%, so the blue and orange curves barely separate before the shaded wall. For carbon there is no wall, every mole of carbonate carbon can leave as CO&#8322;, so &delta;&sup1;&sup3;C can fall tens of per mil while &delta;&sup1;&#8312;O hardly moves, and the coupled trajectory in the lower panel is nearly vertical. A sample left of the envelope is the fingerprint of infiltration, which is why coupled &delta;&sup1;&sup3;C&ndash;&delta;&sup1;&#8312;O arrays, not either axis alone, diagnose open-system metamorphism. The same lever-rule logic (Box 12.1) explains why prograde biotite &delta;D falls ~30&permil; across a dehydration sequence while whole-rock oxygen stays fixed.</p>
+  </div>
+</div>
+<div class="tooltip" id="tt"></div>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const P = { d0: 20, al: 6, lim: 0.6, f: 0.7, c0: 0, dc: 3, sx: 8, sy: -10 };
+
+const rayR = F => (P.d0 + 1000) * Math.pow(Math.max(F, 1e-4), P.al / 1000) - 1000;
+const batR = F => P.d0 - (1 - F) * P.al;
+const rayF = F => rayR(F) + P.al;
+const batF = F => batR(F) + P.al;
+
+// coupled decarbonation
+const FO = Fc => 1 - 0.4 * (1 - Fc);
+const rayC = Fc => (P.c0 + 1000) * Math.pow(Math.max(Fc, 1e-4), P.dc / 1000) - 1000;
+const rayO = Fc => (P.d0 + 1000) * Math.pow(FO(Fc), P.al / 1000) - 1000;
+const batC = Fc => P.c0 - (1 - Fc) * P.dc;
+const batO = Fc => P.d0 - (1 - FO(Fc)) * P.al;
+
+function niceStep(raw) {
+  const p = Math.pow(10, Math.floor(Math.log10(raw)));
+  const m = raw / p;
+  return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p;
+}
+const decimalsFor = step => Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
+
+function makeChart(svgId, series, cfg) {
+  const svg = $(svgId), tt = $("tt");
+  const W = 880, Ht = +svg.viewBox.baseVal.height;
+  const M = { l: 92, r: 26, t: 18, b: 56 };
+  const pw = W - M.l - M.r, ph = Ht - M.t - M.b;
+  const win = { ...cfg.win };
+  const win0 = { ...cfg.win };
+
+  const defs = [
+    ["x0", cfg.xName + " min"], ["x1", cfg.xName + " max"],
+    ["y0", cfg.yName + " min"], ["y1", cfg.yName + " max"]
+  ];
+  $(svgId + "-win").innerHTML = defs.map(([k, lab]) =>
+    `<span class="ctl">${lab}
+      <input type="range" id="${svgId}-${k}" min="${cfg.lim[k[0]][0]}" max="${cfg.lim[k[0]][1]}" step="${cfg.step[k[0]]}" value="${win[k]}">
+      <input type="number" id="${svgId}-${k}n" min="${cfg.lim[k[0]][0]}" max="${cfg.lim[k[0]][1]}" step="${cfg.step[k[0]]}" value="${win[k]}"></span>`).join("") +
+    `<span class="ctl"><button class="btn" id="${svgId}-fit" type="button">autoscale y</button>
+      <button class="btn" id="${svgId}-rst" type="button">reset view</button></span>`;
+
+  function clampWin(k, v) {
+    const ax = k[0];
+    const gap = 4 * cfg.step[ax];
+    v = Math.min(cfg.lim[ax][1], Math.max(cfg.lim[ax][0], v));
+    if (k === "x0") v = Math.min(v, win.x1 - gap);
+    if (k === "x1") v = Math.max(v, win.x0 + gap);
+    if (k === "y0") v = Math.min(v, win.y1 - gap);
+    if (k === "y1") v = Math.max(v, win.y0 + gap);
+    return v;
+  }
+  function syncWin() {
+    for (const [k] of defs) {
+      $(svgId + "-" + k).value = win[k];
+      const n = $(svgId + "-" + k + "n");
+      if (document.activeElement !== n) n.value = win[k];
+    }
+  }
+  for (const [k] of defs) {
+    const s = $(svgId + "-" + k), n = $(svgId + "-" + k + "n");
+    s.addEventListener("input", () => {
+      win[k] = clampWin(k, parseFloat(s.value));
+      syncWin(); render();
+    });
+    n.addEventListener("change", () => {
+      let v = parseFloat(n.value);
+      if (!isFinite(v)) v = win[k];
+      win[k] = clampWin(k, v);
+      syncWin(); render();
+    });
+  }
+  $(svgId + "-rst").addEventListener("click", () => {
+    Object.assign(win, win0); syncWin(); render();
+  });
+  let fitSrc = null;
+  if (typeof series === "function") fitSrc = series;
+  else if (typeof series !== "undefined" && Array.isArray(series)) fitSrc = () => series;
+  if (!fitSrc) $(svgId + "-fit").style.display = "none";
+  $(svgId + "-fit").addEventListener("click", () => {
+    if (!fitSrc) return;
+    let lo = Infinity, hi = -Infinity;
+    const n2 = 160;
+    for (const ser of fitSrc()) {
+      if (typeof ser.f !== "function") continue;
+      for (let i = 0; i <= n2; i++) {
+        const v = ser.f(win.x0 + (win.x1 - win.x0) * i / n2);
+        if (isFinite(v)) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+      }
+    }
+    if (cfg.points) for (const p of cfg.points()) {
+      if (p.x >= win.x0 && p.x <= win.x1 && isFinite(p.y)) { lo = Math.min(lo, p.y); hi = Math.max(hi, p.y); }
+    }
+    if (!isFinite(lo) || !isFinite(hi)) return;
+    const st = cfg.step.y;
+    const pad = Math.max((hi - lo) * 0.08, 2 * st);
+    lo = Math.max(cfg.lim.y[0], Math.floor((lo - pad) / st) * st);
+    hi = Math.min(cfg.lim.y[1], Math.ceil((hi + pad) / st) * st);
+    if (hi - lo < 4 * st) hi = Math.min(cfg.lim.y[1], lo + 4 * st);
+    win.y0 = lo; win.y1 = hi;
+    syncWin(); render();
+  });
+
+  const X = x => M.l + (x - win.x0) / (win.x1 - win.x0) * pw;
+  const Y = v => M.t + ph - (v - win.y0) / (win.y1 - win.y0) * ph;
+
+  function render() {
+    let s = `<rect x="${M.l}" y="${M.t}" width="${pw}" height="${ph}" fill="#ffffff"/>`;
+    const ys = niceStep((win.y1 - win.y0) / 5), yd = decimalsFor(ys);
+    for (let v = Math.ceil(win.y0 / ys - 1e-9) * ys; v <= win.y1 + 1e-9; v += ys) {
+      s += `<line x1="${M.l}" x2="${W - M.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)" stroke-opacity="0.55"/>`;
+      s += `<line x1="${M.l}" x2="${M.l + 7}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--axis)" stroke-width="1.2"/>`;
+      s += `<line x1="${W - M.r - 7}" x2="${W - M.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--axis)" stroke-width="1.2"/>`;
+      s += `<text x="${M.l - 10}" y="${Y(v) + 4.5}" text-anchor="end" font-size="13" font-weight="600" fill="var(--text-secondary)">${v.toFixed(yd)}</text>`;
+    }
+    const xs = niceStep((win.x1 - win.x0) / 6), xd = decimalsFor(xs);
+    for (let x = Math.ceil(win.x0 / xs - 1e-9) * xs; x <= win.x1 + 1e-9; x += xs) {
+      s += `<line x1="${X(x)}" x2="${X(x)}" y1="${M.t + ph - 7}" y2="${M.t + ph}" stroke="var(--axis)" stroke-width="1.2"/>`;
+      s += `<line x1="${X(x)}" x2="${X(x)}" y1="${M.t}" y2="${M.t + 7}" stroke="var(--axis)" stroke-width="1.2"/>`;
+      s += `<text x="${X(x)}" y="${Ht - M.b + 24}" text-anchor="middle" font-size="13" font-weight="600" fill="var(--text-secondary)">${x.toFixed(xd)}</text>`;
+    }
+    s += `<rect x="${M.l}" y="${M.t}" width="${pw}" height="${ph}" fill="none" stroke="var(--axis)" stroke-width="1.5"/>`;
+    s += `<text x="${M.l + pw / 2}" y="${Ht - 7}" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text-secondary)">${cfg.xLabel}</text>`;
+    s += `<text transform="translate(20 ${M.t + ph / 2}) rotate(-90)" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text-secondary)">${cfg.yLabel}</text>`;
+    s += `<clipPath id="${svgId}-clip"><rect x="${M.l}" y="${M.t}" width="${pw}" height="${ph}"/></clipPath>`;
+    s += `<g clip-path="url(#${svgId}-clip)">`;
+    if (cfg.rects) for (const r of cfg.rects()) {
+      const rx = X(Math.max(r.x0, win.x0)), rx1 = X(Math.min(r.x1, win.x1));
+      if (rx1 > rx) {
+        s += `<rect x="${rx}" y="${M.t}" width="${rx1 - rx}" height="${ph}" fill="var(--series-7)" fill-opacity="0.10"/>`;
+        if (r.label) s += `<text x="${rx + 8}" y="${M.t + 18}" font-size="11" font-weight="600" fill="var(--series-7)">${r.label}</text>`;
+      }
+    }
+    if (cfg.paths) for (const p of cfg.paths()) {
+      const d = p.pts.map(([x, y], i) => (i ? "L" : "M") + X(x).toFixed(1) + " " + Y(y).toFixed(1)).join("");
+      s += `<path d="${d}" fill="none" stroke="${p.color}" stroke-width="2"${p.dash ? ` stroke-dasharray="${p.dash}"` : ""}/>`;
+    }
+    const n = 300;
+    for (const ser of series()) {
+      let d = "";
+      for (let i = 0; i <= n; i++) {
+        const x = win.x0 + (win.x1 - win.x0) * i / n;
+        const v = ser.f(x);
+        if (!isFinite(v)) continue;
+        d += (d ? "L" : "M") + X(x).toFixed(1) + " " + Y(v).toFixed(1);
+      }
+      s += `<path d="${d}" fill="none" stroke="${ser.color}" stroke-width="3"${ser.dash ? ` stroke-dasharray="${ser.dash}"` : ""}/>`;
+    }
+    if (cfg.points) for (const p of cfg.points()) {
+      if (p.x >= win.x0 && p.x <= win.x1 && p.y >= win.y0 && p.y <= win.y1) {
+        s += `<circle cx="${X(p.x)}" cy="${Y(p.y)}" r="7" fill="${p.color}" stroke="var(--surface-1)" stroke-width="2.5"/>`;
+        if (p.label) s += `<text x="${X(p.x) + (p.lx ?? 11)}" y="${Y(p.y) + (p.ly ?? -10)}" font-size="13" font-weight="700" fill="${p.color}">${p.label}</text>`;
+      }
+    }
+    s += `</g>`;
+    s += `<line id="${svgId}-cross" x1="0" x2="0" y1="${M.t}" y2="${M.t + ph}" stroke="var(--axis)" stroke-dasharray="3 3" visibility="hidden"/>`;
+    svg.innerHTML = s;
+  }
+
+  svg.addEventListener("pointermove", ev => {
+    const r = svg.getBoundingClientRect();
+    const x = win.x0 + (((ev.clientX - r.left) / r.width * W) - M.l) / pw * (win.x1 - win.x0);
+    const cross = $(svgId + "-cross");
+    if (x < win.x0 || x > win.x1) { tt.style.display = "none"; cross.setAttribute("visibility", "hidden"); return; }
+    cross.setAttribute("x1", X(x)); cross.setAttribute("x2", X(x));
+    cross.setAttribute("visibility", "visible");
+    tt.style.display = "block";
+    tt.style.left = (ev.clientX + 14) + "px";
+    tt.style.top = (ev.clientY - 10) + "px";
+    const sers = series();
+    tt.innerHTML = `<strong>${cfg.ttx} = ${x.toFixed(2)}</strong>` +
+      (sers.length ? "<br>" + sers.map(ser => `<span style="color:${ser.color}">●</span> ${ser.label}, ${isFinite(ser.f(x)) ? ser.f(x).toFixed(1) + " ‰" : "—"}`).join("<br>") : "");
+  });
+  svg.addEventListener("pointerleave", () => {
+    tt.style.display = "none";
+    const cross = $(svgId + "-cross");
+    if (cross) cross.setAttribute("visibility", "hidden");
+  });
+
+  syncWin();
+  render();
+  return { render };
+}
+
+const chart1 = makeChart("c1", () => [
+  { label: "rock, Rayleigh", color: "var(--series-1)", f: rayR },
+  { label: "rock, batch", color: "var(--series-2)", f: batR },
+  { label: "fluid, Rayleigh inst.", color: "var(--series-3)", dash: "9 6", f: rayF },
+  { label: "fluid, batch", color: "var(--series-4)", dash: "9 6", f: batF }
+], {
+  win: { x0: 0, x1: 1, y0: 5, y1: 32 },
+  lim: { x: [0, 1], y: [-10, 45] },
+  step: { x: 0.01, y: 0.5 },
+  xName: "F", yName: "δ¹⁸O",
+  xLabel: "F, fraction of the element remaining in the rock", yLabel: "δ¹⁸O (‰, VSMOW)",
+  ttx: "F",
+  rects: () => [{ x0: 0, x1: P.lim, label: "inaccessible, F limit" }],
+  points: () => [{ x: P.f, y: rayR(P.f), color: "var(--series-1)", label: "chosen F" }]
+});
+
+const chart2 = makeChart("c2", () => [], {
+  win: { x0: 2, x1: 24, y0: -16, y1: 4 },
+  lim: { x: [-5, 30], y: [-30, 8] },
+  step: { x: 0.5, y: 0.5 },
+  xName: "δ¹⁸O", yName: "δ¹³C",
+  xLabel: "δ¹⁸O whole rock (‰, VSMOW)", yLabel: "δ¹³C carbonate (‰, VPDB)",
+  ttx: "δ¹⁸O",
+  paths: () => {
+    const ray = [], bat = [];
+    for (let i = 0; i <= 240; i++) {
+      const Fc = 1 - 0.995 * i / 240;
+      ray.push([rayO(Fc), rayC(Fc)]);
+      bat.push([batO(Fc), batC(Fc)]);
+    }
+    return [
+      { pts: ray, color: "var(--series-1)" },
+      { pts: bat, color: "var(--series-2)" }
+    ];
+  },
+  points: () => [
+    { x: P.d0, y: P.c0, color: "var(--series-3)", label: "protolith", lx: 10, ly: -6 },
+    { x: P.sx, y: P.sy, color: "var(--series-7)", label: "sample", lx: 10, ly: 16 }
+  ]
+});
+
+function upd() {
+  for (const [id, key] of [["p-d0","d0"],["p-al","al"],["p-lim","lim"],["p-f","f"],["p-c0","c0"],["p-dc","dc"],["p-sx","sx"],["p-sy","sy"]]) {
+    P[key] = parseFloat($(id).value);
+  }
+  $("t-ray").innerHTML = rayR(P.f).toFixed(2) + ' <span class="u">‰</span>';
+  $("t-bat").innerHTML = batR(P.f).toFixed(2) + ' <span class="u">‰</span>';
+  $("t-max").innerHTML = (rayR(Math.max(P.lim, 1e-4)) - P.d0).toFixed(2) + ' <span class="u">‰</span>';
+  const floor = rayO(0.005);
+  $("t-floor").innerHTML = floor.toFixed(1) + ' <span class="u">‰</span>';
+  const inside = P.sx >= floor - 0.3;
+  $("t-verdict").innerHTML = inside
+    ? 'yes <span class="u">decarbonation alone can explain it</span>'
+    : 'no <span class="u">fluid infiltration required</span>';
+  chart1.render();
+  chart2.render();
+}
+["p-d0","p-al","p-lim","p-f","p-c0","p-dc","p-sx","p-sy"].forEach(id => $(id).addEventListener("input", upd));
+upd();
+// typed number inputs mirror the model sliders; reset-model restores shipped defaults
+document.querySelectorAll('input[type="range"][id^="p-"]').forEach(sl => {
+  const n = $(sl.id + "n");
+  if (!n) return;
+  sl.addEventListener("input", () => { n.value = sl.value; });
+  n.addEventListener("change", () => {
+    let v = parseFloat(n.value);
+    if (!isFinite(v)) v = parseFloat(sl.value);
+    v = Math.min(parseFloat(sl.max), Math.max(parseFloat(sl.min), v));
+    sl.value = v;
+    sl.dispatchEvent(new Event("input"));
+    n.value = sl.value;
+  });
+});
+document.querySelectorAll(".paramrow button[data-reset]").forEach(b => {
+  b.addEventListener("click", () => {
+    b.closest(".paramrow").querySelectorAll('input[type="range"]').forEach(sl => {
+      sl.value = sl.defaultValue;
+      sl.dispatchEvent(new Event("input"));
+      const n = $(sl.id + "n");
+      if (n) n.value = sl.value;
+    });
+  });
+});
+</script>
+</body>
+</html>
