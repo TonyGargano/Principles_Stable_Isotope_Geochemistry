@@ -24,128 +24,119 @@
 html, body { margin: 0; background: transparent; }
 body {
   font-family: "Epilogue", system-ui, -apple-system, "Segoe UI", sans-serif;
-  color: var(--ink);
-  font-size: 15px;
-  line-height: 1.45;
-  -webkit-font-smoothing: antialiased;
+  color: var(--ink); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased;
 }
 button { font: inherit; color: inherit; }
-.pt {
-  max-width: 1240px; margin: 0 auto; background: var(--surface);
-  border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px 12px;
-}
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.pt { max-width: 1240px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px 14px; }
 .pt-head { margin: 0 0 12px; }
 .pt-head h1 { font-size: 22px; font-weight: 500; margin: 0 0 2px; letter-spacing: -0.01em; }
 .pt-head p { margin: 0; color: var(--ink2); font-size: 14px; }
 html.embed .pt-head { display: none; }
 
-/* controls */
-.controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.seg { display: inline-flex; flex-wrap: wrap; border: 1px solid var(--ink); border-radius: 999px; overflow: hidden; }
-.seg button {
-  border: 0; background: transparent; cursor: pointer; padding: 7px 15px; font-size: 13.5px;
-  border-right: 1px solid var(--ink); transition: background-color .15s, color .15s;
-}
+/* layer switch */
+.controls { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-bottom: 12px; }
+.seg { display: inline-flex; border: 1px solid var(--ink); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; background: transparent; cursor: pointer; padding: 7px 15px; font-size: 13.5px; border-right: 1px solid var(--ink); transition: background-color .15s, color .15s; }
 .seg button:last-child { border-right: 0; }
 .seg button[aria-checked="true"] { background: var(--ink); color: #fff; }
 .seg button:not([aria-checked="true"]):hover { background: rgba(11,11,11,0.06); }
-.seg button:focus-visible, .tool:focus-visible, .chip:focus-visible, .el-chip:focus-visible, .x:focus-visible, th button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-.tools { display: inline-flex; gap: 8px; }
-.tool {
-  border: 1px solid var(--hair); background: #fff; border-radius: 999px; padding: 6px 13px; font-size: 13px;
-  cursor: pointer; color: var(--ink2);
-}
-.tool:hover { border-color: var(--ink2); color: var(--ink); }
-.tool[aria-pressed="true"] { border-color: var(--ink); color: var(--ink); }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
 /* grid */
+.scroll-hint { display: none; font-size: 12px; color: var(--muted); margin: -4px 0 4px; }
 .gridwrap { overflow-x: auto; padding: 4px 2px 6px; }
-.grid {
-  display: grid; grid-template-columns: repeat(18, minmax(38px, 1fr)); gap: 3px;
-  min-width: 740px; position: relative;
-}
+.grid { display: grid; grid-template-columns: repeat(18, minmax(38px, 1fr)); gap: 3px; min-width: 740px; position: relative; }
 .cell {
-  border: 0; margin: 0; cursor: pointer; aspect-ratio: 1 / 1.04; border-radius: 6px;
-  display: flex; flex-direction: column; justify-content: space-between; padding: 4px 4px 3px;
-  background: var(--neutral); color: var(--ink2); position: relative; min-width: 0;
+  border: 0; margin: 0; aspect-ratio: 1 / 1.04; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between;
+  padding: 4px 4px 3px; background: var(--neutral); color: var(--ink2); position: relative; min-width: 0; cursor: default;
   transition: background-color .25s, color .25s, opacity .2s, transform .15s, box-shadow .15s;
 }
 .cell .z { font-size: 10px; line-height: 1; text-align: left; opacity: .85; font-variant-numeric: tabular-nums; }
 .cell .sym { font-size: clamp(13px, 1.55vw, 19px); font-weight: 600; text-align: center; line-height: 1; }
-.cell .lab { font-size: clamp(7.5px, .72vw, 9.5px); text-align: center; line-height: 1.05; min-height: 9px; white-space: nowrap; overflow: hidden; text-overflow: clip; }
-.cell:hover { transform: translateY(-1px); box-shadow: 0 2px 7px rgba(11,11,11,0.18); z-index: 2; }
-.cell:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; z-index: 3; }
+.cell .lab { font-size: clamp(7.5px, .72vw, 9.5px); text-align: center; line-height: 1.05; min-height: 9px; white-space: nowrap; overflow: hidden; }
+button.cell { cursor: pointer; }
+button.cell:hover { transform: translateY(-1px); box-shadow: 0 2px 7px rgba(11,11,11,0.22); z-index: 2; }
+button.cell::after { content: ""; position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.grid[data-layer="systems"] button.cell::after { display: none; }
 .cell.is-selected { outline: 3px solid var(--ink); outline-offset: 2px; transform: scale(1.1); z-index: 4; box-shadow: 0 6px 18px rgba(11,11,11,0.28); }
 .grid.dim .cell:not(.is-member) { opacity: .2; }
 .grid.dim .cell.is-member { outline: 2px solid var(--ink); outline-offset: 1px; }
 .ph { display: flex; align-items: center; justify-content: center; font-size: 9.5px; color: var(--muted); border: 1px dashed var(--hair); border-radius: 6px; text-align: center; line-height: 1.1; }
 .spacer { height: 8px; }
-.scroll-hint { display: none; font-size: 12px; color: var(--muted); margin: -4px 0 4px; }
-@media (max-width: 760px) { .scroll-hint { display: block; } }
 
-/* legend in the table gap */
-.legend { grid-area: 1 / 3 / 4 / 13; display: flex; flex-direction: column; justify-content: center; gap: 6px; padding: 2px 12px 2px 14px; min-width: 0; }
+/* key in the table gap */
+.legend { grid-area: 1 / 3 / 4 / 13; display: flex; flex-direction: column; justify-content: center; gap: 7px; padding: 2px 12px 2px 14px; min-width: 0; }
 .lg-title { font-size: 15px; font-weight: 600; line-height: 1.2; }
-.lg-desc { font-size: 12.5px; color: var(--ink2); line-height: 1.35; max-width: 62ch; }
 .lg-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.lg-hint { font-size: 11.5px; color: var(--muted); }
-.chip {
-  display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--hair); background: #fff;
-  border-radius: 999px; padding: 4px 10px 4px 7px; font-size: 12.5px; cursor: pointer; line-height: 1.2; color: var(--ink);
-}
+.lg-hint { font-size: 11.5px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.lg-hint .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ink2); display: inline-block; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--hair); background: #fff; border-radius: 999px; padding: 3px 9px 3px 6px; font-size: 12px; cursor: pointer; line-height: 1.2; color: var(--ink); }
 .chip i { width: 12px; height: 12px; border-radius: 3px; flex: none; }
 .chip .n { color: var(--muted); font-variant-numeric: tabular-nums; }
 .chip .rng { color: var(--ink2); }
 .chip:hover { border-color: var(--ink2); }
 .chip[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-.legend .chip { font-size: 12px; padding: 3px 9px 3px 6px; }
-.legend.has-cat { justify-content: flex-start; padding-top: 4px; overflow: auto; }
-.lg-cat { position: relative; background: #fff; border: 1px solid var(--hair); border-radius: 10px; padding: 8px 36px 8px 12px; }
-.lg-cat-head { font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; outline: none; }
-.lg-cat-head i { width: 12px; height: 12px; border-radius: 3px; flex: none; }
-.lg-cat-head span { font-weight: 400; color: var(--ink2); font-size: 12.5px; }
-.lg-cat p { margin: 4px 0 0; font-size: 13px; line-height: 1.4; }
-.lg-cat p.src { font-size: 11px; }
-.lg-x { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 50%; border: 0; background: #f1f0ec; cursor: pointer; font-size: 15px; line-height: 1; color: var(--ink2); }
-.lg-x:hover { background: #e4e3dd; color: var(--ink); }
-.lg-x:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 
-/* footer */
-.foot { display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 12px; color: var(--muted); }
-.foot .linkish { border: 0; background: none; padding: 0; color: var(--ink2); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; font-size: 12px; }
+/* text boxes beneath the table */
+.below { border-top: 1px solid var(--hair); margin-top: 10px; padding-top: 16px; }
+.below-head h2 { font-size: 18px; font-weight: 500; margin: 0 0 4px; letter-spacing: -0.005em; }
+.below-head p { margin: 0 0 14px; color: var(--ink2); font-size: 14px; max-width: 90ch; }
+.boxes { display: grid; gap: 12px; }
+.boxes.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.boxes.n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.catbox { border: 1px solid var(--hair); background: #fff; border-radius: 12px; padding: 12px 14px 12px; cursor: pointer; transition: border-color .15s, box-shadow .15s; position: relative; }
+.catbox[data-cat]:hover { border-color: var(--ink2); }
+.catbox[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.catbox .cb-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.catbox .cb-head i { width: 14px; height: 14px; border-radius: 4px; flex: none; }
+.catbox h3 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.2; }
+.catbox .gloss { font-size: 12.5px; color: var(--ink2); margin: -2px 0 6px; }
+.catbox p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.45; }
+.catbox .meta { font-size: 12px; color: var(--muted); margin: 0; }
+.members { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.el-chip { border: 0; border-radius: 6px; min-width: 34px; height: 30px; padding: 0 6px; font-weight: 600; font-size: 13px; cursor: pointer; }
+.el-chip:hover { box-shadow: 0 2px 6px rgba(11,11,11,0.25); }
+.note { font-size: 13px; color: var(--ink2); margin: 12px 0 0; max-width: 100ch; }
+.src { font-size: 11.5px; color: var(--muted); margin: 12px 0 0; line-height: 1.6; }
+.flag { display: inline-block; font-size: 10.5px; border-radius: 999px; padding: 0 6px; margin-right: 3px; border: 1px solid var(--hair); color: var(--ink2); background: #faf9f6; }
+.flag.own { border-color: var(--own); color: var(--own); }
 
-/* table view */
-.tablewrap { max-height: 600px; overflow: auto; border: 1px solid var(--hair); border-radius: 10px; }
-table.data { border-collapse: collapse; width: 100%; font-size: 13px; }
-table.data th { position: sticky; top: 0; background: #fff; text-align: left; font-weight: 600; border-bottom: 1px solid var(--hair); padding: 0; z-index: 1; }
-table.data th button { border: 0; background: none; width: 100%; text-align: left; padding: 8px 10px; cursor: pointer; font-weight: 600; font-size: 12.5px; }
-table.data td { padding: 6px 10px; border-bottom: 1px solid #f0efea; }
-table.data tr { cursor: pointer; }
-table.data tbody tr:hover { background: #f4f3ef; }
-table.data tr.is-selected { background: #ecebe5; }
-table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
-.sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+/* vapor pressure explainer */
+.vp { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 14px; margin-top: 14px; }
+.vp-text { border: 1px solid var(--hair); background: #fff; border-radius: 12px; padding: 12px 14px; }
+.vp-text h3 { margin: 0 0 4px; font-size: 15px; font-weight: 600; }
+.vp-text p { margin: 0 0 10px; font-size: 13.5px; line-height: 1.45; }
+.vp-text p:last-child { margin-bottom: 0; }
+figure.chart { margin: 0; border: 1px solid var(--hair); background: #fff; border-radius: 12px; padding: 12px 12px 10px; position: relative; }
+figure.chart .ch-title { font-size: 14px; font-weight: 600; margin: 0 0 2px; }
+figure.chart .ch-sub { font-size: 12px; color: var(--ink2); margin: 0 0 6px; }
+figure.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+figure.chart figcaption { font-size: 12px; color: var(--ink2); margin-top: 4px; }
+.ch-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--ink2); margin: 0 0 4px; }
+.ch-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.ch-legend i { width: 14px; height: 2px; border-radius: 1px; display: inline-block; }
+.svg-tick { font-size: 10.5px; fill: var(--muted); font-variant-numeric: tabular-nums; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; stroke-linejoin: round; }
+.svg-lab { font-size: 11.5px; fill: var(--ink2); }
+.svg-val { font-size: 11px; fill: var(--ink); font-variant-numeric: tabular-nums; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; stroke-linejoin: round; }
+.svg-strong { font-weight: 600; fill: var(--ink); }
 
-/* text box */
-.box {
-  position: fixed; z-index: 30; width: min(410px, calc(100vw - 24px)); max-height: calc(100vh - 24px); overflow: auto;
-  background: #fff; border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 18px 50px rgba(11,11,11,0.22);
-  padding: 16px 18px 14px; overscroll-behavior: contain;
-}
+/* card for my systems */
+.box { position: fixed; z-index: 30; width: min(410px, calc(100vw - 24px)); max-height: min(640px, calc(100vh - 24px)); overflow: auto; background: #fff; border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 18px 50px rgba(11,11,11,0.22); padding: 16px 18px 14px; overscroll-behavior: contain; }
 .box[hidden] { display: none; }
+.box.inline { position: static; width: auto; max-height: none; box-shadow: 0 6px 20px rgba(11,11,11,0.12); margin: 8px 0 4px; }
 .x { position: sticky; top: 0; float: right; margin: -6px -8px 0 8px; width: 30px; height: 30px; border-radius: 50%; border: 0; background: #f1f0ec; cursor: pointer; font-size: 18px; line-height: 1; color: var(--ink2); z-index: 2; }
 .x:hover { background: #e4e3dd; color: var(--ink); }
 .bx-head { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
 .bx-tile { width: 58px; height: 60px; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-between; padding: 5px 6px; flex: none; }
 .bx-tile .z { font-size: 10.5px; line-height: 1; }
 .bx-tile .sym { font-size: 24px; font-weight: 600; text-align: center; line-height: 1; padding-bottom: 6px; }
-.bx-swatch { width: 40px; height: 40px; border-radius: 8px; flex: none; }
 .box h3 { font-size: 20px; font-weight: 500; margin: 0; line-height: 1.15; outline: none; }
 .box .sub { font-size: 12.5px; color: var(--ink2); margin-top: 2px; }
 .box .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
 .box .lead { margin: 0 0 12px; font-size: 14.5px; }
 .research { border-left: 3px solid var(--own); padding: 2px 0 2px 12px; margin: 0 0 12px; }
-.research h4, .box h4 { margin: 0 0 4px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--ink2); }
+.research h4 { margin: 0 0 4px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--ink2); }
 .research p { margin: 0 0 8px; font-size: 14px; }
 .papers { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; }
 .papers li { font-size: 12.5px; line-height: 1.35; color: var(--ink2); }
@@ -153,7 +144,7 @@ table.data .num { text-align: right; font-variant-numeric: tabular-nums; }
 .papers a:hover { text-decoration-color: var(--ink); }
 .papers .status { font-size: 11px; border: 1px solid var(--hair); border-radius: 999px; padding: 0 6px; margin-left: 4px; color: var(--ink2); white-space: nowrap; }
 details.tech { border-top: 1px solid var(--hair); padding-top: 8px; margin-bottom: 10px; }
-details.tech summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--ink); padding: 2px 0; }
+details.tech summary { cursor: pointer; font-size: 13px; font-weight: 600; padding: 2px 0; }
 details.tech dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 8px 0 10px; font-size: 13px; }
 details.tech dt { color: var(--ink2); }
 details.tech dd { margin: 0; }
@@ -164,30 +155,29 @@ table.iso .num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 table.iso .barcell { width: 34%; }
 .bar { display: block; height: 7px; border-radius: 0 4px 4px 0; background: #898781; min-width: 2px; }
 .bar.rad { background: #c3c2b7; }
-.members { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 12px; }
-.el-chip { border: 0; border-radius: 6px; min-width: 34px; height: 30px; padding: 0 6px; font-weight: 600; font-size: 13px; cursor: pointer; }
-.el-chip:hover { box-shadow: 0 2px 6px rgba(11,11,11,0.25); }
-.src { font-size: 11.5px; color: var(--muted); margin: 0; line-height: 1.5; }
-.flag { display: inline-block; font-size: 10.5px; border-radius: 999px; padding: 0 6px; margin-right: 3px; border: 1px solid var(--hair); color: var(--ink2); background: #faf9f6; }
-.flag.own { border-color: var(--own); color: var(--own); }
-.srclist { margin: 0 0 10px; padding-left: 18px; font-size: 13px; }
-.srclist li { margin-bottom: 6px; }
+.box .src { margin-top: 0; }
 
-/* tooltip */
-.tip { position: fixed; z-index: 40; pointer-events: none; background: #0b0b0b; color: #fff; font-size: 12px; padding: 5px 8px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); }
+.foot { margin-top: 10px; font-size: 12px; color: var(--muted); }
+.tip { position: fixed; z-index: 40; pointer-events: none; background: #0b0b0b; color: #fff; font-size: 12px; padding: 5px 8px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); line-height: 1.4; }
 .tip[hidden] { display: none; }
 
+@media (max-width: 1000px) {
+  .boxes.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .vp { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .vp-text { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .scroll-hint { display: block; }
+  .boxes.n3, .boxes.n4, .vp { grid-template-columns: minmax(0, 1fr); }
+}
 @media (max-width: 700px) {
   .pt { padding: 14px 12px 10px; border-radius: 12px; }
-  .controls { gap: 8px; }
   .seg { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; border-radius: 12px; }
   .seg button { font-size: 12.5px; padding: 8px 6px; line-height: 1.2; text-align: center; }
-  .box { left: 0 !important; right: 0 !important; top: auto !important; bottom: 0; width: auto; max-height: 72vh; border-radius: 16px 16px 0 0; }
-  .lg-desc { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .cell, .seg button { transition: none; }
-  .cell:hover, .cell.is-selected { transform: none; }
+  .cell, .seg button, .catbox { transition: none; }
+  button.cell:hover, .cell.is-selected { transform: none; }
 }
 @media (forced-colors: active) {
   .cell { border: 1px solid CanvasText; }
@@ -207,20 +197,13 @@ table.iso .barcell { width: 34%; }
       <button type="button" role="radio" data-layer="gold">Goldschmidt class</button>
       <button type="button" role="radio" data-layer="vol">Volatility</button>
     </div>
-    <div class="tools">
-      <button type="button" class="tool" id="viewToggle" aria-pressed="false">Table view</button>
-      <button type="button" class="tool" id="srcBtn">Sources</button>
-    </div>
   </div>
   <div class="scroll-hint">Scroll sideways to see the whole table.</div>
-  <div class="gridwrap" id="gridView">
-    <div class="grid" id="grid" aria-label="Periodic table"></div>
-  </div>
-  <div class="tablewrap" id="tableView" hidden></div>
-  <div class="foot">
-    <span>Click an element or a category to open its description. Arrow keys move between elements, Esc closes.</span>
-    <span>Data from published compilations, descriptions constructed. <button type="button" class="linkish" id="srcLink">Sources and notes</button></span>
-  </div>
+  <div class="gridwrap" id="gridView"><div class="grid" id="grid" aria-label="Periodic table"></div></div>
+  <div id="cardSlot"></div>
+  <section class="below" id="below" aria-live="polite"></section>
+  <div class="foot">Hover any element for its name. My isotope systems are clickable and open a card with my research on that element.</div>
+  <div class="sr-only"><table id="srTable"></table></div>
 </div>
 <div class="box" id="box" role="dialog" aria-labelledby="box-title" hidden>
   <button type="button" class="x" id="boxClose" aria-label="Close">&times;</button>
@@ -232,46 +215,38 @@ table.iso .barcell { width: 34%; }
 (() => {
 "use strict";
 const ELEMENTS = [{"z":1,"sym":"H","name":"Hydrogen","mass":1.008,"group":1,"period":1,"gold":"atmophile","tc":null,"iso":[{"A":1,"ab":99.9855,"hl":null},{"A":2,"ab":0.0145,"hl":null}]},{"z":2,"sym":"He","name":"Helium","mass":4.0026,"group":18,"period":1,"gold":"atmophile","tc":null,"iso":[{"A":3,"ab":0.0002,"hl":null},{"A":4,"ab":99.9998,"hl":null}]},{"z":3,"sym":"Li","name":"Lithium","mass":6.94,"group":1,"period":2,"gold":"lithophile","tc":1142,"iso":[{"A":6,"ab":4.85,"hl":null},{"A":7,"ab":95.15,"hl":null}]},{"z":4,"sym":"Be","name":"Beryllium","mass":9.0122,"group":2,"period":2,"gold":"lithophile","tc":1452,"iso":[{"A":9,"ab":100.0,"hl":null}]},{"z":5,"sym":"B","name":"Boron","mass":10.81,"group":13,"period":2,"gold":"lithophile","tc":908,"iso":[{"A":10,"ab":19.65,"hl":null},{"A":11,"ab":80.35,"hl":null}]},{"z":6,"sym":"C","name":"Carbon","mass":12.011,"group":14,"period":2,"gold":"atmophile","tc":40,"iso":[{"A":12,"ab":98.94,"hl":null},{"A":13,"ab":1.06,"hl":null}]},{"z":7,"sym":"N","name":"Nitrogen","mass":14.007,"group":15,"period":2,"gold":"atmophile","tc":123,"iso":[{"A":14,"ab":99.6205,"hl":null},{"A":15,"ab":0.3795,"hl":null}]},{"z":8,"sym":"O","name":"Oxygen","mass":15.999,"group":16,"period":2,"gold":"lithophile","tc":180,"iso":[{"A":16,"ab":99.757,"hl":null},{"A":17,"ab":0.03835,"hl":null},{"A":18,"ab":0.2045,"hl":null}]},{"z":9,"sym":"F","name":"Fluorine","mass":18.9984,"group":17,"period":2,"gold":"lithophile","tc":734,"iso":[{"A":19,"ab":100.0,"hl":null}]},{"z":10,"sym":"Ne","name":"Neon","mass":20.1797,"group":18,"period":2,"gold":"atmophile","tc":9.1,"iso":[{"A":20,"ab":90.48,"hl":null},{"A":21,"ab":0.27,"hl":null},{"A":22,"ab":9.25,"hl":null}]},{"z":11,"sym":"Na","name":"Sodium","mass":22.9898,"group":1,"period":3,"gold":"lithophile","tc":958,"iso":[{"A":23,"ab":100.0,"hl":null}]},{"z":12,"sym":"Mg","name":"Magnesium","mass":24.305,"group":2,"period":3,"gold":"lithophile","tc":1336,"iso":[{"A":24,"ab":78.965,"hl":null},{"A":25,"ab":10.011,"hl":null},{"A":26,"ab":11.025,"hl":null}]},{"z":13,"sym":"Al","name":"Aluminum","mass":26.9815,"group":13,"period":3,"gold":"lithophile","tc":1653,"iso":[{"A":27,"ab":100.0,"hl":null}]},{"z":14,"sym":"Si","name":"Silicon","mass":28.085,"group":14,"period":3,"gold":"lithophile","tc":1310,"iso":[{"A":28,"ab":92.2545,"hl":null},{"A":29,"ab":4.672,"hl":null},{"A":30,"ab":3.0735,"hl":null}]},{"z":15,"sym":"P","name":"Phosphorus","mass":30.9738,"group":15,"period":3,"gold":"lithophile","tc":1229,"iso":[{"A":31,"ab":100.0,"hl":null}]},{"z":16,"sym":"S","name":"Sulfur","mass":32.06,"group":16,"period":3,"gold":"chalcophile","tc":664,"iso":[{"A":32,"ab":94.85,"hl":null},{"A":33,"ab":0.763,"hl":null},{"A":34,"ab":4.365,"hl":null},{"A":36,"ab":0.0158,"hl":null}]},{"z":17,"sym":"Cl","name":"Chlorine","mass":35.45,"group":17,"period":3,"gold":"lithophile","tc":948,"iso":[{"A":35,"ab":75.8,"hl":null},{"A":37,"ab":24.2,"hl":null}]},{"z":18,"sym":"Ar","name":"Argon","mass":39.948,"group":18,"period":3,"gold":"atmophile","tc":47,"iso":[{"A":36,"ab":0.3336,"hl":null},{"A":38,"ab":0.0629,"hl":null},{"A":40,"ab":99.6035,"hl":null}]},{"z":19,"sym":"K","name":"Potassium","mass":39.0983,"group":1,"period":4,"gold":"lithophile","tc":1006,"iso":[{"A":39,"ab":93.2581,"hl":null},{"A":40,"ab":0.0117,"hl":1248000000.0},{"A":41,"ab":6.7302,"hl":null}]},{"z":20,"sym":"Ca","name":"Calcium","mass":40.078,"group":2,"period":4,"gold":"lithophile","tc":1517,"iso":[{"A":40,"ab":96.941,"hl":null},{"A":42,"ab":0.647,"hl":null},{"A":43,"ab":0.135,"hl":null},{"A":44,"ab":2.086,"hl":null},{"A":46,"ab":0.004,"hl":null},{"A":48,"ab":0.187,"hl":5.6e+19}]},{"z":21,"sym":"Sc","name":"Scandium","mass":44.9559,"group":3,"period":4,"gold":"lithophile","tc":1659,"iso":[{"A":45,"ab":100.0,"hl":null}]},{"z":22,"sym":"Ti","name":"Titanium","mass":47.867,"group":4,"period":4,"gold":"lithophile","tc":1582,"iso":[{"A":46,"ab":8.25,"hl":null},{"A":47,"ab":7.44,"hl":null},{"A":48,"ab":73.72,"hl":null},{"A":49,"ab":5.41,"hl":null},{"A":50,"ab":5.18,"hl":null}]},{"z":23,"sym":"V","name":"Vanadium","mass":50.9415,"group":5,"period":4,"gold":"lithophile","tc":1429,"iso":[{"A":50,"ab":0.25,"hl":2.71e+17},{"A":51,"ab":99.75,"hl":null}]},{"z":24,"sym":"Cr","name":"Chromium","mass":51.9961,"group":6,"period":4,"gold":"lithophile","tc":1296,"iso":[{"A":50,"ab":4.345,"hl":null},{"A":52,"ab":83.789,"hl":null},{"A":53,"ab":9.501,"hl":null},{"A":54,"ab":2.365,"hl":null}]},{"z":25,"sym":"Mn","name":"Manganese","mass":54.938,"group":7,"period":4,"gold":"siderophile","tc":1158,"iso":[{"A":55,"ab":100.0,"hl":null}]},{"z":26,"sym":"Fe","name":"Iron","mass":55.845,"group":8,"period":4,"gold":"siderophile","tc":1334,"iso":[{"A":54,"ab":5.845,"hl":null},{"A":56,"ab":91.754,"hl":null},{"A":57,"ab":2.119,"hl":null},{"A":58,"ab":0.282,"hl":null}]},{"z":27,"sym":"Co","name":"Cobalt","mass":58.9332,"group":9,"period":4,"gold":"siderophile","tc":1352,"iso":[{"A":59,"ab":100.0,"hl":null}]},{"z":28,"sym":"Ni","name":"Nickel","mass":58.6934,"group":10,"period":4,"gold":"siderophile","tc":1353,"iso":[{"A":58,"ab":68.0769,"hl":null},{"A":60,"ab":26.2231,"hl":null},{"A":61,"ab":1.1399,"hl":null},{"A":62,"ab":3.6345,"hl":null},{"A":64,"ab":0.9256,"hl":null}]},{"z":29,"sym":"Cu","name":"Copper","mass":63.546,"group":11,"period":4,"gold":"chalcophile","tc":1037,"iso":[{"A":63,"ab":69.15,"hl":null},{"A":65,"ab":30.85,"hl":null}]},{"z":30,"sym":"Zn","name":"Zinc","mass":65.38,"group":12,"period":4,"gold":"chalcophile","tc":726,"iso":[{"A":64,"ab":49.17,"hl":null},{"A":66,"ab":27.73,"hl":null},{"A":67,"ab":4.04,"hl":null},{"A":68,"ab":18.45,"hl":null},{"A":70,"ab":0.61,"hl":null}]},{"z":31,"sym":"Ga","name":"Gallium","mass":69.723,"group":13,"period":4,"gold":"chalcophile","tc":968,"iso":[{"A":69,"ab":60.108,"hl":null},{"A":71,"ab":39.892,"hl":null}]},{"z":32,"sym":"Ge","name":"Germanium","mass":72.63,"group":14,"period":4,"gold":"chalcophile","tc":883,"iso":[{"A":70,"ab":20.52,"hl":null},{"A":72,"ab":27.45,"hl":null},{"A":73,"ab":7.76,"hl":null},{"A":74,"ab":36.52,"hl":null},{"A":76,"ab":7.75,"hl":1.88e+21}]},{"z":33,"sym":"As","name":"Arsenic","mass":74.9216,"group":15,"period":4,"gold":"chalcophile","tc":1065,"iso":[{"A":75,"ab":100.0,"hl":null}]},{"z":34,"sym":"Se","name":"Selenium","mass":78.971,"group":16,"period":4,"gold":"chalcophile","tc":697,"iso":[{"A":74,"ab":0.86,"hl":null},{"A":76,"ab":9.23,"hl":null},{"A":77,"ab":7.6,"hl":null},{"A":78,"ab":23.69,"hl":null},{"A":80,"ab":49.8,"hl":null},{"A":82,"ab":8.82,"hl":8.76e+19}]},{"z":35,"sym":"Br","name":"Bromine","mass":79.904,"group":17,"period":4,"gold":"lithophile","tc":546,"iso":[{"A":79,"ab":50.65,"hl":null},{"A":81,"ab":49.35,"hl":null}]},{"z":36,"sym":"Kr","name":"Krypton","mass":83.798,"group":18,"period":4,"gold":"atmophile","tc":52,"iso":[{"A":78,"ab":0.355,"hl":null},{"A":80,"ab":2.286,"hl":null},{"A":82,"ab":11.593,"hl":null},{"A":83,"ab":11.5,"hl":null},{"A":84,"ab":56.987,"hl":null},{"A":86,"ab":17.279,"hl":null}]},{"z":37,"sym":"Rb","name":"Rubidium","mass":85.4678,"group":1,"period":5,"gold":"lithophile","tc":800,"iso":[{"A":85,"ab":72.17,"hl":null},{"A":87,"ab":27.83,"hl":49700000000.0}]},{"z":38,"sym":"Sr","name":"Strontium","mass":87.62,"group":2,"period":5,"gold":"lithophile","tc":1464,"iso":[{"A":84,"ab":0.56,"hl":null},{"A":86,"ab":9.86,"hl":null},{"A":87,"ab":7.0,"hl":null},{"A":88,"ab":82.58,"hl":null}]},{"z":39,"sym":"Y","name":"Yttrium","mass":88.9058,"group":3,"period":5,"gold":"lithophile","tc":1659,"iso":[{"A":89,"ab":100.0,"hl":null}]},{"z":40,"sym":"Zr","name":"Zirconium","mass":91.224,"group":4,"period":5,"gold":"lithophile","tc":1741,"iso":[{"A":90,"ab":51.45,"hl":null},{"A":91,"ab":11.22,"hl":null},{"A":92,"ab":17.15,"hl":null},{"A":94,"ab":17.38,"hl":null},{"A":96,"ab":2.8,"hl":2.34e+19}]},{"z":41,"sym":"Nb","name":"Niobium","mass":92.9064,"group":5,"period":5,"gold":"lithophile","tc":1559,"iso":[{"A":93,"ab":100.0,"hl":null}]},{"z":42,"sym":"Mo","name":"Molybdenum","mass":95.95,"group":6,"period":5,"gold":"siderophile","tc":1590,"iso":[{"A":92,"ab":14.649,"hl":null},{"A":94,"ab":9.187,"hl":null},{"A":95,"ab":15.873,"hl":null},{"A":96,"ab":16.673,"hl":null},{"A":97,"ab":9.582,"hl":null},{"A":98,"ab":24.292,"hl":null},{"A":100,"ab":9.744,"hl":7.07e+18}]},{"z":43,"sym":"Tc","name":"Technetium","mass":97.9072,"group":7,"period":5,"gold":null,"tc":null,"iso":[]},{"z":44,"sym":"Ru","name":"Ruthenium","mass":101.07,"group":8,"period":5,"gold":"siderophile","tc":1551,"iso":[{"A":96,"ab":5.54,"hl":null},{"A":98,"ab":1.87,"hl":null},{"A":99,"ab":12.76,"hl":null},{"A":100,"ab":12.6,"hl":null},{"A":101,"ab":17.06,"hl":null},{"A":102,"ab":31.55,"hl":null},{"A":104,"ab":18.62,"hl":null}]},{"z":45,"sym":"Rh","name":"Rhodium","mass":102.9055,"group":9,"period":5,"gold":"siderophile","tc":1392,"iso":[{"A":103,"ab":100.0,"hl":null}]},{"z":46,"sym":"Pd","name":"Palladium","mass":106.42,"group":10,"period":5,"gold":"siderophile","tc":1324,"iso":[{"A":102,"ab":1.02,"hl":null},{"A":104,"ab":11.14,"hl":null},{"A":105,"ab":22.33,"hl":null},{"A":106,"ab":27.33,"hl":null},{"A":108,"ab":26.46,"hl":null},{"A":110,"ab":11.72,"hl":null}]},{"z":47,"sym":"Ag","name":"Silver","mass":107.8682,"group":11,"period":5,"gold":"chalcophile","tc":996,"iso":[{"A":107,"ab":51.839,"hl":null},{"A":109,"ab":48.161,"hl":null}]},{"z":48,"sym":"Cd","name":"Cadmium","mass":112.414,"group":12,"period":5,"gold":"chalcophile","tc":652,"iso":[{"A":106,"ab":1.245,"hl":null},{"A":108,"ab":0.888,"hl":null},{"A":110,"ab":12.47,"hl":null},{"A":111,"ab":12.795,"hl":null},{"A":112,"ab":24.109,"hl":null},{"A":113,"ab":12.227,"hl":8039999999999999.0},{"A":114,"ab":28.754,"hl":null},{"A":116,"ab":7.512,"hl":2.69e+19}]},{"z":49,"sym":"In","name":"Indium","mass":114.818,"group":13,"period":5,"gold":"chalcophile","tc":536,"iso":[{"A":113,"ab":4.281,"hl":null},{"A":115,"ab":95.719,"hl":441000000000000.0}]},{"z":50,"sym":"Sn","name":"Tin","mass":118.71,"group":14,"period":5,"gold":"chalcophile","tc":704,"iso":[{"A":112,"ab":0.97,"hl":null},{"A":114,"ab":0.66,"hl":null},{"A":115,"ab":0.34,"hl":null},{"A":116,"ab":14.54,"hl":null},{"A":117,"ab":7.68,"hl":null},{"A":118,"ab":24.22,"hl":null},{"A":119,"ab":8.59,"hl":null},{"A":120,"ab":32.58,"hl":null},{"A":122,"ab":4.63,"hl":null},{"A":124,"ab":5.79,"hl":null}]},{"z":51,"sym":"Sb","name":"Antimony","mass":121.76,"group":15,"period":5,"gold":"chalcophile","tc":979,"iso":[{"A":121,"ab":57.21,"hl":null},{"A":123,"ab":42.79,"hl":null}]},{"z":52,"sym":"Te","name":"Tellurium","mass":127.6,"group":16,"period":5,"gold":"chalcophile","tc":709,"iso":[{"A":120,"ab":0.09,"hl":null},{"A":122,"ab":2.55,"hl":null},{"A":123,"ab":0.89,"hl":null},{"A":124,"ab":4.74,"hl":null},{"A":125,"ab":7.07,"hl":null},{"A":126,"ab":18.84,"hl":null},{"A":128,"ab":31.74,"hl":2.2499999999999998e+24},{"A":130,"ab":34.08,"hl":7.91e+20}]},{"z":53,"sym":"I","name":"Iodine","mass":126.9045,"group":17,"period":5,"gold":"lithophile","tc":535,"iso":[{"A":127,"ab":100.0,"hl":null}]},{"z":54,"sym":"Xe","name":"Xenon","mass":131.293,"group":18,"period":5,"gold":"atmophile","tc":68,"iso":[{"A":124,"ab":0.095,"hl":null},{"A":126,"ab":0.089,"hl":null},{"A":128,"ab":1.91,"hl":null},{"A":129,"ab":26.401,"hl":null},{"A":130,"ab":4.071,"hl":null},{"A":131,"ab":21.232,"hl":null},{"A":132,"ab":26.909,"hl":null},{"A":134,"ab":10.436,"hl":null},{"A":136,"ab":8.857,"hl":2.1800000000000003e+21}]},{"z":55,"sym":"Cs","name":"Cesium","mass":132.9055,"group":1,"period":6,"gold":"lithophile","tc":799,"iso":[{"A":133,"ab":100.0,"hl":null}]},{"z":56,"sym":"Ba","name":"Barium","mass":137.327,"group":2,"period":6,"gold":"lithophile","tc":1455,"iso":[{"A":130,"ab":0.11,"hl":null},{"A":132,"ab":0.1,"hl":null},{"A":134,"ab":2.42,"hl":null},{"A":135,"ab":6.59,"hl":null},{"A":136,"ab":7.85,"hl":null},{"A":137,"ab":11.23,"hl":null},{"A":138,"ab":71.7,"hl":null}]},{"z":57,"sym":"La","name":"Lanthanum","mass":138.9055,"group":3,"period":6,"gold":"lithophile","tc":1578,"iso":[{"A":138,"ab":0.08881,"hl":103000000000.0},{"A":139,"ab":99.91119,"hl":null}]},{"z":58,"sym":"Ce","name":"Cerium","mass":140.116,"group":null,"period":6,"gold":"lithophile","tc":1478,"iso":[{"A":136,"ab":0.186,"hl":null},{"A":138,"ab":0.251,"hl":null},{"A":140,"ab":88.449,"hl":null},{"A":142,"ab":11.114,"hl":null}]},{"z":59,"sym":"Pr","name":"Praseodymium","mass":140.9077,"group":null,"period":6,"gold":"lithophile","tc":1582,"iso":[{"A":141,"ab":100.0,"hl":null}]},{"z":60,"sym":"Nd","name":"Neodymium","mass":144.242,"group":null,"period":6,"gold":"lithophile","tc":1602,"iso":[{"A":142,"ab":27.153,"hl":null},{"A":143,"ab":12.173,"hl":null},{"A":144,"ab":23.798,"hl":2290000000000000.0},{"A":145,"ab":8.293,"hl":null},{"A":146,"ab":17.189,"hl":null},{"A":148,"ab":5.756,"hl":null},{"A":150,"ab":5.638,"hl":9.3e+18}]},{"z":61,"sym":"Pm","name":"Promethium","mass":144.9128,"group":null,"period":6,"gold":"lithophile","tc":null,"iso":[]},{"z":62,"sym":"Sm","name":"Samarium","mass":150.36,"group":null,"period":6,"gold":"lithophile","tc":1590,"iso":[{"A":144,"ab":3.08,"hl":null},{"A":147,"ab":15.0,"hl":106600000000.0},{"A":148,"ab":11.25,"hl":6300000000000000.0},{"A":149,"ab":13.82,"hl":null},{"A":150,"ab":7.37,"hl":null},{"A":152,"ab":26.74,"hl":null},{"A":154,"ab":22.74,"hl":null}]},{"z":63,"sym":"Eu","name":"Europium","mass":151.964,"group":null,"period":6,"gold":"lithophile","tc":1356,"iso":[{"A":151,"ab":47.81,"hl":4.5999999999999995e+18},{"A":153,"ab":52.19,"hl":null}]},{"z":64,"sym":"Gd","name":"Gadolinium","mass":157.25,"group":null,"period":6,"gold":"lithophile","tc":1659,"iso":[{"A":152,"ab":0.2,"hl":108000000000000.0},{"A":154,"ab":2.18,"hl":null},{"A":155,"ab":14.8,"hl":null},{"A":156,"ab":20.47,"hl":null},{"A":157,"ab":15.65,"hl":null},{"A":158,"ab":24.84,"hl":null},{"A":160,"ab":21.86,"hl":null}]},{"z":65,"sym":"Tb","name":"Terbium","mass":158.9254,"group":null,"period":6,"gold":"lithophile","tc":1659,"iso":[{"A":159,"ab":100.0,"hl":null}]},{"z":66,"sym":"Dy","name":"Dysprosium","mass":162.5,"group":null,"period":6,"gold":"lithophile","tc":1659,"iso":[{"A":156,"ab":0.056,"hl":null},{"A":158,"ab":0.095,"hl":null},{"A":160,"ab":2.329,"hl":null},{"A":161,"ab":18.889,"hl":null},{"A":162,"ab":25.475,"hl":null},{"A":163,"ab":24.896,"hl":null},{"A":164,"ab":28.26,"hl":null}]},{"z":67,"sym":"Ho","name":"Holmium","mass":164.9303,"group":null,"period":6,"gold":"lithophile","tc":1659,"iso":[{"A":165,"ab":100.0,"hl":null}]},{"z":68,"sym":"Er","name":"Erbium","mass":167.259,"group":null,"period":6,"gold":"lithophile","tc":1659,"iso":[{"A":162,"ab":0.139,"hl":null},{"A":164,"ab":1.601,"hl":null},{"A":166,"ab":33.503,"hl":null},{"A":167,"ab":22.869,"hl":null},{"A":168,"ab":26.978,"hl":null},{"A":170,"ab":14.91,"hl":null}]},{"z":69,"sym":"Tm","name":"Thulium","mass":168.9342,"group":null,"period":6,"gold":"lithophile","tc":1659,"iso":[{"A":169,"ab":100.0,"hl":null}]},{"z":70,"sym":"Yb","name":"Ytterbium","mass":173.045,"group":null,"period":6,"gold":"lithophile","tc":1487,"iso":[{"A":168,"ab":0.123,"hl":null},{"A":170,"ab":2.982,"hl":null},{"A":171,"ab":14.086,"hl":null},{"A":172,"ab":21.686,"hl":null},{"A":173,"ab":16.103,"hl":null},{"A":174,"ab":32.025,"hl":null},{"A":176,"ab":12.995,"hl":null}]},{"z":71,"sym":"Lu","name":"Lutetium","mass":174.9668,"group":null,"period":6,"gold":"lithophile","tc":1659,"iso":[{"A":175,"ab":97.401,"hl":null},{"A":176,"ab":2.599,"hl":37010000000.0}]},{"z":72,"sym":"Hf","name":"Hafnium","mass":178.49,"group":4,"period":6,"gold":"lithophile","tc":1684,"iso":[{"A":174,"ab":0.16,"hl":2000000000000000.0},{"A":176,"ab":5.26,"hl":null},{"A":177,"ab":18.6,"hl":null},{"A":178,"ab":27.28,"hl":null},{"A":179,"ab":13.62,"hl":null},{"A":180,"ab":35.08,"hl":null}]},{"z":73,"sym":"Ta","name":"Tantalum","mass":180.9479,"group":5,"period":6,"gold":"lithophile","tc":1573,"iso":[{"A":181,"ab":99.98799,"hl":null}]},{"z":74,"sym":"W","name":"Tungsten","mass":183.84,"group":6,"period":6,"gold":"lithophile","tc":1789,"iso":[{"A":180,"ab":0.12,"hl":1.59e+18},{"A":182,"ab":26.5,"hl":null},{"A":183,"ab":14.31,"hl":null},{"A":184,"ab":30.64,"hl":null},{"A":186,"ab":28.43,"hl":null}]},{"z":75,"sym":"Re","name":"Rhenium","mass":186.207,"group":7,"period":6,"gold":"siderophile","tc":1821,"iso":[{"A":185,"ab":37.4,"hl":null},{"A":187,"ab":62.6,"hl":41600000000.0}]},{"z":76,"sym":"Os","name":"Osmium","mass":190.23,"group":8,"period":6,"gold":"siderophile","tc":1812,"iso":[{"A":184,"ab":0.02,"hl":11200000000000.0},{"A":186,"ab":1.59,"hl":2000000000000000.0},{"A":187,"ab":1.96,"hl":null},{"A":188,"ab":13.24,"hl":null},{"A":189,"ab":16.15,"hl":null},{"A":190,"ab":26.26,"hl":null},{"A":192,"ab":40.78,"hl":null}]},{"z":77,"sym":"Ir","name":"Iridium","mass":192.217,"group":9,"period":6,"gold":"siderophile","tc":1603,"iso":[{"A":191,"ab":37.3,"hl":null},{"A":193,"ab":62.7,"hl":null}]},{"z":78,"sym":"Pt","name":"Platinum","mass":195.084,"group":10,"period":6,"gold":"siderophile","tc":1408,"iso":[{"A":190,"ab":0.012,"hl":483000000000.0},{"A":192,"ab":0.782,"hl":null},{"A":194,"ab":32.864,"hl":null},{"A":195,"ab":33.775,"hl":null},{"A":196,"ab":25.211,"hl":null},{"A":198,"ab":7.356,"hl":null}]},{"z":79,"sym":"Au","name":"Gold","mass":196.9666,"group":11,"period":6,"gold":"siderophile","tc":1060,"iso":[{"A":197,"ab":100.0,"hl":null}]},{"z":80,"sym":"Hg","name":"Mercury","mass":200.592,"group":12,"period":6,"gold":"chalcophile","tc":252,"iso":[{"A":196,"ab":0.15,"hl":null},{"A":198,"ab":10.04,"hl":null},{"A":199,"ab":16.94,"hl":null},{"A":200,"ab":23.14,"hl":null},{"A":201,"ab":13.17,"hl":null},{"A":202,"ab":29.74,"hl":null},{"A":204,"ab":6.82,"hl":null}]},{"z":81,"sym":"Tl","name":"Thallium","mass":204.38,"group":13,"period":6,"gold":"chalcophile","tc":532,"iso":[{"A":203,"ab":29.515,"hl":null},{"A":205,"ab":70.485,"hl":null}]},{"z":82,"sym":"Pb","name":"Lead","mass":207.2,"group":14,"period":6,"gold":"chalcophile","tc":727,"iso":[{"A":204,"ab":1.4,"hl":null},{"A":206,"ab":24.1,"hl":null},{"A":207,"ab":22.1,"hl":null},{"A":208,"ab":52.4,"hl":null}]},{"z":83,"sym":"Bi","name":"Bismuth","mass":208.9804,"group":15,"period":6,"gold":"chalcophile","tc":746,"iso":[{"A":209,"ab":100.0,"hl":2.01e+19}]},{"z":84,"sym":"Po","name":"Polonium","mass":209.0,"group":16,"period":6,"gold":null,"tc":null,"iso":[]},{"z":85,"sym":"At","name":"Astatine","mass":210.0,"group":17,"period":6,"gold":null,"tc":null,"iso":[]},{"z":86,"sym":"Rn","name":"Radon","mass":222.0,"group":18,"period":6,"gold":null,"tc":null,"iso":[]},{"z":87,"sym":"Fr","name":"Francium","mass":223.0,"group":1,"period":7,"gold":null,"tc":null,"iso":[]},{"z":88,"sym":"Ra","name":"Radium","mass":226.0,"group":2,"period":7,"gold":"lithophile","tc":null,"iso":[]},{"z":89,"sym":"Ac","name":"Actinium","mass":227.0,"group":3,"period":7,"gold":null,"tc":null,"iso":[]},{"z":90,"sym":"Th","name":"Thorium","mass":232.0377,"group":null,"period":7,"gold":"lithophile","tc":1659,"iso":[{"A":230,"ab":0.02,"hl":75400.0},{"A":232,"ab":99.98,"hl":14000000000.0}]},{"z":91,"sym":"Pa","name":"Protactinium","mass":231.0359,"group":null,"period":7,"gold":"lithophile","tc":null,"iso":[{"A":231,"ab":100.0,"hl":32650.0}]},{"z":92,"sym":"U","name":"Uranium","mass":238.0289,"group":null,"period":7,"gold":"lithophile","tc":1610,"iso":[{"A":234,"ab":0.0054,"hl":245500.0},{"A":235,"ab":0.7204,"hl":704000000.0},{"A":238,"ab":99.2742,"hl":4463000000.0}]},{"z":93,"sym":"Np","name":"Neptunium","mass":237.0,"group":null,"period":7,"gold":null,"tc":null,"iso":[]},{"z":94,"sym":"Pu","name":"Plutonium","mass":244.0,"group":null,"period":7,"gold":null,"tc":null,"iso":[]},{"z":95,"sym":"Am","name":"Americium","mass":243.0,"group":null,"period":7,"gold":null,"tc":null,"iso":[]},{"z":96,"sym":"Cm","name":"Curium","mass":247.0,"group":null,"period":7,"gold":null,"tc":null,"iso":[]},{"z":97,"sym":"Bk","name":"Berkelium","mass":247.0,"group":null,"period":7,"gold":null,"tc":null,"iso":[]},{"z":98,"sym":"Cf","name":"Californium","mass":251.0,"group":null,"period":7,"gold":null,"tc":null,"iso":[]},{"z":99,"sym":"Es","name":"Einsteinium","mass":252.0,"group":null,"period":7,"gold":null,"tc":null,"iso":[]},{"z":100,"sym":"Fm","name":"Fermium","mass":257.0,"group":null,"period":7,"gold":null,"tc":null,"iso":[]},{"z":101,"sym":"Md","name":"Mendelevium","mass":258.0,"group":null,"period":7,"gold":null,"tc":null,"iso":[]},{"z":102,"sym":"No","name":"Nobelium","mass":259.0,"group":null,"period":7,"gold":null,"tc":null,"iso":[]},{"z":103,"sym":"Lr","name":"Lawrencium","mass":262.0,"group":null,"period":7,"gold":null,"tc":null,"iso":[]},{"z":104,"sym":"Rf","name":"Rutherfordium","mass":267.0,"group":4,"period":7,"gold":null,"tc":null,"iso":[]},{"z":105,"sym":"Db","name":"Dubnium","mass":268.0,"group":5,"period":7,"gold":null,"tc":null,"iso":[]},{"z":106,"sym":"Sg","name":"Seaborgium","mass":271.0,"group":6,"period":7,"gold":null,"tc":null,"iso":[]},{"z":107,"sym":"Bh","name":"Bohrium","mass":274.0,"group":7,"period":7,"gold":null,"tc":null,"iso":[]},{"z":108,"sym":"Hs","name":"Hassium","mass":269.0,"group":8,"period":7,"gold":null,"tc":null,"iso":[]},{"z":109,"sym":"Mt","name":"Meitnerium","mass":276.0,"group":9,"period":7,"gold":null,"tc":null,"iso":[]},{"z":110,"sym":"Ds","name":"Darmstadtium","mass":281.0,"group":10,"period":7,"gold":null,"tc":null,"iso":[]},{"z":111,"sym":"Rg","name":"Roentgenium","mass":281.0,"group":11,"period":7,"gold":null,"tc":null,"iso":[]},{"z":112,"sym":"Cn","name":"Copernicium","mass":285.0,"group":12,"period":7,"gold":null,"tc":null,"iso":[]},{"z":113,"sym":"Nh","name":"Nihonium","mass":286.0,"group":13,"period":7,"gold":null,"tc":null,"iso":[]},{"z":114,"sym":"Fl","name":"Flerovium","mass":289.0,"group":14,"period":7,"gold":null,"tc":null,"iso":[]},{"z":115,"sym":"Mc","name":"Moscovium","mass":288.0,"group":15,"period":7,"gold":null,"tc":null,"iso":[]},{"z":116,"sym":"Lv","name":"Livermorium","mass":293.0,"group":16,"period":7,"gold":null,"tc":null,"iso":[]},{"z":117,"sym":"Ts","name":"Tennessine","mass":294.0,"group":17,"period":7,"gold":null,"tc":null,"iso":[]},{"z":118,"sym":"Og","name":"Oganesson","mass":294.0,"group":18,"period":7,"gold":null,"tc":null,"iso":[]}];
+const VAPOR = {"bars":[{"name":"Diethyl ether","kpa":71.7,"bp":34.4},{"name":"Dichloromethane","kpa":58.4,"bp":39.7},{"name":"Acetone","kpa":30.8,"bp":56.1},{"name":"Hexane","kpa":20.3,"bp":68.7},{"name":"Methanol","kpa":16.8,"bp":64.5},{"name":"Ethanol","kpa":7.9,"bp":78.3},{"name":"Toluene","kpa":3.8,"bp":110.7},{"name":"Water","kpa":3.2,"bp":100.0}],"curves":[{"name":"Water","bp":100.0,"pts":[[0,0.61],[1,0.66],[2,0.7],[3,0.76],[4,0.81],[5,0.87],[6,0.93],[7,1.0],[8,1.07],[9,1.15],[10,1.23],[11,1.31],[12,1.4],[13,1.5],[14,1.6],[15,1.71],[16,1.82],[17,1.94],[18,2.06],[19,2.2],[20,2.34],[21,2.49],[22,2.65],[23,2.81],[24,2.99],[25,3.17],[26,3.36],[27,3.57],[28,3.78],[29,4.01],[30,4.25],[31,4.5],[32,4.76],[33,5.04],[34,5.33],[35,5.63],[36,5.95],[37,6.28],[38,6.63],[39,7.0],[40,7.39],[41,7.79],[42,8.21],[43,8.65],[44,9.11],[45,9.6],[46,10.1],[47,10.63],[48,11.18],[49,11.75],[50,12.35],[51,12.98],[52,13.63],[53,14.31],[54,15.02],[55,15.76],[56,16.53],[57,17.33],[58,18.17],[59,19.04],[60,19.94],[61,20.88],[62,21.86],[63,22.88],[64,23.93],[65,25.03],[66,26.17],[67,27.35],[68,28.58],[69,29.86],[70,31.18],[71,32.55],[72,33.98],[73,35.45],[74,36.98],[75,38.56],[76,40.21],[77,41.9],[78,43.66],[79,45.48],[80,47.37],[81,49.32],[82,51.33],[83,53.42],[84,55.57],[85,57.8],[86,60.1],[87,62.48],[88,64.94],[89,67.47],[90,70.09],[91,72.79],[92,75.58],[93,78.46],[94,81.43],[95,84.49],[96,87.64],[97,90.9],[98,94.25],[99,97.7],[100,101.26]]},{"name":"Ethanol","bp":78.3,"pts":[[0,1.6],[1,1.71],[2,1.84],[3,1.97],[4,2.11],[5,2.26],[6,2.42],[7,2.59],[8,2.76],[9,2.95],[10,3.15],[11,3.36],[12,3.59],[13,3.82],[14,4.07],[15,4.34],[16,4.62],[17,4.91],[18,5.22],[19,5.55],[20,5.9],[21,6.26],[22,6.65],[23,7.05],[24,7.48],[25,7.92],[26,8.39],[27,8.89],[28,9.41],[29,9.95],[30,10.53],[31,11.13],[32,11.76],[33,12.42],[34,13.11],[35,13.83],[36,14.59],[37,15.38],[38,16.22],[39,17.09],[40,17.99],[41,18.94],[42,19.94],[43,20.97],[44,22.05],[45,23.18],[46,24.36],[47,25.59],[48,26.87],[49,28.21],[50,29.6],[51,31.05],[52,32.56],[53,34.13],[54,35.76],[55,37.46],[56,39.23],[57,41.06],[58,42.97],[59,44.96],[60,47.02],[61,49.16],[62,51.38],[63,53.68],[64,56.07],[65,58.55],[66,61.12],[67,63.79],[68,66.55],[69,69.41],[70,72.37],[71,75.44],[72,78.61],[73,81.9],[74,85.3],[75,88.82],[76,92.45],[77,96.21],[78,100.09],[79,104.11],[80,108.25],[81,112.53],[82,116.96],[83,121.52],[84,126.23],[85,131.09],[86,136.1],[87,141.27],[88,146.6],[89,152.1],[90,157.76],[91,163.59],[92,169.6],[93,175.79],[94,182.17],[95,188.73],[96,195.48],[97,202.43],[98,209.58],[99,216.94],[100,224.5]]},{"name":"Acetone","bp":56.1,"pts":[[0,9.39],[1,9.89],[2,10.42],[3,10.97],[4,11.54],[5,12.14],[6,12.77],[7,13.42],[8,14.09],[9,14.8],[10,15.54],[11,16.3],[12,17.1],[13,17.93],[14,18.79],[15,19.68],[16,20.62],[17,21.58],[18,22.59],[19,23.63],[20,24.71],[21,25.83],[22,27.0],[23,28.2],[24,29.46],[25,30.75],[26,32.09],[27,33.48],[28,34.92],[29,36.41],[30,37.95],[31,39.55],[32,41.2],[33,42.9],[34,44.66],[35,46.48],[36,48.36],[37,50.3],[38,52.3],[39,54.37],[40,56.5],[41,58.7],[42,60.97],[43,63.3],[44,65.72],[45,68.2],[46,70.76],[47,73.39],[48,76.11],[49,78.9],[50,81.78],[51,84.74],[52,87.78],[53,90.92],[54,94.14],[55,97.45],[56,100.85],[57,104.35],[58,107.95],[59,111.64],[60,115.43],[61,119.32],[62,123.32],[63,127.43],[64,131.64],[65,135.96],[66,140.39],[67,144.94],[68,149.6],[69,154.38],[70,159.28],[71,164.3],[72,169.44],[73,174.71],[74,180.11],[75,185.64],[76,191.3],[77,197.1],[78,203.04],[79,209.11],[80,215.32],[81,221.68],[82,228.19],[83,234.84],[84,241.64],[85,248.6],[86,255.71],[87,262.98],[88,270.41],[89,278.0],[90,285.76],[91,293.68],[92,301.77],[93,310.04],[94,318.48],[95,327.09],[96,335.89],[97,344.87],[98,354.03],[99,363.38],[100,372.92]]},{"name":"Diethyl ether","bp":34.4,"pts":[[0,24.82],[1,26.01],[2,27.25],[3,28.54],[4,29.88],[5,31.27],[6,32.71],[7,34.2],[8,35.74],[9,37.34],[10,39.0],[11,40.72],[12,42.49],[13,44.33],[14,46.23],[15,48.19],[16,50.23],[17,52.32],[18,54.49],[19,56.73],[20,59.04],[21,61.42],[22,63.88],[23,66.42],[24,69.04],[25,71.73],[26,74.51],[27,77.37],[28,80.32],[29,83.36],[30,86.49],[31,89.7],[32,93.01],[33,96.42],[34,99.92],[35,103.52],[36,107.22],[37,111.02],[38,114.93],[39,118.95],[40,123.07],[41,127.3],[42,131.64],[43,136.1],[44,140.68],[45,145.37],[46,150.18],[47,155.12],[48,160.18],[49,165.37],[50,170.68],[51,176.13],[52,181.71],[53,187.42],[54,193.27],[55,199.26],[56,205.39],[57,211.67],[58,218.09],[59,224.66],[60,231.38],[61,238.25],[62,245.28],[63,252.46],[64,259.81],[65,267.32],[66,274.99],[67,282.82],[68,290.83],[69,299.01],[70,307.36],[71,315.89],[72,324.59],[73,333.48],[74,342.55],[75,351.81],[76,361.26],[77,370.89],[78,380.72],[79,390.75],[80,400.97],[81,411.4],[82,422.03],[83,432.86],[84,443.91],[85,455.16],[86,466.63],[87,478.32],[88,490.23],[89,502.35],[90,514.71],[91,527.29],[92,540.1],[93,553.15],[94,566.43],[95,579.95],[96,593.71],[97,607.71],[98,621.96],[99,636.47],[100,651.22]]}]};
 const BY_SYM = Object.fromEntries(ELEMENTS.map(e => [e.sym, e]));
-
 const params = new URLSearchParams(location.search);
 if (params.get("embed") === "1") document.documentElement.classList.add("embed");
 
-/* ---------- vocabulary ---------- */
 const SUPD = {"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","-":"⁻"};
 const supU = n => String(n).split("").map(d => SUPD[d] || d).join("");
 const WORDS = ["no","one","two","three","four","five","six","seven","eight","nine","ten"];
 
+/* ---------- categories ---------- */
 const GOLD = {
   lithophile:  { label: "Lithophile",  short: "Litho",  gloss: "rock-loving",  color: "#008300", ink: "#ffffff",
-    sentence: "It bonds with oxygen and stays in the silicate rock of crusts and mantles.",
-    text: "Lithophile, or “rock-loving”, elements bond strongly with oxygen. They form silicate and oxide minerals and stay in the crust and mantle rather than sinking into the core." },
+    text: "Lithophile elements bond strongly with oxygen. They build the silicate and oxide minerals of the crust and mantle, so they stayed in rock rather than following metal into the core. They include the major rock-forming elements (Si, Mg, Al, Ca, Na, K), the rare earth elements, and uranium and thorium." },
   siderophile: { label: "Siderophile", short: "Sidero", gloss: "iron-loving",  color: "#e87ba4", ink: "#ffffff",
-    sentence: "It dissolves readily in iron metal and tends to follow metal into planetary cores.",
-    text: "Siderophile, or “iron-loving”, elements dissolve readily in iron metal. When Earth’s core formed, much of their inventory followed the metal down, leaving the mantle depleted in them." },
+    text: "Siderophile elements dissolve readily in iron metal. When Earth’s core formed, much of their inventory followed the metal down, leaving the mantle depleted. The most siderophile, such as osmium, iridium, platinum and gold, are so scarce in the mantle that small additions of meteoritic material after core formation can dominate their budget." },
   chalcophile: { label: "Chalcophile", short: "Chalco", gloss: "ore-loving",   color: "#eda100", ink: "#0b0b0b",
-    sentence: "It bonds with sulfur and concentrates in sulfide minerals.",
-    text: "Chalcophile, or “ore-loving”, elements bond readily with sulfur. They concentrate in sulfide minerals, and many are mined from sulfide ores." },
+    text: "Chalcophile elements bond readily with sulfur. They concentrate in sulfide minerals such as sphalerite and galena, and many metals mined from sulfide ores, including copper, zinc and lead, belong here. Many chalcophile elements are also volatile." },
   atmophile:   { label: "Atmophile",   short: "Atmo",   gloss: "vapor-loving", color: "#2a78d6", ink: "#ffffff",
-    sentence: "It stays mostly gaseous and collects in atmospheres and oceans.",
-    text: "Atmophile, or “vapor-loving”, elements stay mostly as gases. They collect in atmospheres and oceans rather than in rock or metal." },
-  none:        { label: "Not classified", short: "", color: "#e9e8e3", ink: "#52514e",
-    text: "Synthetic and very short-lived elements have no stable home in rock, metal or gas, so no Goldschmidt class is assigned here." }
+    text: "Atmophile elements stay mostly as gases. Hydrogen, nitrogen and the noble gases collect in atmospheres and oceans rather than in rock or metal, and rocky planets hold only small amounts of them compared with the Sun." },
+  none:        { label: "Not classified", short: "", gloss: "", color: "#e9e8e3", ink: "#52514e", text: "" }
 };
-
 const VOL = {
   refractory: { label: "Refractory", range: "≥ 1355 K", color: "#0d366b", ink: "#ffffff",
-    text: "Refractory elements were among the first to become solid as the gas around the young Sun cooled. Half of each had condensed above 1355 K, which is why they are concentrated in the oldest solids, the calcium-aluminum-rich inclusions." },
+    text: "The first elements to become solid as the gas around the young Sun cooled. They are concentrated in the oldest solids, the calcium-aluminum-rich inclusions." },
   common:     { label: "Common", range: "1250–1354 K", color: "#1c5cab", ink: "#ffffff",
-    text: "Common elements condensed between 1250 and 1354 K, together with the magnesium silicates and iron–nickel metal that make up most of the rock and metal in planets." },
+    text: "Condensed together with the magnesium silicates and iron–nickel metal that make up most of the rock and metal in planets." },
   volatile:   { label: "Volatile", range: "650–1249 K", color: "#3987e5", ink: "#ffffff",
-    text: "Volatile elements condensed between 650 and 1249 K. Bodies that formed hot or were heated later, including the Moon, are often depleted in them, and their isotopes can record that loss." },
+    text: "Condensed only at lower temperatures. Bodies that formed hot or were heated later, including the Moon, are often depleted in them, and their isotopes can record that loss." },
   highly:     { label: "Highly volatile", range: "< 650 K", color: "#86b6ef", ink: "#0b0b0b",
-    text: "Highly volatile elements stayed in gas until below 650 K. Most of them are scarce in rocky bodies compared with the Sun." },
-  none:       { label: "No value", range: "", color: "#e9e8e3", ink: "#52514e",
-    text: "No 50% condensation temperature is listed here, either because the element is synthetic or because it stays largely gaseous." }
+    text: "Stayed in gas until the coolest stages. Most of them are scarce in rocky bodies compared with the Sun." },
+  none:       { label: "No value", range: "", color: "#e9e8e3", ink: "#52514e", text: "" }
 };
-
 const SYSG = {
   stable:  { label: "Stable isotope ratios", color: "#2a78d6", ink: "#ffffff",
     text: "Ratios of stable isotopes shift by small, predictable amounts during evaporation, condensation, degassing and chemical reactions. I use these mass-dependent shifts to trace volatile loss and the sources of planetary materials." },
@@ -280,6 +255,12 @@ const SYSG = {
   halogen: { label: "Halogen abundances", color: "#1baf7a", ink: "#ffffff",
     text: "Fluorine, bromine and iodine are measured as abundances alongside chlorine, which also has isotope ratios. Together the halogens show how volatile elements were lost or retained." },
   none:    { label: "Other elements", color: "#e9e8e3", ink: "#52514e", text: "" }
+};
+const MIXED = {
+  Fe: "It shows both lithophile and siderophile character, and is found throughout the core, mantle and crust.",
+  Cr: "It shows both lithophile and siderophile character.",
+  Mo: "It shows both lithophile and siderophile character.",
+  Zn: "It is also somewhat lithophile, occurring in silicate minerals."
 };
 
 /* ---------- papers (from my CV) ---------- */
@@ -364,24 +345,6 @@ const SYSTEMS = {
         research: HALOGEN_RESEARCH, notation: "Measured as abundance. Monoisotopic, ¹²⁷I.", papers: ["pnas2020", "icarus"] }
 };
 
-/* ---------- mixed affinities (caveats in the Wikipedia Goldschmidt classification article, a source cited by mendeleev) ---------- */
-const MIXED = {
-  Mn: "It shows both lithophile and siderophile character, and sources differ on its class.",
-  Fe: "It shows both lithophile and siderophile character, and is found throughout the core, mantle and crust.",
-  Cr: "It shows both lithophile and siderophile character.",
-  Mo: "It shows both lithophile and siderophile character.",
-  V:  "Its siderophile character is disputed and depends on temperature and pressure.",
-  Nb: "Its siderophile character is disputed and depends on temperature and pressure.",
-  W:  "Some sources also count it as siderophile.",
-  Ag: "Some sources also count it as siderophile.",
-  Ge: "Some sources count it as siderophile.",
-  Zn: "It is also somewhat lithophile, occurring in silicate minerals.",
-  Ga: "It is also somewhat lithophile, occurring in silicate minerals.",
-  Cu: "Some of it may also mix into core metal.",
-  H:  "It also has some lithophile character, since it occurs in water and hydrous minerals."
-};
-
-/* ---------- classification helpers ---------- */
 const goldKey = e => GOLD[e.gold] ? e.gold : "none";
 const volKey = e => e.tc == null ? "none" : e.tc >= 1355 ? "refractory" : e.tc >= 1250 ? "common" : e.tc >= 650 ? "volatile" : "highly";
 const sysKey = e => SYSTEMS[e.sym] ? SYSTEMS[e.sym].group : "none";
@@ -389,25 +352,16 @@ const fmtTc = t => (Number.isInteger(t) ? t : t.toFixed(1)) + " K";
 const fmtMass = e => e.iso.length === 0 && e.mass != null ? "[" + Math.round(e.mass) + "]" : (e.mass == null ? "n/a" : String(e.mass));
 
 const LAYERS = {
-  systems: { label: "My isotope systems", title: "Isotope systems I work with",
-    desc: "The sixteen elements I measure or work with, colored by the kind of isotope signal they carry.",
-    key: sysKey, cats: SYSG, showNone: false,
-    cellLabel: e => SYSTEMS[e.sym] ? SYSTEMS[e.sym].tag.replace(" δ¹⁸O", ",¹⁸O").replace("¹⁸⁷Os/¹⁸⁸Os", "¹⁸⁷Os") : "" },
-  gold: { label: "Goldschmidt class", title: "Goldschmidt classification",
-    desc: "Where each element prefers to reside, in rock, metal, sulfide or gas (White, 2013).",
-    key: goldKey, cats: GOLD, showNone: true, cellLabel: e => GOLD[goldKey(e)].short },
-  vol: { label: "Volatility", title: "Volatility",
-    desc: "The temperature by which half of each element had condensed from the gas around the young Sun, at 10⁻⁴ bar (Lodders, 2003).",
-    key: volKey, cats: VOL, showNone: true, cellLabel: e => e.tc == null ? "" : fmtTc(e.tc) }
+  systems: { title: "Isotope systems I work with", key: sysKey, cats: SYSG, order: ["stable", "nucleo", "halogen"],
+    cellLabel: e => SYSTEMS[e.sym] ? SYSTEMS[e.sym].tag.replace(" δ¹⁸O", ",¹⁸O").replace("¹⁸⁷Os/¹⁸⁸Os", "¹⁸⁷Os") : "",
+    hint: "Click a colored element to open its card." },
+  gold: { title: "Goldschmidt classification", key: goldKey, cats: GOLD, order: ["lithophile", "siderophile", "chalcophile", "atmophile"],
+    cellLabel: e => GOLD[goldKey(e)].short, hint: "marks my isotope systems. Click one to open its card." },
+  vol: { title: "Volatility", key: volKey, cats: VOL, order: ["refractory", "common", "volatile", "highly"],
+    cellLabel: e => e.tc == null ? "" : fmtTc(e.tc), hint: "marks my isotope systems. Click one to open its card." }
 };
 
-/* ---------- sentences ---------- */
-function classSentence(e) {
-  const k = goldKey(e);
-  if (k === "none") return e.name + " has no Goldschmidt class here, because it is synthetic or too short-lived to have a stable geochemical home.";
-  const g = GOLD[k];
-  return e.name + " is " + g.label.toLowerCase() + ", or “" + g.gloss + "”. " + g.sentence + (MIXED[e.sym] ? " " + MIXED[e.sym] : "");
-}
+/* ---------- sentences for my system cards ---------- */
 function volSentence(e) {
   const k = volKey(e), t = e.tc == null ? "" : fmtTc(e.tc);
   if (e.sym === "O") return "Only part of it condensed into rock-forming minerals at high temperature. Half of all oxygen condensed only as water ice, by " + t + ".";
@@ -424,11 +378,7 @@ function isoSentence(e) {
   const n = e.iso.length, nm = e.name.toLowerCase();
   if (n === 0) return "It has no long-lived natural isotopes.";
   const rad = e.iso.filter(isRad);
-  if (n === 1) {
-    const i = e.iso[0];
-    return isRad(i) ? "Its only natural isotope, <sup>" + i.A + "</sup>" + e.sym + ", is radioactive." : "It has a single natural isotope, <sup>" + i.A + "</sup>" + e.sym + ".";
-  }
-  if (rad.length === n) return "Natural " + nm + " is a mix of " + WORDS[n] + " isotopes, all radioactive.";
+  if (n === 1) { const i = e.iso[0]; return isRad(i) ? "Its only natural isotope, <sup>" + i.A + "</sup>" + e.sym + ", is radioactive." : "It has a single natural isotope, <sup>" + i.A + "</sup>" + e.sym + "."; }
   let s = "Natural " + nm + " is a mix of " + (WORDS[n] || n) + " isotopes";
   if (rad.length) s += ", including radioactive " + rad.map(i => "<sup>" + i.A + "</sup>" + e.sym).join(" and ");
   return s + ".";
@@ -441,330 +391,311 @@ function fmtHL(y) {
   if (y >= 1e3) return +(y / 1e3).toPrecision(4) + " kyr";
   return +y.toPrecision(4) + " yr";
 }
-function fmtAb(a) { return (a >= 1 ? +a.toFixed(3) : +a.toPrecision(3)) + "%"; }
+const fmtAb = a => (a >= 1 ? +a.toFixed(3) : +a.toPrecision(3)) + "%";
 
-/* ---------- state + elements ---------- */
-const state = { layer: "systems", sel: null, view: "grid", techOpen: false, sortKey: "z", sortDir: 1 };
+/* ---------- state ---------- */
+const state = { layer: "systems", sel: null, techOpen: false };
 const grid = document.getElementById("grid");
+const below = document.getElementById("below");
 const box = document.getElementById("box");
 const boxBody = document.getElementById("boxBody");
+const cardSlot = document.getElementById("cardSlot");
 const tip = document.getElementById("tip");
 const cellBySym = {};
 let legend, lastAnchor = null;
+const narrow = () => window.innerWidth <= 700;
 
 function pos(e) {
   if (e.z >= 57 && e.z <= 71) return { row: 9, col: 3 + (e.z - 57) };
   if (e.z >= 89 && e.z <= 103) return { row: 10, col: 3 + (e.z - 89) };
   return { row: e.period, col: e.group };
 }
-
 function buildGrid() {
   ELEMENTS.forEach(e => {
     const p = pos(e); e._row = p.row; e._col = p.col;
-    const b = document.createElement("button");
-    b.type = "button"; b.className = "cell"; b.dataset.sym = e.sym;
-    b.style.gridRow = p.row; b.style.gridColumn = p.col;
-    b.innerHTML = '<span class="z">' + e.z + '</span><span class="sym">' + e.sym + '</span><span class="lab"></span>';
-    grid.appendChild(b); cellBySym[e.sym] = b;
+    const isSys = !!SYSTEMS[e.sym];
+    const c = document.createElement(isSys ? "button" : "div");
+    if (isSys) c.type = "button"; else c.setAttribute("aria-hidden", "true");
+    c.className = "cell"; c.dataset.sym = e.sym;
+    c.style.gridRow = p.row; c.style.gridColumn = p.col;
+    c.innerHTML = '<span class="z">' + e.z + '</span><span class="sym">' + e.sym + '</span><span class="lab"></span>';
+    grid.appendChild(c); cellBySym[e.sym] = c;
   });
-  [[6, "57–71"], [7, "89–103"]].forEach(([r, t]) => {
-    const d = document.createElement("div"); d.className = "ph"; d.style.gridRow = r; d.style.gridColumn = 3; d.textContent = t; d.setAttribute("aria-hidden", "true"); grid.appendChild(d);
-  });
+  [[6, "57–71"], [7, "89–103"]].forEach(([r, t]) => { const d = document.createElement("div"); d.className = "ph"; d.style.gridRow = r; d.style.gridColumn = 3; d.textContent = t; d.setAttribute("aria-hidden", "true"); grid.appendChild(d); });
   const sp = document.createElement("div"); sp.className = "spacer"; sp.style.gridRow = 8; sp.style.gridColumn = "1 / -1"; grid.appendChild(sp);
   legend = document.createElement("div"); legend.className = "legend"; grid.appendChild(legend);
+  // screen-reader twin of the table
+  document.getElementById("srTable").innerHTML = '<caption>Elements, Goldschmidt class and 50% condensation temperature</caption><thead><tr><th>Element</th><th>Goldschmidt class</th><th>50% condensation temperature</th><th>My isotope system</th></tr></thead><tbody>' +
+    ELEMENTS.map(e => '<tr><td>' + e.name + ' (' + e.sym + ')</td><td>' + GOLD[goldKey(e)].label + '</td><td>' + (e.tc != null ? fmtTc(e.tc) : "none") + '</td><td>' + (SYSTEMS[e.sym] ? SYSTEMS[e.sym].tag : "") + '</td></tr>').join("") + '</tbody>';
 }
+function counts(L) { const c = {}; ELEMENTS.forEach(e => { const k = L.key(e); c[k] = (c[k] || 0) + 1; }); return c; }
 
 function paint() {
   const L = LAYERS[state.layer];
+  grid.dataset.layer = state.layer;
   ELEMENTS.forEach(e => {
-    const c = cellBySym[e.sym], k = L.key(e), cat = L.cats[k];
+    const c = cellBySym[e.sym], cat = L.cats[L.key(e)];
     c.style.background = cat.color; c.style.color = cat.ink;
     c.querySelector(".lab").textContent = L.cellLabel(e);
-    c.dataset.cat = k;
-    const extra = state.layer === "vol" && e.tc != null ? ", " + fmtTc(e.tc) : (state.layer === "systems" && SYSTEMS[e.sym] ? ", " + SYSTEMS[e.sym].tag : "");
-    c.setAttribute("aria-label", e.name + ", " + e.sym + ", atomic number " + e.z + ". " + cat.label + extra + ".");
+    if (SYSTEMS[e.sym]) c.setAttribute("aria-label", e.name + ", my isotope system, " + SYSTEMS[e.sym].tag + ". Open card.");
   });
   document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-checked", String(b.dataset.layer === state.layer)));
-  renderLegend();
-  applyHighlight();
-  if (state.view === "table") renderTable();
+  renderLegend(); renderBelow(); applyHighlight();
 }
-
-function counts(L) { const c = {}; ELEMENTS.forEach(e => { const k = L.key(e); c[k] = (c[k] || 0) + 1; }); return c; }
-
-function catSource(layer) {
-  return layer === "systems"
-    ? '<span class="flag own">my work</span>Group assignments. <span class="flag">constructed</span>Description.'
-    : layer === "gold"
-      ? '<span class="flag">published</span>Classes from White (2013). <span class="flag">constructed</span>Description.'
-      : '<span class="flag">published</span>Temperatures from Lodders (2003). <span class="flag">constructed</span>Group boundaries and description.';
-}
+function selKey() { return state.sel && state.sel.type === "cat" && state.sel.layer === state.layer ? state.sel.key : null; }
 function renderLegend() {
-  const L = LAYERS[state.layer], n = counts(L);
-  const selKey = state.sel && state.sel.type === "cat" && state.sel.layer === state.layer ? state.sel.key : null;
-  const chips = Object.entries(L.cats).filter(([k]) => (k !== "none" || L.showNone) && n[k]).map(([k, c]) => {
-    return '<button type="button" class="chip" data-cat="' + state.layer + ':' + k + '" aria-pressed="' + (selKey === k) + '"><i style="background:' + c.color + '"></i>' + c.label + (c.range ? ' <span class="rng">' + c.range + '</span>' : '') + ' <span class="n">' + n[k] + '</span></button>';
-  }).join("");
-  if (selKey) {
-    const c = L.cats[selKey];
-    legend.classList.add("has-cat");
-    legend.innerHTML = '<div class="lg-title">' + L.title + '</div><div class="lg-chips">' + chips + '</div>' +
-      '<div class="lg-cat" role="region" aria-labelledby="lgcat-title"><button type="button" class="lg-x" aria-label="Clear selection">&times;</button>' +
-      '<div class="lg-cat-head" id="lgcat-title" tabindex="-1"><i style="background:' + c.color + '"></i>' + c.label + ' <span>' + n[selKey] + ' elements highlighted' + (c.range ? ' · ' + c.range : '') + '</span></div>' +
-      (c.text ? '<p>' + c.text + '</p>' : '') + '<p class="src">' + catSource(state.layer) + '</p></div>';
-  } else {
-    legend.classList.remove("has-cat");
-    legend.innerHTML = '<div class="lg-title">' + L.title + '</div><div class="lg-desc">' + L.desc + '</div><div class="lg-chips">' + chips + '</div><div class="lg-hint">Click an element or a category.</div>';
-  }
+  const L = LAYERS[state.layer], n = counts(L), sk = selKey();
+  const chips = L.order.map(k => { const c = L.cats[k]; return '<button type="button" class="chip" data-cat="' + state.layer + ':' + k + '" aria-pressed="' + (sk === k) + '"><i style="background:' + c.color + '"></i>' + c.label + (c.range ? ' <span class="rng">' + c.range + '</span>' : '') + ' <span class="n">' + (n[k] || 0) + '</span></button>'; }).join("");
+  const hint = state.layer === "systems" ? L.hint : '<span class="dot" aria-hidden="true"></span><span>The dot ' + L.hint + '</span>';
+  legend.innerHTML = '<div class="lg-title">' + L.title + '</div><div class="lg-chips">' + chips + '</div><div class="lg-hint">' + hint + '</div>';
 }
-
 function applyHighlight() {
-  const L = LAYERS[state.layer];
-  const catSel = state.sel && state.sel.type === "cat" && state.sel.layer === state.layer ? state.sel.key : null;
-  grid.classList.toggle("dim", !!catSel);
+  const L = LAYERS[state.layer], sk = selKey();
+  grid.classList.toggle("dim", !!sk);
   ELEMENTS.forEach(e => {
     const c = cellBySym[e.sym];
-    c.classList.toggle("is-member", !!catSel && L.key(e) === catSel);
+    c.classList.toggle("is-member", !!sk && L.key(e) === sk);
     const selected = !!state.sel && state.sel.type === "el" && state.sel.sym === e.sym;
     c.classList.toggle("is-selected", selected);
-    c.setAttribute("aria-pressed", String(selected));
+    if (SYSTEMS[e.sym]) c.setAttribute("aria-pressed", String(selected));
   });
-  document.querySelectorAll("table.data tr[data-sym]").forEach(r => r.classList.toggle("is-selected", !!state.sel && state.sel.type === "el" && state.sel.sym === r.dataset.sym));
+  below.querySelectorAll(".catbox[data-cat]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.cat === state.layer + ":" + sk)));
+  legend.querySelectorAll(".chip[data-cat]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.cat === state.layer + ":" + sk)));
 }
 
-/* ---------- text box ---------- */
-function chip(layer, key, label) {
-  const c = LAYERS[layer].cats[key];
-  return '<button type="button" class="chip" data-cat="' + layer + ':' + key + '"><i style="background:' + c.color + '"></i>' + label + '</button>';
+/* ---------- text boxes beneath the table ---------- */
+function catBox(layer, key, extra) {
+  const L = LAYERS[layer], c = L.cats[key], n = counts(L)[key] || 0, clickable = !extra;
+  return '<article class="catbox"' + (clickable ? ' role="button" tabindex="0" data-cat="' + layer + ':' + key + '" aria-pressed="false"' : ' style="cursor:default"') + '>' +
+    '<div class="cb-head"><i style="background:' + c.color + '"></i><h3>' + c.label + '</h3></div>' +
+    (c.gloss ? '<div class="gloss">“' + c.gloss + '”</div>' : '') + (c.range ? '<div class="gloss">' + c.range + '</div>' : '') +
+    '<p>' + c.text + '</p>' + (extra || '') + '<p class="meta">' + n + ' elements' + (clickable ? ' in the table. Click to highlight them.' : '. Click a symbol to open its card.') + '</p></article>';
 }
+function renderBelow() {
+  let html = "";
+  if (state.layer === "systems") {
+    html = '<div class="below-head"><h2>Isotope systems I work with</h2><p>Sixteen elements, grouped by the kind of isotope signal they carry. Click a colored element in the table, or a symbol below, to open its card.</p></div>' +
+      '<div class="boxes n3">' + LAYERS.systems.order.map(k => {
+        const members = ELEMENTS.filter(e => sysKey(e) === k);
+        const chips = '<div class="members">' + members.map(e => '<button type="button" class="el-chip" data-sym="' + e.sym + '" style="background:' + SYSG[k].color + ';color:' + SYSG[k].ink + '" title="' + e.name + '">' + e.sym + '</button>').join("") + '</div>';
+        return catBox("systems", k, chips);
+      }).join("") + '</div>' +
+      '<p class="src"><span class="flag own">my work</span>Systems, groupings, research summaries and papers. <span class="flag">constructed</span>Descriptions.</p>';
+  } else if (state.layer === "gold") {
+    html = '<div class="below-head"><h2>Goldschmidt classes</h2><p>In the 1920s the geochemist Victor Goldschmidt grouped the elements by where they prefer to reside in a planet, in rock, metal, sulfide or gas. Click a class to highlight its elements in the table.</p></div>' +
+      '<div class="boxes n4">' + LAYERS.gold.order.map(k => catBox("gold", k)).join("") + '</div>' +
+      '<p class="note">Several elements, including Mn, Fe, Cr, Mo, V and W, show more than one character, and their class differs between compilations. Synthetic and very short-lived elements are left unclassified (gray).</p>' +
+      '<p class="src"><span class="flag">published</span>Classes, White (2013) <em>Geochemistry</em>, as compiled in the mendeleev Python package. Mixed-affinity caveats, Wikipedia, Goldschmidt classification. <span class="flag">constructed</span>Descriptions.</p>';
+  } else {
+    html = '<div class="below-head"><h2>Volatility</h2><p>How readily an element turns to vapor. Each element in the table shows the temperature by which half of it had condensed from the gas around the young Sun. Click a group to highlight its elements.</p></div>' +
+      '<div class="boxes n4">' + LAYERS.vol.order.map(k => catBox("vol", k)).join("") + '</div>' +
+      '<div class="vp">' +
+        '<div class="vp-text"><h3>What is vapor pressure?</h3><p>Every liquid and solid gives off some vapor. Vapor pressure is the pressure of that vapor when it is in balance with the liquid or solid at a given temperature. A substance with a high vapor pressure evaporates readily, and we call it volatile.</p><p>Vapor pressure climbs steeply as temperature rises, and a liquid boils when its vapor pressure reaches the pressure of its surroundings.</p>' +
+        '<h3>From solvents to the solar nebula</h3><p>The same idea sets the condensation temperatures in the table. As the gas around the young Sun cooled, an element condensed once its vapor pressure over a solid fell below its partial pressure in the gas. Elements whose solids have extremely low vapor pressures, like tungsten and osmium, condensed first and hottest. Elements with high vapor pressures, like zinc and sulfur, waited until the gas was much cooler.</p><p>The model behind these temperatures assumes a total gas pressure of 10⁻⁴ bar (10 Pa), roughly 1/300 of the vapor pressure of water at room temperature.</p></div>' +
+        '<figure class="chart" id="barFig"><div class="ch-title">Vapor pressure at 25 °C</div><div class="ch-sub">Common solvents, in kilopascals (kPa)</div><div class="ch-body"></div><figcaption>Higher values evaporate faster. Water is the least volatile of these.</figcaption></figure>' +
+        '<figure class="chart" id="lineFig"><div class="ch-title">Vapor pressure rises with temperature</div><div class="ch-sub">kPa, 0 to 100 °C</div><div class="ch-legend"></div><div class="ch-body"></div><figcaption>Each liquid boils where its curve reaches 1 atm (101.3 kPa), marked by a dot.</figcaption></figure>' +
+      '</div>' +
+      '<p class="src"><span class="flag">published</span>Condensation temperatures at 10⁻⁴ bar, Lodders (2003) <em>Astrophysical Journal</em> 591, 1220. Solvent vapor pressures computed from the correlations in Perry’s Chemical Engineers’ Handbook, 8th ed. (Green &amp; Perry, 2008), Table 2-8. <span class="flag">constructed</span>Group boundaries (1355, 1250 and 650 K) and descriptions.</p>';
+  }
+  below.innerHTML = html;
+  if (state.layer === "vol") { drawBars(); drawLines(); }
+  applyHighlightBelowOnly();
+}
+function applyHighlightBelowOnly() {
+  const sk = selKey();
+  below.querySelectorAll(".catbox[data-cat]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.cat === state.layer + ":" + sk)));
+}
+
+/* ---------- charts ---------- */
+const NS = "http://www.w3.org/2000/svg";
+function svgEl(tag, attrs, text) { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (text != null) n.textContent = text; return n; }
+function showTipAt(x, y, html) { tip.innerHTML = html; tip.hidden = false; const half = tip.offsetWidth / 2; tip.style.left = Math.max(half + 6, Math.min(window.innerWidth - half - 6, x)) + "px"; tip.style.top = Math.max(tip.offsetHeight + 16, y) + "px"; }
+
+function drawBars() {
+  const fig = document.getElementById("barFig"); if (!fig) return;
+  const host = fig.querySelector(".ch-body"); host.innerHTML = "";
+  const data = VAPOR.bars, W = Math.max(260, host.clientWidth || 320), rowH = 25, top = 4, left = 104, right = 54, axisH = 20;
+  const H = top + data.length * rowH + axisH, max = 80, pw = W - left - right;
+  const x = v => left + (v / max) * pw;
+  const s = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": "Bar chart of vapor pressure at 25 °C: " + data.map(d => d.name + " " + d.kpa + " kPa").join(", ") });
+  [0, 20, 40, 60, 80].forEach(t => { s.appendChild(svgEl("line", { x1: x(t), x2: x(t), y1: top, y2: top + data.length * rowH, stroke: t === 0 ? "#c3c2b7" : "#e1e0d9", "stroke-width": 1 })); s.appendChild(svgEl("text", { x: x(t), y: H - 6, "text-anchor": "middle", class: "svg-tick" }, t)); });
+  data.forEach((d, i) => {
+    const y0 = top + i * rowH + (rowH - 14) / 2, y1 = y0 + 14, x0 = x(0), x1 = x(d.kpa), r = Math.min(4, (x1 - x0) / 2, 7);
+    const g = svgEl("g", { tabindex: "0", "aria-label": d.name + ", " + d.kpa + " kPa at 25 °C, boils at " + d.bp + " °C" });
+    g.appendChild(svgEl("rect", { x: 0, y: top + i * rowH, width: W, height: rowH, fill: "transparent" }));
+    g.appendChild(svgEl("path", { d: "M" + x0 + "," + y0 + " H" + (x1 - r) + " A" + r + "," + r + " 0 0 1 " + x1 + "," + (y0 + r) + " V" + (y1 - r) + " A" + r + "," + r + " 0 0 1 " + (x1 - r) + "," + y1 + " H" + x0 + " Z", fill: "#2a78d6" }));
+    g.appendChild(svgEl("text", { x: left - 8, y: y0 + 11, "text-anchor": "end", class: "svg-lab" + (d.name === "Water" ? " svg-strong" : "") }, d.name));
+    g.appendChild(svgEl("text", { x: x1 + 6, y: y0 + 11, class: "svg-val" }, d.kpa + " kPa"));
+    const show = ev => { const b = (ev.currentTarget || g).getBoundingClientRect(); showTipAt(ev.clientX || (b.left + b.width / 2), (ev.clientY || b.top) - 4, "<b>" + d.name + "</b><br>" + d.kpa + " kPa at 25 °C<br>Boils at " + d.bp + " °C"); };
+    g.addEventListener("pointermove", show); g.addEventListener("focus", show);
+    g.addEventListener("pointerleave", () => tip.hidden = true); g.addEventListener("blur", () => tip.hidden = true);
+    s.appendChild(g);
+  });
+  host.appendChild(s);
+}
+function drawLines() {
+  const fig = document.getElementById("lineFig"); if (!fig) return;
+  const host = fig.querySelector(".ch-body"); host.innerHTML = "";
+  const COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"];
+  const series = VAPOR.curves.map((c, i) => ({ ...c, color: COLORS[i] }));
+  fig.querySelector(".ch-legend").innerHTML = series.map(s => '<span><i style="background:' + s.color + '"></i>' + s.name + '</span>').join("");
+  const W = Math.max(260, host.clientWidth || 320), H = 220, m = { l: 34, r: 10, t: 8, b: 24 }, pw = W - m.l - m.r, ph = H - m.t - m.b, ymax = 200;
+  const x = t => m.l + (t / 100) * pw, y = p => m.t + ph - (Math.min(p, ymax) / ymax) * ph;
+  const s = svgEl("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": "Line chart of vapor pressure from 0 to 100 °C for " + series.map(c => c.name + " (boils at " + c.bp + " °C)").join(", ") });
+  const defs = svgEl("defs", {}); const cp = svgEl("clipPath", { id: "plotclip" }); cp.appendChild(svgEl("rect", { x: m.l, y: m.t, width: pw, height: ph })); defs.appendChild(cp); s.appendChild(defs);
+  [0, 50, 100, 150, 200].forEach(p => { s.appendChild(svgEl("line", { x1: m.l, x2: m.l + pw, y1: y(p), y2: y(p), stroke: p === 0 ? "#c3c2b7" : "#e1e0d9", "stroke-width": 1 })); s.appendChild(svgEl("text", { x: m.l - 6, y: y(p) + 3.5, "text-anchor": "end", class: "svg-tick" }, p)); });
+  [0, 20, 40, 60, 80, 100].forEach(t => s.appendChild(svgEl("text", { x: x(t), y: H - 7, "text-anchor": "middle", class: "svg-tick" }, t + "°")));
+  s.appendChild(svgEl("line", { x1: m.l, x2: m.l + pw, y1: y(101.325), y2: y(101.325), stroke: "#898781", "stroke-width": 1 }));
+  s.appendChild(svgEl("text", { x: m.l + 4, y: y(101.325) - 5, class: "svg-tick" }, "1 atm"));
+  series.forEach(c => {
+    const d = c.pts.map((p, i) => (i ? "L" : "M") + x(p[0]).toFixed(1) + "," + (m.t + ph - (p[1] / ymax) * ph).toFixed(1)).join(" ");
+    s.appendChild(svgEl("path", { d, fill: "none", stroke: c.color, "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round", "clip-path": "url(#plotclip)" }));
+  });
+  series.forEach(c => {
+    s.appendChild(svgEl("circle", { cx: x(c.bp), cy: y(101.325), r: 4.5, fill: c.color, stroke: "#ffffff", "stroke-width": 2 }));
+    s.appendChild(svgEl("text", { x: x(c.bp), y: y(101.325) + 16, "text-anchor": "middle", class: "svg-val" }, (Math.round(c.bp * 10) / 10) + "°"));
+  });
+  const cross = svgEl("line", { x1: 0, x2: 0, y1: m.t, y2: m.t + ph, stroke: "#c3c2b7", "stroke-width": 1, visibility: "hidden" }); s.appendChild(cross);
+  const hit = svgEl("rect", { x: m.l, y: m.t, width: pw, height: ph, fill: "transparent" }); s.appendChild(hit);
+  hit.addEventListener("pointermove", ev => {
+    const r = s.getBoundingClientRect(), sx = (ev.clientX - r.left) * (W / r.width);
+    const t = Math.max(0, Math.min(100, Math.round(((sx - m.l) / pw) * 100)));
+    cross.setAttribute("x1", x(t)); cross.setAttribute("x2", x(t)); cross.setAttribute("visibility", "visible");
+    showTipAt(ev.clientX, ev.clientY - 6, "<b>" + t + " °C</b><br>" + series.map(c => c.name + " " + (c.pts[t][1] >= 100 ? Math.round(c.pts[t][1]) : c.pts[t][1].toFixed(1)) + " kPa").join("<br>"));
+  });
+  hit.addEventListener("pointerleave", () => { cross.setAttribute("visibility", "hidden"); tip.hidden = true; });
+  host.appendChild(s);
+  const wrap = document.createElement("div"); wrap.className = "sr-only";
+  wrap.innerHTML = "<table><caption>Vapor pressure (kPa)</caption><tr><th>°C</th>" + series.map(c => "<th>" + c.name + "</th>").join("") + "</tr>" + [0, 25, 50, 75, 100].map(T => "<tr><td>" + T + "</td>" + series.map(c => "<td>" + c.pts[T][1] + "</td>").join("") + "</tr>").join("") + "</table>";
+  host.appendChild(wrap);
+}
+
+/* ---------- cards for my systems ---------- */
+function chip(layer, key, label) { const c = LAYERS[layer].cats[key]; return '<button type="button" class="chip" data-cat="' + layer + ':' + key + '"><i style="background:' + c.color + '"></i>' + label + '</button>'; }
 function papersHtml(keys) {
   if (!keys.length) return "";
-  return '<ul class="papers">' + keys.map(k => {
-    const p = P[k];
-    const t = p.url ? '<a href="' + p.url + '" target="_blank" rel="noopener">' + p.title + '</a>' : p.title;
-    return '<li>' + p.cite + (/\.$/.test(p.cite) ? ' ' : '. ') + t + '. <em>' + p.venue + '</em>.' + (p.status ? '<span class="status">' + p.status + '</span>' : '') + '</li>';
-  }).join("") + '</ul>';
+  return '<ul class="papers">' + keys.map(k => { const p = P[k]; const t = p.url ? '<a href="' + p.url + '" target="_blank" rel="noopener">' + p.title + '</a>' : p.title; return '<li>' + p.cite + (/\.$/.test(p.cite) ? ' ' : '. ') + t + '. <em>' + p.venue + '</em>.' + (p.status ? '<span class="status">' + p.status + '</span>' : '') + '</li>'; }).join("") + '</ul>';
 }
 function isoTable(e) {
-  if (!e.iso.length) return '<p class="src">No long-lived natural isotopes.</p>';
   const rows = e.iso.map(i => '<tr><td><sup>' + i.A + '</sup>' + e.sym + '</td><td class="num">' + fmtAb(i.ab) + '</td><td class="barcell"><span class="bar' + (isRad(i) ? ' rad' : '') + '" style="width:' + Math.max(0, Math.min(100, i.ab)) + '%"></span></td><td class="num">' + fmtHL(i.hl) + '</td></tr>').join("");
   return '<table class="iso"><thead><tr><th>Isotope</th><th class="num">Abundance</th><th></th><th class="num">Half-life</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
-function renderElementBox(e) {
-  const gk = goldKey(e), vk = volKey(e), sys = SYSTEMS[e.sym];
-  const L = LAYERS[state.layer], tc = L.cats[L.key(e)];
-  const chips = [
-    chip("gold", gk, gk === "none" ? "No Goldschmidt class" : GOLD[gk].label),
-    chip("vol", vk, e.tc != null ? VOL[vk].label + " · " + fmtTc(e.tc) : "No condensation value"),
-    sys ? chip("systems", sys.group, "My system · " + sys.tag) : ""
-  ].join("");
-  const lead = [sys ? sys.summary : classSentence(e), volSentence(e), isoSentence(e)].filter(Boolean).join(" ");
-  const research = sys ? '<section class="research"><h4>In my research</h4><p>' + sys.research + '</p>' + papersHtml(sys.papers) + '</section>' : "";
-  const dl = '<dl>' +
-    '<dt>Goldschmidt class</dt><dd>' + (gk === "none" ? "Not classified" : GOLD[gk].label + " (" + GOLD[gk].gloss + ")") + '</dd>' +
-    '<dt>50% condensation T</dt><dd>' + (e.tc != null ? fmtTc(e.tc) + " at 10⁻⁴ bar" : "Not listed") + '</dd>' +
-    '<dt>Volatility group</dt><dd>' + VOL[vk].label + (VOL[vk].range ? " (" + VOL[vk].range + ")" : "") + '</dd>' +
-    (MIXED[e.sym] ? '<dt>Class note</dt><dd>' + MIXED[e.sym] + '</dd>' : "") +
-    (sys ? '<dt>Notation</dt><dd>' + sys.notation + '</dd>' : "") +
-    '<dt>Atomic weight</dt><dd>' + fmtMass(e) + '</dd>' +
-    '</dl>';
-  const tech = '<details class="tech"' + (state.techOpen ? " open" : "") + '><summary>Technical detail</summary>' + dl + isoTable(e) + '</details>';
-  const src = '<p class="src"><span class="flag">published</span>Class, White (2013). Condensation T, Lodders (2003). Isotopes, NUBASE2020. <span class="flag">constructed</span>Description' + (sys ? ' <span class="flag own">my work</span>Research summary and papers' : '') + '.</p>';
-  return '<header class="bx-head"><div class="bx-tile" style="background:' + tc.color + ';color:' + tc.ink + '"><span class="z">' + e.z + '</span><span class="sym">' + e.sym + '</span></div><div><h3 id="box-title" tabindex="-1">' + e.name + '</h3><div class="sub">Atomic number ' + e.z + ' · Atomic weight ' + fmtMass(e) + '</div></div></header>' +
-    '<div class="chips">' + chips + '</div><p class="lead">' + lead + '</p>' + research + tech + src;
+function renderCard(e) {
+  const sys = SYSTEMS[e.sym], gk = goldKey(e), vk = volKey(e), L = LAYERS[state.layer], tc = L.cats[L.key(e)];
+  const chips = chip("gold", gk, GOLD[gk].label) + chip("vol", vk, VOL[vk].label + " · " + fmtTc(e.tc)) + chip("systems", sys.group, SYSG[sys.group].label);
+  const lead = [sys.summary, volSentence(e), isoSentence(e)].filter(Boolean).join(" ");
+  const dl = '<dl><dt>Notation</dt><dd>' + sys.notation + '</dd>' +
+    '<dt>Goldschmidt class</dt><dd>' + GOLD[gk].label + ' (' + GOLD[gk].gloss + ')</dd>' + (MIXED[e.sym] ? '<dt>Class note</dt><dd>' + MIXED[e.sym] + '</dd>' : '') +
+    '<dt>50% condensation T</dt><dd>' + fmtTc(e.tc) + ' at 10⁻⁴ bar</dd><dt>Volatility group</dt><dd>' + VOL[vk].label + ' (' + VOL[vk].range + ')</dd><dt>Atomic weight</dt><dd>' + fmtMass(e) + '</dd></dl>';
+  return '<header class="bx-head"><div class="bx-tile" style="background:' + tc.color + ';color:' + tc.ink + '"><span class="z">' + e.z + '</span><span class="sym">' + e.sym + '</span></div><div><h3 id="box-title" tabindex="-1">' + e.name + '</h3><div class="sub">' + sys.tag + ' · Atomic number ' + e.z + '</div></div></header>' +
+    '<div class="chips">' + chips + '</div><p class="lead">' + lead + '</p>' +
+    '<section class="research"><h4>In my research</h4><p>' + sys.research + '</p>' + papersHtml(sys.papers) + '</section>' +
+    '<details class="tech"' + (state.techOpen ? ' open' : '') + '><summary>Technical detail</summary>' + dl + isoTable(e) + '</details>' +
+    '<p class="src"><span class="flag own">my work</span>Research summary and papers. <span class="flag">published</span>Class, White (2013). Condensation T, Lodders (2003). Isotopes, NUBASE2020. <span class="flag">constructed</span>Description.</p>';
 }
-function renderSourcesBox() {
-  return '<header class="bx-head"><div><h3 id="box-title" tabindex="-1">Sources and notes</h3><div class="sub">What is published, what is constructed, and what is my own work</div></div></header>' +
-    '<ul class="srclist">' +
-    '<li><span class="flag">published</span> Goldschmidt classes. W. M. White (2013), <em>Geochemistry</em>, Wiley, as compiled in the mendeleev Python package (v1.3.0).</li>' +
-    '<li><span class="flag">published</span> 50% condensation temperatures at 10⁻⁴ bar. K. Lodders (2003), <em>Astrophysical Journal</em> 591, 1220–1247, Table 8.</li>' +
-    '<li><span class="flag">published</span> Isotopic abundances and half-lives. F. G. Kondev et al. (2021), NUBASE2020, <em>Chinese Physics C</em> 45, 030001.</li>' +
-    '<li><span class="flag">published</span> Standard atomic weights. IUPAC (2016), <em>Pure and Applied Chemistry</em> 88, 265–291.</li>' +
-    '<li><span class="flag">published</span> Mixed-affinity notes (for example Mn, Fe, Cr, Mo, V, W). Caveats from the Wikipedia article on the Goldschmidt classification, also cited by mendeleev. Classes for these elements differ between compilations.</li>' +
-    '<li><span class="flag">constructed</span> Volatility group boundaries (1355, 1250 and 650 K), all element and category descriptions, and the grouping of my systems.</li>' +
-    '<li><span class="flag own">my work</span> Research summaries and paper lists, from my CV.</li>' +
-    '</ul><p class="src">Isotopes with half-lives longer than 10¹² years are treated as effectively stable in the descriptions. Bracketed atomic weights are mass numbers for elements without stable isotopes.</p>';
-}
-
-function openBox(html, anchor) {
-  boxBody.innerHTML = html;
-  box.hidden = false;
-  lastAnchor = anchor || null;
-  positionBox(anchor);
+function openCard(sym, anchor) {
+  const e = BY_SYM[sym]; if (!e || !SYSTEMS[sym]) return;
+  state.sel = { type: "el", sym }; applyHighlight();
+  boxBody.innerHTML = renderCard(e);
+  if (narrow()) { box.classList.add("inline"); cardSlot.appendChild(box); } else { box.classList.remove("inline"); document.body.appendChild(box); }
+  box.hidden = false; lastAnchor = anchor || cellBySym[sym];
+  positionBox(lastAnchor);
+  const d = box.querySelector("details.tech"); if (d) d.addEventListener("toggle", () => { state.techOpen = d.open; positionBox(lastAnchor); postHeight(); });
   const h = box.querySelector("h3"); if (h) h.focus({ preventScroll: true });
-  const d = box.querySelector("details.tech");
-  if (d) d.addEventListener("toggle", () => { state.techOpen = d.open; if (lastAnchor) positionBox(lastAnchor); });
+  if (narrow()) box.scrollIntoView({ block: "nearest" });
+  updateHash(); postHeight();
 }
 function positionBox(anchor) {
-  if (window.innerWidth <= 700) { box.style.left = ""; box.style.top = ""; return; }
-  const bw = box.offsetWidth, bh = box.offsetHeight, vw = window.innerWidth, vh = window.innerHeight, m = 12;
-  let left, top;
-  if (anchor && anchor.getBoundingClientRect) {
-    const r = anchor.getBoundingClientRect();
-    left = r.right + 14;
-    if (left + bw > vw - m) left = r.left - bw - 14;
-    if (left < m) left = Math.max(m, Math.min(vw - bw - m, r.left + r.width / 2 - bw / 2));
-    top = r.top - 10;
-  } else { left = (vw - bw) / 2; top = (vh - bh) / 2; }
-  top = Math.max(m, Math.min(top, vh - bh - m));
+  if (box.classList.contains("inline")) { box.style.left = ""; box.style.top = ""; return; }
+  const bw = box.offsetWidth, bh = box.offsetHeight, vw = window.innerWidth, vh = window.innerHeight, mg = 12;
+  const r = anchor.getBoundingClientRect();
+  let left = r.right + 14; if (left + bw > vw - mg) left = r.left - bw - 14; if (left < mg) left = Math.max(mg, Math.min(vw - bw - mg, r.left + r.width / 2 - bw / 2));
+  let top = Math.max(mg, Math.min(r.top - 10, vh - bh - mg));
   box.style.left = Math.round(left) + "px"; box.style.top = Math.round(top) + "px";
 }
-function closeBox() {
-  box.hidden = true; state.sel = null; applyHighlight(); renderLegend(); updateHash();
+function closeCard() {
+  if (box.hidden) return;
+  box.hidden = true; if (state.sel && state.sel.type === "el") state.sel = null; applyHighlight(); updateHash(); postHeight();
   if (lastAnchor && lastAnchor.isConnected && lastAnchor.focus) lastAnchor.focus({ preventScroll: true });
   lastAnchor = null;
-}
-
-function selectElement(sym, anchor) {
-  const e = BY_SYM[sym]; if (!e) return;
-  state.sel = { type: "el", sym };
-  applyHighlight(); renderLegend();
-  const a = anchor || (state.view === "grid" ? cellBySym[sym] : document.querySelector('table.data tr[data-sym="' + sym + '"]'));
-  openBox(renderElementBox(e), a);
-  updateHash();
 }
 function selectCategory(layer, key) {
   if (!LAYERS[layer] || !LAYERS[layer].cats[key]) return;
   if (!box.hidden) { box.hidden = true; lastAnchor = null; }
-  if (state.view !== "grid") setView("grid");
-  state.layer = layer;
-  state.sel = { type: "cat", layer, key };
-  paint();
-  const h = document.getElementById("lgcat-title"); if (h) h.focus({ preventScroll: true });
-  updateHash();
-}
-function clearCategory() {
-  state.sel = null; paint(); updateHash();
+  if (state.sel && state.sel.type === "cat" && state.sel.layer === layer && state.sel.key === key) { state.sel = null; applyHighlight(); updateHash(); return; }
+  const switching = state.layer !== layer;
+  state.layer = layer; state.sel = { type: "cat", layer, key };
+  if (switching) paint(); else applyHighlight();
+  updateHash(); postHeight();
 }
 
-/* ---------- table view ---------- */
-function renderTable() {
-  const cols = [
-    ["z", "Z", e => e.z, true], ["sym", "Symbol", e => e.sym], ["name", "Name", e => e.name],
-    ["gold", "Goldschmidt class", e => goldKey(e) === "none" ? "" : GOLD[goldKey(e)].label],
-    ["tc", "50% T (K)", e => e.tc, true], ["vol", "Volatility", e => volKey(e) === "none" ? "" : VOL[volKey(e)].label],
-    ["sys", "My system", e => SYSTEMS[e.sym] ? SYSTEMS[e.sym].tag : ""]
-  ];
-  const col = cols.find(c => c[0] === state.sortKey) || cols[0];
-  const rows = ELEMENTS.slice().sort((a, b) => {
-    let x = col[2](a), y = col[2](b);
-    if (x == null || x === "") return 1; if (y == null || y === "") return -1;
-    return (x > y ? 1 : x < y ? -1 : 0) * state.sortDir;
-  });
-  const L = LAYERS[state.layer];
-  const th = cols.map(c => '<th aria-sort="' + (c[0] === state.sortKey ? (state.sortDir > 0 ? "ascending" : "descending") : "none") + '"><button type="button" data-sort="' + c[0] + '">' + c[1] + (c[0] === state.sortKey ? (state.sortDir > 0 ? " ↑" : " ↓") : "") + '</button></th>').join("");
-  const tr = rows.map(e => {
-    const cat = L.cats[L.key(e)];
-    return '<tr data-sym="' + e.sym + '" tabindex="0"><td class="num">' + e.z + '</td><td><span class="sw" style="background:' + cat.color + '"></span>' + e.sym + '</td><td>' + e.name + '</td><td>' + cols[3][2](e) + '</td><td class="num">' + (e.tc != null ? (Number.isInteger(e.tc) ? e.tc : e.tc.toFixed(1)) : "") + '</td><td>' + cols[5][2](e) + '</td><td>' + cols[6][2](e) + '</td></tr>';
-  }).join("");
-  document.getElementById("tableView").innerHTML = '<table class="data"><thead><tr>' + th + '</tr></thead><tbody>' + tr + '</tbody></table>';
-  applyHighlight();
-}
-function setView(v) {
-  state.view = v;
-  document.getElementById("gridView").hidden = v !== "grid";
-  document.getElementById("tableView").hidden = v !== "table";
-  const t = document.getElementById("viewToggle");
-  t.setAttribute("aria-pressed", String(v === "table"));
-  t.textContent = v === "table" ? "Periodic table" : "Table view";
-  if (v === "table") renderTable();
-  if (!box.hidden) closeBox();
-  updateHash();
-}
-
-/* ---------- hash state ---------- */
+/* ---------- hash + height ---------- */
 function updateHash() {
-  const p = new URLSearchParams();
-  p.set("layer", state.layer);
-  if (state.view === "table") p.set("view", "table");
+  const p = new URLSearchParams(); p.set("layer", state.layer);
   if (state.sel && state.sel.type === "el") p.set("el", state.sel.sym);
   if (state.sel && state.sel.type === "cat") p.set("cat", state.sel.key);
   try { history.replaceState(null, "", location.pathname + location.search + "#" + p.toString()); } catch (_) {}
 }
-function readHash() {
-  const p = new URLSearchParams(location.hash.slice(1));
-  if (LAYERS[p.get("layer")]) state.layer = p.get("layer");
-  if (p.get("view") === "table") state.view = "table";
-  return { el: p.get("el"), cat: p.get("cat"), src: p.has("sources") };
-}
-
-/* ---------- tooltip ---------- */
-function showTip(cell) {
-  const e = BY_SYM[cell.dataset.sym]; if (!e) return;
-  const parts = [e.name];
-  const gk = goldKey(e); if (gk !== "none") parts.push(GOLD[gk].label);
-  if (e.tc != null) parts.push(fmtTc(e.tc));
-  if (SYSTEMS[e.sym]) parts.push("My system");
-  tip.textContent = parts.join(" · ");
-  const r = cell.getBoundingClientRect();
-  tip.hidden = false;
-  const half = tip.offsetWidth / 2;
-  tip.style.left = Math.max(half + 6, Math.min(window.innerWidth - half - 6, r.left + r.width / 2)) + "px";
-  tip.style.top = Math.max(tip.offsetHeight + 16, r.top) + "px";
+let lastH = 0;
+function postHeight() {
+  if (window.parent === window) return;
+  const h = Math.ceil(document.getElementById("pt").getBoundingClientRect().height + 4);
+  if (Math.abs(h - lastH) < 2) return; lastH = h;
+  try { window.parent.postMessage({ type: "gg-ptable-height", height: h }, "*"); } catch (_) {}
 }
 
 /* ---------- events ---------- */
+function showCellTip(cell) {
+  const e = BY_SYM[cell.dataset.sym]; if (!e) return;
+  const parts = [e.name];
+  if (state.layer === "gold") parts.push(GOLD[goldKey(e)].label); else if (state.layer === "vol") parts.push(e.tc != null ? fmtTc(e.tc) : "no condensation value"); else if (SYSTEMS[e.sym]) parts.push(SYSTEMS[e.sym].tag);
+  if (SYSTEMS[e.sym]) parts.push("click to open");
+  const r = cell.getBoundingClientRect(); showTipAt(r.left + r.width / 2, r.top, parts.join(" · "));
+}
 document.addEventListener("click", ev => {
   const t = ev.target;
   const seg = t.closest(".seg button");
-  if (seg) {
-    state.layer = seg.dataset.layer;
-    if (state.sel && state.sel.type === "cat") { box.hidden = true; state.sel = null; }
-    paint();
-    if (state.sel && state.sel.type === "el" && !box.hidden) { boxBody.innerHTML = renderElementBox(BY_SYM[state.sel.sym]); positionBox(lastAnchor); }
-    updateHash(); return;
-  }
-  const cell = t.closest(".cell");
-  if (cell) { tip.hidden = true; if (state.sel && state.sel.type === "el" && state.sel.sym === cell.dataset.sym && !box.hidden) closeBox(); else selectElement(cell.dataset.sym, cell); return; }
-  const c = t.closest(".chip[data-cat]");
-  if (c) {
-    const [layer, key] = c.dataset.cat.split(":");
-    if (!box.contains(c) && state.sel && state.sel.type === "cat" && state.sel.layer === layer && state.sel.key === key) clearCategory();
-    else selectCategory(layer, key);
-    return;
-  }
-  if (t.closest(".lg-x")) { clearCategory(); return; }
-  const srt = t.closest("th button[data-sort]");
-  if (srt) { const k = srt.dataset.sort; if (state.sortKey === k) state.sortDir *= -1; else { state.sortKey = k; state.sortDir = 1; } renderTable(); return; }
-  const row = t.closest("table.data tr[data-sym]");
-  if (row) { selectElement(row.dataset.sym, row); return; }
-  if (t.closest("#boxClose")) { closeBox(); return; }
-  if (t.closest("#viewToggle")) { setView(state.view === "grid" ? "table" : "grid"); return; }
-  if (t.closest("#srcBtn") || t.closest("#srcLink")) { state.sel = null; applyHighlight(); renderLegend(); openBox(renderSourcesBox(), t.closest("button")); return; }
-  if (!box.hidden && !box.contains(t)) closeBox();
+  if (seg) { if (state.layer !== seg.dataset.layer) { state.layer = seg.dataset.layer; if (state.sel && state.sel.type === "cat") state.sel = null; paint(); if (!box.hidden && state.sel) { boxBody.innerHTML = renderCard(BY_SYM[state.sel.sym]); positionBox(lastAnchor); } updateHash(); postHeight(); } return; }
+  const cell = t.closest("button.cell");
+  if (cell) { tip.hidden = true; if (state.sel && state.sel.type === "el" && state.sel.sym === cell.dataset.sym && !box.hidden) closeCard(); else openCard(cell.dataset.sym, cell); return; }
+  const ec = t.closest(".el-chip"); if (ec) { openCard(ec.dataset.sym, cellBySym[ec.dataset.sym]); return; }
+  const c = t.closest(".chip[data-cat], .catbox[data-cat]");
+  if (c) { const [layer, key] = c.dataset.cat.split(":"); selectCategory(layer, key); return; }
+  if (t.closest("#boxClose")) { closeCard(); return; }
+  if (!box.hidden && !box.contains(t)) closeCard();
 });
 document.addEventListener("keydown", ev => {
-  if (ev.key === "Escape" && !box.hidden) { ev.preventDefault(); closeBox(); return; }
-  if (ev.key === "Escape" && state.sel && state.sel.type === "cat") { ev.preventDefault(); clearCategory(); return; }
-  const row = ev.target.closest && ev.target.closest("table.data tr[data-sym]");
-  if (row && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); selectElement(row.dataset.sym, row); return; }
-  const cell = ev.target.closest && ev.target.closest(".cell");
+  if (ev.key === "Escape") { if (!box.hidden) { ev.preventDefault(); closeCard(); return; } if (state.sel && state.sel.type === "cat") { ev.preventDefault(); state.sel = null; applyHighlight(); updateHash(); return; } }
+  const cb = ev.target.closest && ev.target.closest(".catbox[data-cat]");
+  if (cb && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); const [layer, key] = cb.dataset.cat.split(":"); selectCategory(layer, key); return; }
+  const cell = ev.target.closest && ev.target.closest("button.cell");
   const dirs = { ArrowRight: [0, 1], ArrowLeft: [0, -1], ArrowDown: [1, 0], ArrowUp: [-1, 0] };
   if (cell && dirs[ev.key]) {
     ev.preventDefault();
     const e = BY_SYM[cell.dataset.sym], [dr, dc] = dirs[ev.key];
-    const cands = ELEMENTS.filter(o => dr ? Math.sign(o._row - e._row) === dr : (o._row === e._row && Math.sign(o._col - e._col) === dc));
+    const cands = ELEMENTS.filter(o => SYSTEMS[o.sym] && o !== e && (dr ? Math.sign(o._row - e._row) === dr : Math.sign(o._col - e._col) === dc));
     if (!cands.length) return;
-    const score = o => dr ? Math.abs(o._row - e._row) * 100 + Math.abs(o._col - e._col) : Math.abs(o._col - e._col);
-    cands.sort((a, b) => score(a) - score(b));
-    cellBySym[cands[0].sym].focus();
+    const score = o => dr ? Math.abs(o._row - e._row) * 100 + Math.abs(o._col - e._col) : Math.abs(o._row - e._row) * 100 + Math.abs(o._col - e._col);
+    cands.sort((a, b) => score(a) - score(b)); cellBySym[cands[0].sym].focus();
   }
 });
-grid.addEventListener("pointerover", ev => { const c = ev.target.closest(".cell"); if (c && ev.pointerType !== "touch") showTip(c); });
+grid.addEventListener("pointerover", ev => { const c = ev.target.closest(".cell"); if (c && ev.pointerType !== "touch") showCellTip(c); });
 grid.addEventListener("pointerout", ev => { if (ev.target.closest(".cell")) tip.hidden = true; });
-grid.addEventListener("focusin", ev => { const c = ev.target.closest(".cell"); if (c && c.matches(":focus-visible")) showTip(c); });
+grid.addEventListener("focusin", ev => { const c = ev.target.closest("button.cell"); if (c && c.matches(":focus-visible")) showCellTip(c); });
 grid.addEventListener("focusout", () => { tip.hidden = true; });
-window.addEventListener("resize", () => { if (!box.hidden) positionBox(lastAnchor); });
-document.getElementById("gridView").addEventListener("scroll", () => { if (!box.hidden) positionBox(lastAnchor); tip.hidden = true; });
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { if (state.layer === "vol") { drawBars(); drawLines(); } if (!box.hidden) positionBox(lastAnchor); postHeight(); }, 120); });
+document.getElementById("gridView").addEventListener("scroll", () => { tip.hidden = true; if (!box.hidden) positionBox(lastAnchor); });
+if (window.ResizeObserver) new ResizeObserver(() => postHeight()).observe(document.getElementById("pt"));
+window.addEventListener("load", postHeight);
 
 /* ---------- init ---------- */
 buildGrid();
-const initial = readHash();
+const hp = new URLSearchParams(location.hash.slice(1));
+if (LAYERS[hp.get("layer")]) state.layer = hp.get("layer");
 paint();
-if (state.view === "table") setView("table");
-if (initial.el && BY_SYM[initial.el]) requestAnimationFrame(() => selectElement(initial.el));
-else if (initial.cat && LAYERS[state.layer].cats[initial.cat]) requestAnimationFrame(() => selectCategory(state.layer, initial.cat));
-else if (initial.src) requestAnimationFrame(() => openBox(renderSourcesBox(), document.getElementById("srcBtn")));
+if (hp.get("el") && SYSTEMS[hp.get("el")]) requestAnimationFrame(() => openCard(hp.get("el")));
+else if (hp.get("cat") && LAYERS[state.layer].cats[hp.get("cat")]) selectCategory(state.layer, hp.get("cat"));
+postHeight();
 })();
 </script>
 </body>
