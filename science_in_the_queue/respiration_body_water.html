@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Breathing into Body Water</title>
+<style>
+:root {
+  color-scheme: light;
+  --surface-1: #ffffff;
+  --page: #ffffff;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --border: rgba(11,11,11,0.12);
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-7: #6250d6;
+  --warn-bg: #fff4e8;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--page); color: var(--text-primary);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 15px; line-height: 1.5;
+}
+.wrap { max-width: 920px; margin: 0 auto; padding: 28px 16px 48px; }
+h1 { font-size: 1.45rem; margin: 0 0 4px; }
+h2 { font-size: 1.05rem; margin: 0 0 10px; }
+.subtitle { color: var(--text-secondary); margin: 0 0 8px; }
+.colorkey { font-size: 0.8rem; color: var(--text-secondary); margin: 0 0 20px; }
+.badge {
+  display: inline-block; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em;
+  color: #fff; padding: 2px 8px; border-radius: 999px; vertical-align: 1px;
+}
+.badge.model { background: var(--series-2); }
+.badge.view { background: var(--series-1); }
+.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 18px; }
+.legend { display: flex; gap: 8px 18px; flex-wrap: wrap; font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 10px; }
+.legend .chip { display: inline-block; width: 18px; height: 4px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+.legend .dotchip { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 6px; }
+.legend .ringchip { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -1px; margin-right: 6px; border: 2px solid var(--text-primary); background: transparent; }
+.legend .sqchip { display: inline-block; width: 11px; height: 11px; vertical-align: -1px; margin-right: 6px; border-radius: 2px; }
+svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
+.figure { border: 1.5px solid var(--axis); border-radius: 8px; background: #fbfaf7; padding: 10px 12px 6px; margin: 12px 0 4px; }
+.figure .legend { margin: 0 0 8px; padding: 0 0 8px; border-bottom: 1px solid var(--grid); }
+.winrow, .paramrow {
+  display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center;
+  font-size: 0.8rem; color: var(--text-secondary);
+}
+.paramrow { margin: 10px 0 4px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; }
+.winrow { padding: 10px 12px; border-top: 1px solid var(--grid); }
+.wlabel { font-weight: 600; margin-right: 2px; display: flex; align-items: center; gap: 8px; }
+.ctl { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+input[type="range"] { width: 120px; accent-color: var(--series-1); }
+.paramrow input[type="range"] { width: 130px; accent-color: var(--series-2); }
+input[type="number"], select {
+  border: 1px solid var(--border); border-radius: 6px; padding: 2px 6px;
+  font-size: 0.8rem; font-variant-numeric: tabular-nums; color: var(--text-primary); background: var(--surface-1);
+}
+input[type="number"] { width: 78px; }
+select { padding: 3px 6px; }
+input:focus-visible, select:focus-visible, .btn:focus-visible { outline: 2px solid var(--series-1); outline-offset: 1px; }
+.unit { color: var(--muted); }
+.btn {
+  border: 1px solid var(--border); background: var(--surface-1); border-radius: 6px;
+  padding: 3px 10px; font-size: 0.75rem; color: var(--text-secondary); cursor: pointer;
+}
+.btn:hover { border-color: var(--axis); color: var(--text-primary); }
+.btn.on { border-color: var(--series-2); color: var(--text-primary); }
+details.viewbox { border: 1px solid var(--border); border-radius: 8px; margin: 10px 0 4px; }
+details.viewbox summary {
+  cursor: pointer; padding: 8px 12px; font-size: 0.8rem; color: var(--text-secondary);
+  display: flex; align-items: center; gap: 8px; list-style: none; user-select: none;
+}
+details.viewbox summary::-webkit-details-marker { display: none; }
+details.viewbox summary::before { content: "\25B8"; color: var(--muted); transition: transform 0.15s; }
+details.viewbox[open] summary::before { transform: rotate(90deg); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-top: 12px; }
+.tile { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.tile .k { font-size: 0.75rem; color: var(--text-secondary); }
+.tile .v { font-size: 1.05rem; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.tile .u { font-size: 0.75rem; color: var(--muted); }
+.tile.warn { background: var(--warn-bg); border-color: var(--series-2); }
+.footnote { font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--grid); margin-top: 16px; padding-top: 10px; }
+.eqs { border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; margin: 0 0 12px; overflow-x: auto; }
+.eq { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 7px 0; }
+.eq .num { color: var(--muted); font-size: 0.78rem; white-space: nowrap; text-align: right; }
+.tooltip {
+  position: fixed; pointer-events: none; background: var(--surface-1);
+  border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px;
+  font-size: 0.8rem; color: var(--text-primary); box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: none; z-index: 10; white-space: nowrap; line-height: 1.45;
+}
+.tablewrap { overflow-x: auto; padding: 4px 12px 12px; }
+table.data { border-collapse: collapse; font-size: 0.78rem; font-variant-numeric: tabular-nums; width: 100%; min-width: 700px; }
+table.data th, table.data td { padding: 4px 8px; border-bottom: 1px solid var(--grid); text-align: left; vertical-align: top; }
+table.data th { color: var(--text-secondary); font-weight: 600; }
+.panels { display: grid; grid-template-columns: 1fr; gap: 6px; }
+body.embed .hdr, body.embed-all .hdr { display: none; }
+body.embed-all .wrap { padding-top: 10px; padding-bottom: 10px; }
+body.embed .card:not(.sel) { display: none; }
+body.embed .wrap { padding-top: 10px; padding-bottom: 10px; }
+@media (max-width: 560px) { .eq { flex-direction: column; align-items: flex-start; gap: 2px; } .eq .num { white-space: normal; text-align: left; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hdr">
+  <h1>Breathing into Body Water</h1>
+  <p class="subtitle">Companion to <em>Inhale, Exhale</em> on Science in the Queue. A steady-state oxygen mass balance that follows the O&#8322; an animal takes up, the CO&#8322; it breathes out and the vapor it exchanges into body water, in &delta;&prime;&sup1;&#8312;O and &Delta;&prime;&sup1;&#8311;O together.</p>
+  </div>
+  <p class="colorkey"><span class="badge model">MODEL</span> orange controls set the physiology and the constants. <span class="badge view">VIEW</span> blue controls only change the plotting window, in the drawer under each chart.</p>
+
+  <div class="card" id="card-path">
+    <h2>Where each breathing term moves body water</h2>
+    <div class="eqs">
+      <div class="eq"><span>O&#8322; share of oxygen inputs f = 1/(W + RQ), CO&#8322; share of oxygen outputs v = f&middot;RQ, all fluxes per O atom of O&#8322; taken up</span><span class="num">mass balance</span></div>
+      <div class="eq"><span>O&#8322; taken up, &delta;&sup1;&#8312;O = b &minus; z(1 &minus; X), with &sup1;&#8311;O set by the slope of the residual O&#8322;, &theta;<sub>res</sub></span><span class="num">Epstein &amp; Zeiri 1988, Kohn 1996 Eq. 2</span></div>
+      <div class="eq"><span>CO&#8322; leaves at &alpha;&sup1;&#8312; = 1 + (17604/T &minus; 17.93)/1000 relative to body water, &alpha;&sup1;&#8311; = (&alpha;&sup1;&#8312;)<sup>&theta;</sup></span><span class="num">Brenninkmeijer et al. 1983</span></div>
+      <div class="eq"><span>R<sub>body water</sub> = (sum of inputs)/(sum of outputs), solved for &sup1;&#8312;O/&sup1;&#8310;O and &sup1;&#8311;O/&sup1;&#8310;O separately, nothing linearized</span><span class="num">steady state</span></div>
+    </div>
+    <div class="paramrow" id="params"><span class="wlabel"><span class="badge model">MODEL</span> Parameters</span>
+      <span class="ctl">animal
+        <select id="p-animal" aria-label="animal archetype"></select></span>
+      <span class="ctl">f, O&#8322; share of inputs
+        <input type="range" id="p-f" min="0.02" max="0.9" step="0.001" value="0.215">
+        <input type="number" id="p-fn" min="0.02" max="0.9" step="0.001" value="0.215"></span>
+      <span class="ctl">fuel, RQ
+        <input type="range" id="p-q" min="0.70" max="1.00" step="0.001" value="0.85">
+        <input type="number" id="p-qn" min="0.70" max="1.00" step="0.001" value="0.85"></span>
+      <span class="ctl"><span id="tb-label">body temperature</span>
+        <input type="range" id="p-tb" min="35" max="39" step="0.1" value="37">
+        <input type="number" id="p-tbn" min="35" max="39" step="0.1" value="37">
+        <span class="unit">&deg;C</span></span>
+      <span class="ctl">O&#8322; extraction X
+        <input type="range" id="p-x" min="0.10" max="0.80" step="0.001" value="0.277">
+        <input type="number" id="p-xn" min="0.10" max="0.80" step="0.001" value="0.277"></span>
+      <span class="ctl">Epstein z
+        <input type="range" id="p-z" min="3" max="14" step="0.1" value="10.4">
+        <input type="number" id="p-zn" min="3" max="14" step="0.1" value="10.4">
+        <span class="unit">‰</span></span>
+      <span class="ctl">&theta; residual O&#8322;
+        <input type="range" id="p-tr" min="0.505" max="0.528" step="0.0005" value="0.518">
+        <input type="number" id="p-trn" min="0.505" max="0.528" step="0.0005" value="0.518"></span>
+      <span class="ctl">&theta; CO&#8322;&ndash;water
+        <input type="range" id="p-tc" min="0.518" max="0.532" step="0.0001" value="0.529">
+        <input type="number" id="p-tcn" min="0.518" max="0.532" step="0.0001" value="0.529">
+        <button class="btn" type="button" data-theta="0.5229" title="Barkan and Luz 2012, laboratory equilibration at 25 C">0.5229 lab</button>
+        <button class="btn" type="button" data-theta="0.5248" title="Cao and Liu 2011, calculated, used by Steele et al. 2025">0.5248 calc.</button>
+        <button class="btn" type="button" data-theta="0.529" title="working value of the model, above every published estimate">0.529 working</button></span>
+      <span class="ctl"><button class="btn" id="p-reset" type="button">reset model</button></span>
+    </div>
+    <div class="figure">
+      <div class="legend">
+        <span><span class="chip" style="background:var(--series-7)"></span>air O&#8322; mixed in, nothing fractionated</span>
+        <span><span class="chip" style="background:var(--series-1)"></span>uptake fractionation</span>
+        <span><span class="chip" style="background:var(--series-2)"></span>CO&#8322; leaves in equilibrium</span>
+        <span><span class="chip" style="background:var(--series-3)"></span>breath vapor</span>
+        <span><span class="dotchip" style="background:var(--text-primary)"></span>body water</span>
+        <span><span class="ringchip"></span>same animal at &theta; 0.5229 and 0.529</span>
+        <span><span class="dotchip" style="background:var(--axis)"></span>the other archetypes</span>
+        <span class="ctl" style="margin-left:auto"><span class="badge view">VIEW</span>
+          <button class="btn on" type="button" id="v-all">whole system</button>
+          <button class="btn" type="button" id="v-bw">body water close-up</button></span>
+      </div>
+      <svg id="c1" viewBox="0 0 880 470" role="img" aria-label="Path from drinking water to body water in delta prime 18O versus Delta prime 17O, showing the shift from each breathing term"></svg>
+    </div>
+    <details class="viewbox">
+      <summary><span class="badge view">VIEW</span> Plot window, view only, does not change the model</summary>
+      <div class="winrow" id="c1-win"></div>
+    </details>
+    <div class="tiles">
+      <div class="tile"><div class="k">body water, &delta;&prime;&sup1;&#8312;O and &Delta;&prime;&sup1;&#8311;O</div><div class="v" id="t-bw"></div></div>
+      <div class="tile"><div class="k">offset from drinking water</div><div class="v" id="t-off"></div></div>
+      <div class="tile"><div class="k">O&#8322; share of inputs f, CO&#8322; share of outputs v</div><div class="v" id="t-fv"></div></div>
+      <div class="tile"><div class="k">O&#8322; taken up, &delta;&prime;&sup1;&#8312;O and &Delta;&prime;&sup1;&#8311;O</div><div class="v" id="t-o2"></div></div>
+      <div class="tile"><div class="k">CO&#8322; term, slope of the shift and share of the O&#8322; imprint it returns</div><div class="v" id="t-co2"></div></div>
+      <div class="tile"><div class="k">respired CO&#8322;, &delta;&prime;&sup1;&#8312;O and &Delta;&prime;&sup1;&#8311;O</div><div class="v" id="t-rco2"></div></div>
+      <div class="tile" id="t-feas-tile"><div class="k">water budget</div><div class="v" id="t-feas"></div></div>
+    </div>
+    <details class="viewbox">
+      <summary>Archetype parameters and their sources</summary>
+      <div class="tablewrap"><table class="data">
+        <thead><tr><th>animal</th><th>water influx</th><th>RQ</th><th>breathing state, share of O&#8322;</th><th>X</th><th>whole-breath extraction</th><th>T<sub>b</sub> (&deg;C)</th><th>exhaled air (&deg;C)</th><th>ambient air</th></tr></thead>
+        <tbody>
+          <tr><td>Kangaroo rat</td><td>WEI 0.07 mL/kJ, assumed</td><td>0.95</td><td>tidal, 1.0</td><td>0.29</td><td>0.20</td><td>37</td><td>27</td><td>25 &deg;C, 50%</td></tr>
+          <tr><td>Human, resting</td><td>WEI 0.30 mL/kJ, assumed</td><td>0.85</td><td>tidal, 1.0</td><td>0.277</td><td>0.164</td><td>37</td><td>34</td><td>25 &deg;C, 50%</td></tr>
+          <tr><td>Songbird</td><td>WEI 0.18 mL/kJ, within Nagy&rsquo;s bird means</td><td>0.85</td><td>flow-through, 1.0</td><td>0.33</td><td>0.245</td><td>41</td><td>28.8</td><td>25 &deg;C, 50%</td></tr>
+          <tr><td>Desert lizard</td><td>WEI 0.171 mL/kJ, Nagy&rsquo;s desert reptile mean</td><td>0.75</td><td>intermittent, 1.0</td><td>0.40, assumed</td><td>0.245</td><td>33, assumed</td><td>31.5</td><td>25 &deg;C, 50%</td></tr>
+          <tr><td>Dolphin</td><td>2.25 per O atom of O&#8322;, fish prey water</td><td>0.75</td><td>resting breaths, 0.4<br>recovery breaths, 0.6 (assumed)</td><td>0.275<br>0.455</td><td>0.24<br>0.40</td><td>37</td><td>31</td><td>25 &deg;C, 50%</td></tr>
+          <tr><td>Ground squirrel, hibernating</td><td>metabolic water + inhaled vapor + 0.15, assumed</td><td>0.703, fat</td><td>arousals, 0.825<br>torpor, 0.175</td><td>0.29<br>0.60, assumed</td><td>0.195<br>0.48</td><td>37<br>6.75</td><td>10.5<br>6.75</td><td>5 &deg;C, 95% burrow</td></tr>
+        </tbody>
+      </table></div>
+      <p class="footnote" style="margin:0 12px 12px">Published sources behind the parameters, alveolar and whole-breath extraction in mammals (Beaver et al. 1981; Stahl 1967; Chappell and Roverud 1990), parabronchial and whole-breath extraction in birds (Johansen and Bech 1983; Johannesen and Nicol 1990; Bech et al. 1985; Chappell and Bucher 1987), exhaled-air temperature (Schmidt-Nielsen et al. 1970; Cole 1954; Tieleman et al. 1999), intermittent breathing in reptiles (Glass et al. 1978; Bennett and Hicks 2001), water economy indices (Nagy 2004), end-expired O&#8322; in dolphins (Fahlman et al. 2018, 2019), and hibernation energetics and torpor (Karpovich et al. 2009; Geiser 2004; Webb and Milsom 2017). RQ follows fuel stoichiometry, 1.00 for carbohydrate, 0.85 mixed, about 0.74 for protein to uric acid and 0.703 for fat. Values marked assumed are constructed. Water influx is per O atom of O&#8322; taken up, from the water economy index (WEI) through the energy released per mole of O&#8322;.</p>
+    </details>
+    <p class="footnote">Published inputs, air O&#8322; at &delta;&sup1;&#8312;O 23.881&permil; and &Delta;&prime;&sup1;&#8311;O &minus;0.440&permil;, the uptake relation of Epstein and Zeiri (1988) in the mass-balance form of Kohn (1996), the residual-O&#8322; slope 0.518 for human breath (Luz and Barkan 2005), which my breath holds bracket, the CO&#8322;&ndash;water fractionation of Brenninkmeijer et al. (1983), and liquid&ndash;vapor fractionation with &theta; 0.529. Measured, z of 10.4&permil; from my breath holds. Constructed, the six archetypes, with the assumed values marked in the parameter table above, all oxygen other than O&#8322; fixed at &delta;&prime;&sup1;&#8312;O &minus;5&permil; and &Delta;&prime;&sup1;&#8311;O +0.015&permil; for every animal so that only breathing differs, and every number the model returns. The path switches the terms on one at a time, so its last point is the exact body water. Moving f rescales the water influx, and RQ and body temperature then act at that water economy.</p>
+  </div>
+
+  <div class="card" id="card-gain">
+    <h2>The size of the signal is set by f</h2>
+    <p class="subtitle" style="font-size:0.85rem">Body water offset from drinking water as the O&#8322; share of oxygen inputs changes, for the animal and settings above. Gray dots are the six archetypes at their own settings. Gill breathers sit at f near 2&nbsp;&times;&nbsp;10&#8315;&#8308;, where water crossing the gills swamps every other flux.</p>
+    <div class="figure">
+      <div class="legend">
+        <span><span class="chip" style="background:var(--series-2)"></span>this animal, &theta; CO&#8322;&ndash;water as set</span>
+        <span><span class="chip" style="background:var(--series-1); height:0; border-top:3px dashed var(--series-1); border-radius:0"></span>this animal at &theta; 0.5229</span>
+        <span><span class="chip" style="background:var(--series-7); height:0; border-top:3px dotted var(--series-7); border-radius:0"></span>this animal at &theta; 0.529</span>
+        <span><span class="dotchip" style="background:var(--axis)"></span>archetypes</span>
+        <span><span class="sqchip" style="background:var(--series-3)"></span>gill breathers</span>
+      </div>
+      <div class="panels">
+        <svg id="c2" viewBox="0 0 880 300" role="img" aria-label="Delta prime 17O offset of body water versus f"></svg>
+        <svg id="c3" viewBox="0 0 880 300" role="img" aria-label="delta prime 18O offset of body water versus f"></svg>
+      </div>
+    </div>
+    <div class="tiles">
+      <div class="tile"><div class="k">&Delta;&prime;&sup1;&#8311;O offset per unit f, this animal</div><div class="v" id="t-pf17"></div></div>
+      <div class="tile"><div class="k">&delta;&prime;&sup1;&#8312;O offset per unit f, this animal</div><div class="v" id="t-pf18"></div></div>
+      <div class="tile"><div class="k">largest f this water budget allows</div><div class="v" id="t-fmax"></div></div>
+    </div>
+    <p class="footnote">Constructed. f is the O&#8322; share of all oxygen entering the body, set by the water economy index and the fuel, not by metabolic rate itself. Beyond the largest f, the water lost in breath would exceed the water coming in. Gill breathers follow from dogfish gill water exchange (Giacomin et al. 2017).</p>
+  </div>
+</div>
+<div class="tooltip" id="tt"></div>
+<script>
+/* bwmodel.js
+   Steady-state body water in triple oxygen isotope space, ported line for line from the round 3
+   Python model (o2co2.py and archetypes.py). Fluxes are counted per O atom of absorbed O2.
+   Inputs   absorbed O2 (1), inhaled vapor (b_in), drinking water and all other O (B = W + RQ - 1 - b_in)
+   Outputs  CO2 (RQ, equilibrium with body water at T_b), exhaled vapor (b_out), other water (W - b_out)
+   Every isotope is solved separately in ratio space. Nothing is linearized. */
+(function (root) {
+  "use strict";
+  const LAM = 0.528, F_IO2 = 0.2095, P_KPA = 101.325, TH_EQ_LV = 0.529;
+  const CONST = { d18_air: 23.881, D17_air: -0.440, z: 10.4, theta_res: 0.518, theta_co2: 0.529, dw: [-5.0, 0.015] };
+
+  const dprime = d => 1000 * Math.log1p(d / 1000);
+  const delta = dp => 1000 * Math.expm1(dp / 1000);
+  const ratiosFromPrime = (dp18, D17) => [Math.exp(dp18 / 1000), Math.exp((D17 + LAM * dp18) / 1000)];
+  const primeFromRatios = (R18, R17) => { const dp18 = 1000 * Math.log(R18); return [dp18, 1000 * Math.log(R17) - LAM * dp18]; };
+  const airRatios = c => ratiosFromPrime(dprime(c.d18_air), c.D17_air);
+
+  // Epstein & Zeiri (1988): exhaled O2 d18O = b + zX; O2 taken up is its exact mass-balance complement
+  function residualO2(X, c, air) {
+    const l18 = Math.log1p(c.z * X / (1000 * air[0]));
+    return [air[0] * Math.exp(l18), air[1] * Math.exp(c.theta_res * l18)];
+  }
+  function absorbedO2(X, c) {
+    X = Math.max(X, 1e-9);
+    const air = airRatios(c), r = residualO2(X, c, air);
+    return [(air[0] - (1 - X) * r[0]) / X, (air[1] - (1 - X) * r[1]) / X];
+  }
+
+  const esatKPa = Tc => 0.61121 * Math.exp((18.678 - Tc / 234.5) * (Tc / (257.14 + Tc)));     // Buck (1981)
+  const xVap = (Tc, h = 1) => { const e = h * esatKPa(Tc); return e / (P_KPA - e); };
+  const alphaLV = Tc => { const T = Tc + 273.15; return Math.exp((1.137e6 / (T * T) - 4.156e2 / T - 2.0667) / 1000); };
+  const alphaCO2 = Tc => 1 + (17604 / (Tc + 273.15) - 17.93) / 1000;      // Brenninkmeijer et al. (1983), epsilon form
+  const qOx = rq => (3.941 + 1.106 * rq) * 4.184 * 22.414;                  // kJ per mol O2 (Weir 1949)
+  const WfromWEI = (wei, rq) => wei * qOx(rq) / (2 * 18.015);
+
+  function breathTerms(st, q) {
+    const nIn = 1 / (F_IO2 * st.E_w);
+    return [(nIn - 1 + q) * xVap(st.T_exh) / 2, nIn * xVap(st.T_a, st.h) / 2];   // [b_out, b_in]
+  }
+
+  function aggregate(states, q, c, o = {}) {
+    const uptake = o.uptake || "epstein", co2 = o.co2 !== false, vapor = o.vapor !== false;
+    const wsum = states.reduce((a, s) => a + (s.w ?? 1), 0);
+    const air = airRatios(c);
+    const g = { abs18: 0, abs17: 0, bin: 0, vin18: 0, vin17: 0, bout: 0, av18: 0, av17: 0, co18: 0, co17: 0, eps: 0, X: 0 };
+    for (const st of states) {
+      const wi = (st.w ?? 1) / wsum;
+      const r = uptake === "none" ? air : absorbedO2(st.X, c);
+      g.abs18 += wi * r[0]; g.abs17 += wi * r[1]; g.X += wi * st.X;
+      const [bOut, bIn] = breathTerms(st, q);
+      const aIn = vapor ? 1 / alphaLV(st.T_a) : 1, aOut = vapor ? 1 / alphaLV(st.T_exh) : 1;
+      g.bin += wi * bIn; g.vin18 += wi * bIn * aIn; g.vin17 += wi * bIn * Math.pow(aIn, TH_EQ_LV);
+      g.bout += wi * bOut; g.av18 += wi * bOut * aOut; g.av17 += wi * bOut * Math.pow(aOut, TH_EQ_LV);
+      const ac = co2 ? alphaCO2(st.T_b) : 1;
+      g.co18 += wi * ac; g.co17 += wi * Math.pow(ac, c.theta_co2); g.eps += wi * 1000 * Math.log(ac);
+    }
+    return g;
+  }
+
+  function solve(W, q, g, c) {
+    const [R18dw, R17dw] = ratiosFromPrime(c.dw[0], c.dw[1]);
+    const B = W + q - 1 - g.bin, other = W - g.bout;
+    const n18 = B * R18dw + g.abs18 + g.vin18 * R18dw, n17 = B * R17dw + g.abs17 + g.vin17 * R17dw;
+    const d18 = other + q * g.co18 + g.av18, d17 = other + q * g.co17 + g.av17;
+    const R18 = n18 / d18, R17 = n17 / d17, tot = B + 1 + g.bin;
+    return {
+      W, q, B, other, b_in: g.bin, b_out: g.bout, X: g.X, f: 1 / tot, v: q / tot, eps_co2: g.eps,
+      feasible: B >= 0 && other >= 0,
+      bw: primeFromRatios(R18, R17), mix: primeFromRatios(n18 / tot, n17 / tot),
+      o2: primeFromRatios(g.abs18, g.abs17), co2: primeFromRatios(R18 * g.co18, R17 * g.co17),
+    };
+  }
+  const bodyWater = (W, q, states, c, o) => solve(W, q, aggregate(states, q, c, o), c);
+
+  // cumulative path: drinking water, + air O2 (nothing fractionates), + uptake, + CO2, + breath vapor
+  function path(W, q, states, c) {
+    return [
+      c.dw.slice(),
+      bodyWater(W, q, states, c, { uptake: "none", co2: false, vapor: false }).bw,
+      bodyWater(W, q, states, c, { co2: false, vapor: false }).bw,
+      bodyWater(W, q, states, c, { vapor: false }).bw,
+      bodyWater(W, q, states, c).bw,
+    ];
+  }
+  // slope along which an output of share v moves a well-mixed reservoir
+  const thetaEff = (v, eps18, th) => { const a18 = Math.exp(eps18 / 1000); return Math.log1p(v * (Math.pow(a18, th) - 1)) / Math.log1p(v * (a18 - 1)); };
+
+  // ------------------------------------------------------------------ six archetypes (archetypes.py)
+  const TA = 25, H = 0.5, MW_FAT = 49 / (2 * 72.5), MW_CARB = 0.5, Q_FAT = 51 / 72.5;
+  const metabolicWater = q => { const phi = (q - Q_FAT) / (1 - Q_FAT); return (1 - phi) * MW_FAT + phi * MW_CARB; };
+  const st = (X, E_w, T_b, T_exh, T_a = TA, h = H, w = 1) => ({ X, E_w: Math.min(E_w, X), T_b, T_exh, T_a, h, w });
+
+  const ARCH = {
+    "Kangaroo rat": { q: 0.95, Tb: 37, TbRange: [35, 39], TbLabel: "body temperature",
+      build: (q, Tb) => ({ W: WfromWEI(0.07, q), states: [st(0.29, 0.20, Tb, 27.0)] }) },
+    "Human": { q: 0.85, Tb: 37, TbRange: [36, 39], TbLabel: "body temperature",
+      build: (q, Tb) => ({ W: WfromWEI(0.30, q), states: [st(0.277, 0.164, Tb, 34.0)] }) },
+    "Passerine": { q: 0.85, Tb: 41, TbRange: [39, 43], TbLabel: "body temperature",
+      build: (q, Tb) => ({ W: WfromWEI(0.18, q), states: [st(0.33, 0.245, Tb, 8.93 + 0.793 * TA)] }) },
+    "Lizard": { q: 0.75, Tb: 33, TbRange: [20, 38], TbLabel: "body temperature",
+      build: (q, Tb) => ({ W: WfromWEI(0.171, q), states: [st(0.40, 0.245, Tb, Tb - 1.5)] }) },
+    "Dolphin": { q: 0.75, Tb: 37, TbRange: [35, 38], TbLabel: "body temperature",
+      build: (q, Tb) => ({ W: 2.25, states: [st(0.275, 0.24, Tb, 31.0, TA, H, 0.4), st(0.455, 0.40, Tb, 31.0, TA, H, 0.6)] }) },
+    "Hibernating squirrel": { q: 51 / 72.5, Tb: 6.75, TbRange: [2, 10], TbLabel: "torpor body temperature",
+      build: (q, Tt) => {
+        const Ta = 5, h = 0.95;
+        const sts = [st(0.29, 0.195, 37, Ta + 5.5, Ta, h, 0.825), st(0.60, 0.48, Tt, Tt, Ta, h, 0.175)];
+        const bIn = sts.reduce((a, s) => a + s.w * breathTerms(s, q)[1], 0) / sts.reduce((a, s) => a + s.w, 0);
+        return { W: metabolicWater(q) + bIn + 0.15, states: sts };
+      } },
+  };
+
+  // An archetype at fuel q and body temperature Tb, with its water influx scaled by Wmult and every
+  // breathing state's extraction shifted by dX (clipped to 0.05 to 0.95, whole-breath E_w kept <= X).
+  function animal(name, q, Tb, Wmult = 1, dX = 0) {
+    const A = ARCH[name], b = A.build(q, Tb);
+    const states = b.states.map(s => { const X = Math.min(0.95, Math.max(0.05, s.X + dX)); return { ...s, X, E_w: Math.min(s.E_w, X) }; });
+    return { W: b.W * Wmult, Wbase: b.W, q, states };
+  }
+  const meanX = states => states.reduce((a, s) => a + s.w * s.X, 0) / states.reduce((a, s) => a + s.w, 0);
+
+  root.BW = { LAM, CONST, dprime, delta, ratiosFromPrime, primeFromRatios, absorbedO2, alphaCO2, WfromWEI, breathTerms,
+    aggregate, solve, bodyWater, path, thetaEff, ARCH, animal, meanX };
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const BWM = window.BW;
+const NAMES = Object.keys(BWM.ARCH);
+const DEFAULT_ANIMAL = "Human";
+const G0 = { z: 10.4, tr: 0.518, tc: 0.529 };
+const P = { animal: DEFAULT_ANIMAL, q: 0.85, tb: 37, mult: 1, dX: 0, ...G0 };
+const fmt = (v, d) => (v < 0 ? "−" : "") + Math.abs(v).toFixed(d);
+const fmts = (v, d) => (v < 0 ? "−" : "+") + Math.abs(v).toFixed(d);
+const PM = "‰";
+
+function cfg(theta) {
+  return { ...BWM.CONST, z: P.z, theta_res: P.tr, theta_co2: theta === undefined ? P.tc : theta };
+}
+function current(theta, multOverride) {
+  const an = BWM.animal(P.animal, P.q, P.tb, multOverride === undefined ? P.mult : multOverride, P.dX);
+  return { an, c: cfg(theta) };
+}
+function baseX() {
+  const an = BWM.animal(P.animal, P.q, P.tb, 1, 0);
+  return BWM.meanX(an.states);
+}
+function evaluate(theta) {
+  const { an, c } = current(theta);
+  const r = BWM.bodyWater(an.W, an.q, an.states, c);
+  const path = BWM.path(an.W, an.q, an.states, c);
+  const noCO2 = BWM.bodyWater(an.W, an.q, an.states, c, { co2: false });
+  const vec = [r.bw[0] - noCO2.bw[0], r.bw[1] - noCO2.bw[1]];
+  const thetaEff = BWM.LAM + vec[1] / vec[0];
+  const imprint = path[2][1] - path[0][1];
+  const share = -(path[3][1] - path[2][1]) / imprint;
+  return { r, path, thetaEff, share, an, c };
+}
+
+// ------------------------------------------------------------------ plotting helper (G's module style)
+function niceStep(raw) {
+  const p = Math.pow(10, Math.floor(Math.log10(raw)));
+  const m = raw / p;
+  return (m < 1.5 ? 1 : m < 3.5 ? 2 : m < 7.5 ? 5 : 10) * p;
+}
+const decimalsFor = step => Math.max(0, -Math.floor(Math.log10(step) + 1e-9));
+const tt = $("tt");
+function showTip(ev, html) {
+  tt.innerHTML = html; tt.style.display = "block";
+  const w = tt.offsetWidth, vw = window.innerWidth;
+  let x = ev.clientX + 14; if (x + w > vw - 8) x = Math.max(8, ev.clientX - 14 - w);
+  tt.style.left = x + "px"; tt.style.top = (ev.clientY - 10) + "px";
+}
+const hideTip = () => { tt.style.display = "none"; };
+
+function makePlot(svgId, cfg) {
+  const svg = $(svgId);
+  const W = 880, Ht = +svg.viewBox.baseVal.height;
+  const M = { l: 92, r: 26, t: 16, b: 54 };
+  const pw = W - M.l - M.r, ph = Ht - M.t - M.b;
+  const win = { ...cfg.win }, win0 = { ...cfg.win };
+  let hot = [];
+  const X = x => M.l + (x - win.x0) / (win.x1 - win.x0) * pw;
+  const Y = v => M.t + ph - (v - win.y0) / (win.y1 - win.y0) * ph;
+  const winRow = cfg.winRow ? $(cfg.winRow) : null;
+  const defs = [["x0", cfg.xName + " min"], ["x1", cfg.xName + " max"], ["y0", cfg.yName + " min"], ["y1", cfg.yName + " max"]];
+  function clampWin(k, v) {
+    const ax = k[0], gap = 4 * cfg.step[ax];
+    v = Math.min(cfg.lim[ax][1], Math.max(cfg.lim[ax][0], v));
+    if (k === "x0") v = Math.min(v, win.x1 - gap);
+    if (k === "x1") v = Math.max(v, win.x0 + gap);
+    if (k === "y0") v = Math.min(v, win.y1 - gap);
+    if (k === "y1") v = Math.max(v, win.y0 + gap);
+    return v;
+  }
+  function syncWin() {
+    if (!winRow) return;
+    for (const [k] of defs) {
+      $(svgId + "-" + k).value = win[k];
+      const n = $(svgId + "-" + k + "n");
+      if (document.activeElement !== n) n.value = win[k];
+    }
+  }
+  if (winRow) {
+    winRow.innerHTML = defs.map(([k, lab]) =>
+      `<span class="ctl">${lab}
+        <input type="range" id="${svgId}-${k}" min="${cfg.lim[k[0]][0]}" max="${cfg.lim[k[0]][1]}" step="${cfg.step[k[0]]}" value="${win[k]}" aria-label="${lab}">
+        <input type="number" id="${svgId}-${k}n" min="${cfg.lim[k[0]][0]}" max="${cfg.lim[k[0]][1]}" step="${cfg.step[k[0]]}" value="${win[k]}" aria-label="${lab}"></span>`).join("") +
+      `<span class="ctl">${(cfg.presets || []).map((p, i) => `<button class="btn" type="button" id="${svgId}-pre${i}">${p.label}</button>`).join("")}
+        <button class="btn" id="${svgId}-rst" type="button">reset view</button></span>`;
+    for (const [k] of defs) {
+      const s = $(svgId + "-" + k), n = $(svgId + "-" + k + "n");
+      s.addEventListener("input", () => { win[k] = clampWin(k, parseFloat(s.value)); syncWin(); render(); });
+      n.addEventListener("change", () => { let v = parseFloat(n.value); if (!isFinite(v)) v = win[k]; win[k] = clampWin(k, v); syncWin(); render(); });
+    }
+    $(svgId + "-rst").addEventListener("click", () => { Object.assign(win, win0); syncWin(); render(); });
+    (cfg.presets || []).forEach((p, i) => $(svgId + "-pre" + i).addEventListener("click", () => { Object.assign(win, p.win()); syncWin(); render(); }));
+  }
+  function render() {
+    const ys = niceStep((win.y1 - win.y0) / 5), yd = decimalsFor(ys);
+    const xs = niceStep((win.x1 - win.x0) / 7), xd = decimalsFor(xs);
+    let s = `<rect x="${M.l}" y="${M.t}" width="${pw}" height="${ph}" fill="#ffffff"/>`;
+    for (let v = Math.ceil(win.y0 / ys - 1e-9) * ys; v <= win.y1 + 1e-9; v += ys) {
+      s += `<line x1="${M.l}" x2="${W - M.r}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)" stroke-opacity="0.55"/>`;
+      s += `<line x1="${M.l}" x2="${M.l + 7}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--axis)" stroke-width="1.2"/>`;
+      s += `<text x="${M.l - 10}" y="${Y(v) + 4.5}" text-anchor="end" font-size="13" font-weight="600" fill="var(--text-secondary)">${fmt(Math.abs(v) < 1e-12 ? 0 : v, yd)}</text>`;
+    }
+    for (let x = Math.ceil(win.x0 / xs - 1e-9) * xs; x <= win.x1 + 1e-9; x += xs) {
+      s += `<line x1="${X(x)}" x2="${X(x)}" y1="${M.t}" y2="${M.t + ph}" stroke="var(--grid)" stroke-opacity="0.35"/>`;
+      s += `<line x1="${X(x)}" x2="${X(x)}" y1="${M.t + ph - 7}" y2="${M.t + ph}" stroke="var(--axis)" stroke-width="1.2"/>`;
+      s += `<text x="${X(x)}" y="${Ht - M.b + 24}" text-anchor="middle" font-size="13" font-weight="600" fill="var(--text-secondary)">${fmt(Math.abs(x) < 1e-12 ? 0 : x, xd)}</text>`;
+    }
+    s += `<rect x="${M.l}" y="${M.t}" width="${pw}" height="${ph}" fill="none" stroke="var(--axis)" stroke-width="1.5"/>`;
+    s += `<text x="${M.l + pw / 2}" y="${Ht - 8}" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text-secondary)">${cfg.xLabel}</text>`;
+    s += `<text transform="translate(22 ${M.t + ph / 2}) rotate(-90)" text-anchor="middle" font-size="15" font-weight="700" fill="var(--text-secondary)">${cfg.yLabel}</text>`;
+    s += `<defs><clipPath id="${svgId}-clip"><rect x="${M.l}" y="${M.t}" width="${pw}" height="${ph}"/></clipPath>${cfg.defs || ""}</defs>`;
+    hot = [];
+    const ctx = { X, Y, win, M, pw, ph, hot };
+    s += `<g clip-path="url(#${svgId}-clip)">${cfg.layers(ctx)}</g>`;
+    s += `<line id="${svgId}-cross" x1="0" x2="0" y1="${M.t}" y2="${M.t + ph}" stroke="var(--axis)" stroke-dasharray="3 3" visibility="hidden"/>`;
+    svg.innerHTML = s;
+  }
+  svg.addEventListener("pointermove", ev => {
+    const r = svg.getBoundingClientRect();
+    const sx = (ev.clientX - r.left) / r.width * W, sy = (ev.clientY - r.top) / r.height * Ht;
+    let best = null, bd = 18;
+    for (const h of hot) { const d = Math.hypot(h.px - sx, h.py - sy); if (d < bd) { bd = d; best = h; } }
+    const cross = $(svgId + "-cross");
+    if (best) { cross.setAttribute("visibility", "hidden"); showTip(ev, best.html); return; }
+    if (cfg.crossTip && sx >= M.l && sx <= W - M.r) {
+      const x = win.x0 + (sx - M.l) / pw * (win.x1 - win.x0);
+      const html = cfg.crossTip(x);
+      if (html) {
+        cross.setAttribute("x1", X(x)); cross.setAttribute("x2", X(x)); cross.setAttribute("visibility", "visible");
+        showTip(ev, html); return;
+      }
+    }
+    cross.setAttribute("visibility", "hidden"); hideTip();
+  });
+  svg.addEventListener("pointerleave", () => { hideTip(); const c = $(svgId + "-cross"); if (c) c.setAttribute("visibility", "hidden"); });
+  syncWin();
+  const setWin = w => { Object.assign(win, w || win0); syncWin(); render(); };
+  return { render, win, setWin };
+}
+
+const arrowDefs = ["series-7", "series-1", "series-2", "series-3"].map(k =>
+  `<marker id="ah-${k}" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--${k})"/></marker>`).join("");
+
+let STATE = null;   // last evaluation, shared by the charts and tiles
+const STEP_NAMES = ["air O₂ mixed in", "uptake fractionation", "CO₂ leaves", "breath vapor"];
+const STEP_KEYS = ["series-7", "series-1", "series-2", "series-3"];
+
+const chart1 = makePlot("c1", {
+  win: { x0: -16, x1: 26, y0: -0.48, y1: 0.06 },
+  lim: { x: [-40, 40], y: [-0.7, 0.2] },
+  step: { x: 0.5, y: 0.005 },
+  xName: "δ′¹⁸O", yName: "Δ′¹⁷O", winRow: "c1-win",
+  xLabel: "δ′¹⁸O (‰, VSMOW)", yLabel: "Δ′¹⁷O (‰, λ 0.528)",
+  defs: arrowDefs,
+  presets: [{ label: "zoom to body water", win: () => closeUp() }],
+  layers: ({ X, Y, hot }) => {
+    const S = STATE; let s = "";
+    s += `<line x1="${X(-100)}" x2="${X(100)}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--axis)" stroke-width="1"/>`;
+    // other archetypes
+    for (const a of S.others) {
+      s += `<circle cx="${X(a.bw[0])}" cy="${Y(a.bw[1])}" r="5" fill="var(--axis)" stroke="#ffffff" stroke-width="2"/>`;
+      hot.push({ px: X(a.bw[0]), py: Y(a.bw[1]), html: `<strong>${a.name}</strong>, at its own settings<br>body water ${fmt(a.bw[0], 2)} ${PM}, ${fmt(a.bw[1], 3)} ${PM}<br>f ${a.f.toFixed(3)}` });
+    }
+    // reference points: air O2 and the O2 taken up
+    const air = [BWM.dprime(BWM.CONST.d18_air), BWM.CONST.D17_air], o2 = S.r.o2;
+    s += `<line x1="${X(air[0])}" y1="${Y(air[1])}" x2="${X(o2[0])}" y2="${Y(o2[1])}" stroke="var(--series-1)" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+    s += `<rect x="${X(air[0]) - 6}" y="${Y(air[1]) - 6}" width="12" height="12" fill="var(--series-7)" stroke="#ffffff" stroke-width="2"/>`;
+    s += `<text x="${X(air[0]) - 10}" y="${Y(air[1]) + 4}" text-anchor="end" font-size="12.5" font-weight="600" fill="var(--text-secondary)">air O₂</text>`;
+    s += `<rect x="${X(o2[0]) - 6}" y="${Y(o2[1]) - 6}" width="12" height="12" fill="var(--series-1)" stroke="#ffffff" stroke-width="2"/>`;
+    s += `<text x="${X(o2[0])}" y="${Y(o2[1]) - 12}" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--text-secondary)">O₂ taken up</text>`;
+    hot.push({ px: X(air[0]), py: Y(air[1]), html: `<strong>air O₂</strong> (published)<br>${fmt(air[0], 2)} ${PM}, ${fmt(air[1], 3)} ${PM}` });
+    hot.push({ px: X(o2[0]), py: Y(o2[1]), html: `<strong>O₂ taken up</strong>, O₂-weighted<br>${fmt(o2[0], 2)} ${PM}, ${fmt(o2[1], 3)} ${PM}<br>X ${S.r.X.toFixed(3)}, z ${P.z.toFixed(1)} ${PM}, θ ${P.tr.toFixed(4)}` });
+    // drinking water
+    const dw = S.path[0];
+    s += `<rect x="${X(dw[0]) - 6}" y="${Y(dw[1]) - 6}" width="12" height="12" fill="var(--muted)" stroke="#ffffff" stroke-width="2"/>`;
+    s += `<text x="${X(dw[0]) + 10}" y="${Y(dw[1]) - 9}" font-size="12.5" font-weight="600" fill="var(--text-secondary)">drinking water</text>`;
+    hot.push({ px: X(dw[0]), py: Y(dw[1]), html: `<strong>drinking water</strong>, fixed (constructed)<br>${fmt(dw[0], 2)} ${PM}, ${fmt(dw[1], 3)} ${PM}` });
+    // path segments
+    for (let i = 0; i < 4; i++) {
+      const a = S.path[i], b = S.path[i + 1];
+      const len = Math.hypot(X(b[0]) - X(a[0]), Y(b[1]) - Y(a[1]));
+      if (len > 3) s += `<line x1="${X(a[0])}" y1="${Y(a[1])}" x2="${X(b[0])}" y2="${Y(b[1])}" stroke="var(--${STEP_KEYS[i]})" stroke-width="2.5" stroke-linecap="round" marker-end="url(#ah-${STEP_KEYS[i]})"/>`;
+      const d18 = b[0] - a[0], d17 = b[1] - a[1];
+      hot.push({ px: (X(a[0]) + X(b[0])) / 2, py: (Y(a[1]) + Y(b[1])) / 2,
+        html: `<strong>${STEP_NAMES[i]}</strong><br>δ′¹⁸O ${fmts(d18, 2)} ${PM}, Δ′¹⁷O ${fmts(d17, 4)} ${PM}` });
+    }
+    for (let i = 1; i < 4; i++) {
+      const p = S.path[i];
+      s += `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="3.5" fill="#ffffff" stroke="var(--${STEP_KEYS[i - 1]})" stroke-width="2"/>`;
+    }
+    // theta brackets and body water
+    S.rings.forEach((r, i) => {
+      s += `<circle cx="${X(r[0])}" cy="${Y(r[1])}" r="7" fill="none" stroke="var(--text-primary)" stroke-width="1.6"/>`;
+      s += `<text x="${X(r[0]) + 11}" y="${Y(r[1]) + 4}" font-size="11.5" font-weight="600" fill="var(--text-secondary)">θ ${i ? "0.529" : "0.5229"}</text>`;
+      hot.push({ px: X(r[0]), py: Y(r[1]), html: `<strong>same animal at θ CO₂–water ${i ? "0.529" : "0.5229"}</strong><br>${fmt(r[0], 2)} ${PM}, ${fmt(r[1], 3)} ${PM}` });
+    });
+    const b = S.r.bw;
+    s += `<circle cx="${X(b[0])}" cy="${Y(b[1])}" r="7.5" fill="var(--text-primary)" stroke="#ffffff" stroke-width="2.5"/>`;
+    s += `<text x="${X(b[0])}" y="${Y(b[1]) - 15}" text-anchor="middle" font-size="13" font-weight="700" fill="var(--text-primary)">body water</text>`;
+    hot.push({ px: X(b[0]), py: Y(b[1]), html: `<strong>body water</strong>, ${DISPLAY[P.animal]}<br>${fmt(b[0], 2)} ${PM}, ${fmt(b[1], 3)} ${PM}<br>θ CO₂–water ${P.tc.toFixed(4)}` });
+    return s;
+  }
+});
+
+function closeUp() {
+  const b = STATE.r.bw, p = STATE.path;
+  const xs = [b[0], p[0][0], p[2][0], p[3][0], p[4][0]].concat(STATE.rings.map(r => r[0]));
+  const ys = [b[1], p[0][1], p[2][1], p[3][1], p[4][1]].concat(STATE.rings.map(r => r[1]));
+  const x0 = Math.floor(Math.min(...xs) - 1.5), x1 = Math.ceil(Math.max(...xs) + 1.5);
+  const y0 = Math.floor((Math.min(...ys) - 0.02) / 0.01) * 0.01, y1 = Math.ceil((Math.max(...ys) + 0.02) / 0.01) * 0.01;
+  return { x0, x1, y0: +y0.toFixed(3), y1: +y1.toFixed(3) };
+}
+let VIEWMODE = "all";
+function applyView() {
+  chart1.setWin(VIEWMODE === "all" ? null : closeUp());
+  $("v-all").classList.toggle("on", VIEWMODE === "all");
+  $("v-bw").classList.toggle("on", VIEWMODE !== "all");
+}
+function curve(theta) {
+  // offsets of this animal as f varies, at the current RQ, temperature and extraction
+  const an1 = BWM.animal(P.animal, P.q, P.tb, 1, P.dX);
+  const c = cfg(theta), out = [];
+  for (let i = 0; i <= 180; i++) {
+    const f = 0.002 + (0.92 - 0.002) * i / 180;
+    const W = 1 / f - P.q;
+    if (W <= 0) continue;
+    const r = BWM.bodyWater(W, P.q, an1.states, c);
+    out.push({ f, d18: r.bw[0] - c.dw[0], d17: r.bw[1] - c.dw[1], ok: r.feasible });
+  }
+  return out;
+}
+function fMax() {
+  const an1 = BWM.animal(P.animal, P.q, P.tb, 1, P.dX);
+  const g = BWM.aggregate(an1.states, P.q, cfg());
+  // feasible while B = W + q - 1 - b_in >= 0 and W - b_out >= 0, with W = 1/f - q
+  return Math.min(1 / (1 + g.bin), 1 / (g.bout + P.q));
+}
+function polyline(pts, X, Y, key, color, dash, width) {
+  let s = "", d = "";
+  for (const p of pts) {
+    if (!p.ok) { if (d) { s += `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}"${dash ? ` stroke-dasharray="${dash}"` : ""} stroke-linecap="round"/>`; d = ""; } continue; }
+    d += (d ? "L" : "M") + X(p.f).toFixed(1) + " " + Y(p[key]).toFixed(1);
+  }
+  if (d) s += `<path d="${d}" fill="none" stroke="${color}" stroke-width="${width}"${dash ? ` stroke-dasharray="${dash}"` : ""} stroke-linecap="round"/>`;
+  return s;
+}
+function gainLayers(key, label) {
+  return ({ X, Y, M, ph, hot }) => {
+    const S = STATE; let s = "";
+    s += `<line x1="${X(0)}" x2="${X(1)}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--axis)" stroke-width="1"/>`;
+    const fm = S.fmax;
+    if (fm < 0.92) {
+      s += `<rect x="${X(fm)}" y="${M.t}" width="${Math.max(0, X(0.95) - X(fm))}" height="${ph}" fill="var(--series-2)" fill-opacity="0.07"/>`;
+      s += `<text x="${X(fm) + 8}" y="${M.t + 16}" font-size="11.5" font-weight="600" fill="var(--text-secondary)">water budget not possible</text>`;
+    }
+    s += polyline(S.curves.lo, X, Y, key, "var(--series-1)", "7 5", 2);
+    s += polyline(S.curves.hi, X, Y, key, "var(--series-7)", "2 4", 2.2);
+    s += polyline(S.curves.now, X, Y, key, "var(--series-2)", null, 3);
+    for (const a of S.others) {
+      const v = key === "d17" ? a.bw[1] - BWM.CONST.dw[1] : a.bw[0] - BWM.CONST.dw[0];
+      s += `<circle cx="${X(a.f)}" cy="${Y(v)}" r="5" fill="var(--axis)" stroke="#ffffff" stroke-width="2"/>`;
+      hot.push({ px: X(a.f), py: Y(v), html: `<strong>${a.name}</strong>, at its own settings<br>f ${a.f.toFixed(3)}, offset ${fmt(v, key === "d17" ? 3 : 2)} ${PM}` });
+    }
+    const gy = 0;
+    s += `<rect x="${X(0.0002) - 5}" y="${Y(gy) - 5}" width="10" height="10" fill="var(--series-3)" stroke="#ffffff" stroke-width="2"/>`;
+    hot.push({ px: X(0.0002), py: Y(gy), html: `<strong>gill breathers</strong><br>f near 2 × 10⁻⁴, no steady-state O₂ imprint` });
+    const me = key === "d17" ? S.r.bw[1] - BWM.CONST.dw[1] : S.r.bw[0] - BWM.CONST.dw[0];
+    s += `<circle cx="${X(S.r.f)}" cy="${Y(me)}" r="7.5" fill="var(--text-primary)" stroke="#ffffff" stroke-width="2.5"/>`;
+    hot.push({ px: X(S.r.f), py: Y(me), html: `<strong>${DISPLAY[P.animal]}</strong>, as set<br>f ${S.r.f.toFixed(3)}, ${label} offset ${fmt(me, key === "d17" ? 3 : 2)} ${PM}` });
+    return s;
+  };
+}
+function gainTip(key) {
+  return f => {
+    if (f < 0 || f > 0.92) return null;
+    const S = STATE, i = Math.round((f - 0.002) / (0.918) * 180);
+    const pick = arr => { const p = arr[Math.max(0, Math.min(arr.length - 1, i))]; return p && p.ok ? fmt(p[key], key === "d17" ? 3 : 2) + " " + PM : "not possible"; };
+    return `<strong>f = ${f.toFixed(3)}</strong><br><span style="color:var(--series-2)">●</span> as set, ${pick(S.curves.now)}<br><span style="color:var(--series-1)">●</span> θ 0.5229, ${pick(S.curves.lo)}<br><span style="color:var(--series-7)">●</span> θ 0.529, ${pick(S.curves.hi)}`;
+  };
+}
+const chart2 = makePlot("c2", {
+  win: { x0: 0, x1: 0.92, y0: -0.34, y1: 0.02 }, lim: { x: [0, 1], y: [-1, 0.2] }, step: { x: 0.01, y: 0.005 },
+  xName: "f", yName: "Δ′¹⁷O offset",
+  xLabel: "f, O₂ share of all oxygen inputs", yLabel: "Δ′¹⁷O offset (‰)",
+  layers: gainLayers("d17", "Δ′¹⁷O"), crossTip: gainTip("d17")
+});
+const chart3 = makePlot("c3", {
+  win: { x0: 0, x1: 0.92, y0: -12, y1: 1 }, lim: { x: [0, 1], y: [-40, 10] }, step: { x: 0.01, y: 0.5 },
+  xName: "f", yName: "δ′¹⁸O offset",
+  xLabel: "f, O₂ share of all oxygen inputs", yLabel: "δ′¹⁸O offset (‰)",
+  layers: gainLayers("d18", "δ′¹⁸O"), crossTip: gainTip("d18")
+});
+
+// ------------------------------------------------------------------ controls
+const sel = $("p-animal");
+const DISPLAY = { "Kangaroo rat": "Kangaroo rat", "Human": "Human, resting", "Passerine": "Songbird", "Lizard": "Desert lizard", "Dolphin": "Dolphin", "Hibernating squirrel": "Ground squirrel, hibernating" };
+sel.innerHTML = NAMES.map(n => `<option value="${n}"${n === DEFAULT_ANIMAL ? " selected" : ""}>${DISPLAY[n]}</option>`).join("");
+
+function setSlider(id, v) {
+  const s = $(id), n = $(id + "n");
+  s.value = v; if (document.activeElement !== n) n.value = (+s.value).toString();
+}
+function syncControls() {
+  const A = BWM.ARCH[P.animal];
+  $("tb-label").textContent = A.TbLabel;
+  for (const id of ["p-tb", "p-tbn"]) $(id).setAttribute("aria-label", A.TbLabel);
+  for (const id of ["p-tb", "p-tbn"]) { $(id).min = A.TbRange[0]; $(id).max = A.TbRange[1]; }
+  setSlider("p-q", P.q.toFixed(3));
+  setSlider("p-tb", P.tb.toFixed(1));
+  setSlider("p-x", (baseX() + P.dX).toFixed(3));
+  setSlider("p-z", P.z.toFixed(1));
+  setSlider("p-tr", P.tr.toFixed(4));
+  setSlider("p-tc", P.tc.toFixed(4));
+  document.querySelectorAll("[data-theta]").forEach(b => b.classList.toggle("on", Math.abs(+b.dataset.theta - P.tc) < 5e-5));
+}
+function loadAnimal(name, keepGlobals) {
+  const A = BWM.ARCH[name];
+  P.animal = name; P.q = A.q; P.tb = A.Tb; P.mult = 1; P.dX = 0;
+  if (!keepGlobals) Object.assign(P, G0);
+  syncControls();
+}
+
+function update() {
+  const now = evaluate();
+  const lo = evaluate(0.5229), hi = evaluate(0.529);
+  now.rings = [lo.r.bw, hi.r.bw];
+  now.others = NAMES.filter(n => n !== P.animal).map(n => {
+    const A = BWM.ARCH[n], an = BWM.animal(n, A.q, A.Tb, 1, 0);
+    const r = BWM.bodyWater(an.W, an.q, an.states, cfg());
+    return { name: DISPLAY[n], bw: r.bw, f: r.f };
+  });
+  now.curves = { now: curve(), lo: curve(0.5229), hi: curve(0.529) };
+  now.fmax = fMax();
+  STATE = now;
+  const r = now.r, dw = BWM.CONST.dw;
+  setSlider("p-f", r.f.toFixed(3));
+  $("t-bw").innerHTML = `${fmt(r.bw[0], 2)} <span class="u">${PM}</span>, ${fmt(r.bw[1], 3)} <span class="u">${PM}</span>`;
+  $("t-off").innerHTML = `${fmts(r.bw[0] - dw[0], 2)} <span class="u">${PM}</span>, ${fmts(r.bw[1] - dw[1], 3)} <span class="u">${PM}</span>`;
+  $("t-fv").innerHTML = `${r.f.toFixed(3)}, ${r.v.toFixed(3)}`;
+  $("t-o2").innerHTML = `${fmt(r.o2[0], 2)} <span class="u">${PM}</span>, ${fmt(r.o2[1], 3)} <span class="u">${PM}</span>`;
+  $("t-co2").innerHTML = `${now.thetaEff.toFixed(4)}, ${(100 * now.share).toFixed(0)}<span class="u">%</span> <span class="u">${now.thetaEff < BWM.LAM ? "raises Δ′¹⁷O" : "lowers Δ′¹⁷O"}</span>`;
+  $("t-rco2").innerHTML = `${fmt(r.co2[0], 2)} <span class="u">${PM}</span>, ${fmt(r.co2[1], 3)} <span class="u">${PM}</span>`;
+  const tile = $("t-feas-tile");
+  if (r.feasible) { tile.classList.remove("warn"); $("t-feas").innerHTML = `balanced <span class="u">every flux non-negative</span>`; }
+  else { tile.classList.add("warn"); $("t-feas").innerHTML = `not possible <span class="u">breath water loss exceeds the water coming in, lower f</span>`; }
+  $("t-pf17").innerHTML = `${fmt((r.bw[1] - dw[1]) / r.f, 3)} <span class="u">${PM} per unit f</span>`;
+  $("t-pf18").innerHTML = `${fmt((r.bw[0] - dw[0]) / r.f, 2)} <span class="u">${PM} per unit f</span>`;
+  $("t-fmax").innerHTML = `${now.fmax.toFixed(3)}`;
+  chart1.render(); chart2.render(); chart3.render();
+}
+
+sel.addEventListener("change", () => { loadAnimal(sel.value, true); update(); if (VIEWMODE !== "all") applyView(); });
+$("v-all").addEventListener("click", () => { VIEWMODE = "all"; applyView(); });
+$("v-bw").addEventListener("click", () => { VIEWMODE = "bw"; applyView(); });
+function bind(id, fn) {
+  const s = $(id), n = $(id + "n");
+  s.addEventListener("input", () => { n.value = s.value; fn(parseFloat(s.value)); update(); });
+  n.addEventListener("change", () => {
+    let v = parseFloat(n.value); if (!isFinite(v)) v = parseFloat(s.value);
+    v = Math.min(parseFloat(s.max), Math.max(parseFloat(s.min), v));
+    s.value = v; n.value = s.value; fn(parseFloat(s.value)); update();
+  });
+}
+bind("p-f", f => { const base = BWM.animal(P.animal, P.q, P.tb, 1, P.dX).W; P.mult = (1 / f - P.q) / base; });
+bind("p-q", v => { P.q = v; });
+bind("p-tb", v => { P.tb = v; });
+bind("p-x", v => { P.dX = v - baseX(); });
+bind("p-z", v => { P.z = v; });
+bind("p-tr", v => { P.tr = v; });
+bind("p-tc", v => { P.tc = v; syncControls(); });
+document.querySelectorAll("[data-theta]").forEach(b => b.addEventListener("click", () => { P.tc = +b.dataset.theta; syncControls(); update(); }));
+$("p-reset").addEventListener("click", () => { loadAnimal(P.animal, false); update(); });
+
+loadAnimal(DEFAULT_ANIMAL, false);
+update();
+
+// label every control for assistive technology from the text that precedes it
+document.querySelectorAll(".paramrow .ctl").forEach(c => {
+  let t = c.firstChild && c.firstChild.nodeType === 3 ? c.firstChild.textContent.trim() : "";
+  if (!t && c.firstElementChild && c.firstElementChild.tagName === "SPAN") t = c.firstElementChild.textContent.trim();
+  c.querySelectorAll("input").forEach(i => { if (!i.getAttribute("aria-label") && t) i.setAttribute("aria-label", t); });
+});
+// Embed mode: a #card-id hash shows that card alone, and the page reports its height to a parent page
+(function () {
+  const id = decodeURIComponent(location.hash.slice(1));
+  const card = id ? document.getElementById(id) : null;
+  if (card && card.classList.contains("card")) { document.body.classList.add("embed"); card.classList.add("sel"); }
+  else if (id === "embed") document.body.classList.add("embed-all");
+  let last = 0;
+  const post = () => {
+    const h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+    if (Math.abs(h - last) < 2) return;
+    last = h;
+    try { if (window.parent !== window) window.parent.postMessage({ type: "module-height", h, href: location.href }, "*"); } catch (e) { /* no parent */ }
+  };
+  if (window.ResizeObserver) new ResizeObserver(post).observe(document.body);
+  window.addEventListener("load", post);
+  post();
+})();
+</script>
+</body>
+</html>
