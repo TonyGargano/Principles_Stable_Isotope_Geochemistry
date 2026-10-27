@@ -263,7 +263,7 @@ const GASES = {
     beams: [{ m: 127, sp: "³²SF₅⁺", ab: 94.85 }, { m: 128, sp: "³³SF₅⁺", ab: 0.763 }, { m: 129, sp: "³⁴SF₅⁺", ab: 4.365 }, { m: 131, sp: "³⁶SF₅⁺", ab: 0.0158 }],
     ratios: [["128/127", "δ³³S"], ["129/127", "δ³⁴S"], ["131/127", "δ³⁶S"]] },
   CH3Cl: { key: "CH3Cl", chip: "CH₃Cl", el: "chlorine", route: "cf", method: "Methyl chloride synthesis", reagent: "AgCl + CH₃I",
-    beams: [{ m: 50, sp: "CH₃³⁵Cl⁺", ab: 75.8 }, { m: 52, sp: "CH₃³⁷Cl⁺", ab: 24.2 }],
+    beams: [{ m: 50, sp: "CH₃³⁵Cl⁺", ab: 74.96 }, { m: 52, sp: "CH₃³⁷Cl⁺", ab: 23.93 }],
     ratios: [["52/50", "δ³⁷Cl"]] },
   H2: { key: "H2", chip: "H₂", el: "hydrogen", route: "cf", method: "High-temperature conversion", reagent: "glassy carbon",
     beams: [{ m: 2, sp: "H₂⁺", ab: 99.971 }, { m: 3, sp: "HD⁺", ab: 0.029 }],
@@ -310,7 +310,7 @@ const IRMS_PARTS = [
     flags: () => flags({ pub: "Bellows and valve, " + ref("mat") + ". 90 comparisons, " + ref("uw") + ".", con: "Description." }) },
   { id: "cf", n: 3, title: "Continuous flow", sub: () => "Helium carrier",
     lead: () => "In continuous flow, a stream of helium carries the sample gas through a gas chromatograph and into the ion source as a short pulse. Pulses of reference gas are injected before and after it.",
-    body: g => ["An open split, a small tube open to the helium stream, lets the source draw a steady flow whatever happens upstream. Continuous flow needs far less sample than the dual inlet and suits gases made one sample at a time, like CH₃Cl or H₂. The ion source, magnet and collectors are the same.",
+    body: g => ["An open split, a small tube at atmospheric pressure where the GC outlet meets the capillary to the source, lets the source draw a steady flow whatever happens upstream. Continuous flow needs far less sample than the dual inlet and suits gases made online in a helium stream, like H₂, or separated by GC just before the source, like CH₃Cl. The ion source, magnet and collectors are the same.",
       { note: g.route === "cf" ? g.chip + " takes this route." : g.chip + " takes the dual inlet route instead (part 2)." }],
     mine: () => "Chlorine isotopes, the thread through my PhD, run this way at UNM, as CH₃Cl in continuous flow on a Delta Plus XL, a close relative of the MAT 253.",
     flags: () => flags({ own: "Chlorine on the Delta Plus XL.", pub: "Reference gas pulses, " + ref("mat") + ".", con: "Description." }) },
@@ -320,7 +320,7 @@ const IRMS_PARTS = [
     flags: () => flags({ pub: "10 kV acceleration and electron impact source, " + ref("mat") + ".", con: "Description." }) },
   { id: "magnet", n: 5, title: "Magnet", sub: () => "Sorts ions by mass",
     lead: () => "The magnet bends the beam. Every ion has the same energy, so heavier ions bend less than lighter ones, and the single beam fans out into separate beams by mass.",
-    body: () => ["For ions of equal charge and energy, the bending radius grows with the square root of mass. Isotope variants of these gases differ by whole mass units, so modest resolution is enough. The MAT 253 reaches a mass resolving power of about 200 for carbon, nitrogen, oxygen and sulfur gases and spreads the beams over a 460 mm dispersion.", "Hydrogen is so light that it is collected on a smaller radius."],
+    body: () => ["For ions of equal charge and energy, the bending radius grows with the square root of mass. Isotope variants of these gases differ by whole mass units, so modest resolution is enough. The MAT 253 reaches a mass resolving power of about 200 for carbon, nitrogen, oxygen and sulfur gases and has a 460 mm mass dispersion, so beams 1 percent apart in mass land about 4.6 mm apart.", "Hydrogen is so light that it is collected on a smaller radius."],
     flags: () => flags({ pub: "Resolving power, dispersion and the hydrogen radius, " + ref("mat") + ".", con: "Description." }) },
   { id: "cups", n: 6, title: "Faraday cups", sub: () => "One cup per mass",
     lead: () => "Each beam lands in its own Faraday cup, a small metal bucket that catches the ions and passes their charge to an amplifier. All beams are collected at once, so any flicker in the source affects them equally and cancels in the ratios.",
@@ -348,14 +348,14 @@ const MC_PARTS = [
     lead: () => "The rock powder is dissolved in hydrofluoric and nitric acids. The solution then passes through columns of ion-exchange resin that hold back other elements and release the target element on its own.",
     body: e => ({
       K: ["Potassium has to be separated from sodium, calcium and the rest of the rock, because other elements change how efficiently the plasma ionizes the sample. Recovery must be near complete, since a column can fractionate isotopes as the element washes through. The purified K is dried down and taken up in dilute nitric acid."],
-      Rb: ["Rubidium has to be separated from potassium and, above all, from strontium, because ⁸⁷Sr has the same mass as ⁸⁷Rb. One published scheme combines cation resin, an anion resin step and a strontium-specific resin, with yields above 95%."]
+      Rb: ["Rubidium has to be separated from potassium and, above all, from strontium, because ⁸⁷Sr has almost exactly the same mass as ⁸⁷Rb. One published scheme combines cation resin, an anion resin step and a strontium-specific resin, with yields above 95%."]
     })[e.key],
     mine: () => "I do HF–HNO₃ digestions and K purification by column chromatography in ultra-clean labs.",
     flags: e => flags({ own: "Digestion and K column chemistry (CV).", pub: e.key === "Rb" ? "Rb chemistry and yields, " + ref("nie") + "." : null, con: "Description." }) },
   { id: "neb", n: 2, title: "Nebulizer and spray chamber", sub: () => "Liquid to mist",
-    lead: () => "A fine capillary draws the solution into a nebulizer, where a jet of argon shatters it into a mist. A spray chamber, or a heated desolvator, removes the large droplets and most of the water, so a fine aerosol reaches the plasma.",
-    body: () => ["A desolvator makes a dry plasma, which raises the signal and cuts down hydride ions such as ⁴⁰Ar¹H⁺. Published K and Rb methods take up about 100 to 150 µL of solution per minute, at tens of parts per billion of the element."],
-    flags: () => flags({ pub: "Uptake rates and concentrations, " + ref("zhang") + " and " + ref("nie") + ".", con: "Description." }) },
+    lead: () => "A fine capillary draws the solution into a nebulizer, where a jet of argon shatters it into a mist. A spray chamber removes the large droplets, and a heated desolvator, when used, also strips out most of the solvent, so a fine aerosol reaches the plasma.",
+    body: () => ["A desolvator makes a dry plasma, which raises the signal and cuts down hydride ions such as ⁴⁰Ar¹H⁺. Published K and Rb methods take up about 100 to 150 µL of solution per minute."],
+    flags: () => flags({ pub: "Uptake rates, " + ref("zhang") + " and " + ref("nie") + ".", con: "Description." }) },
   { id: "plasma", n: 3, title: "Argon plasma", sub: () => "Atoms to ions",
     lead: () => "The plasma is argon gas heated to 6,000 to 10,000 K by a radio-frequency coil, at atmospheric pressure. Droplets dry, molecules break apart and atoms lose an electron. Potassium (4.34 eV) and rubidium (4.18 eV) give up an electron so easily that nearly all of their atoms become ions.",
     body: e => ({
@@ -365,19 +365,19 @@ const MC_PARTS = [
     flags: e => flags({ pub: (e.key === "K" ? "Plasma powers, " + ref("zhang") + ". " : "") + "Ionization energies, " + ref("nist") + ".", con: "Description." }) },
   { id: "cones", n: 4, title: "Interface cones", sub: () => "Air to vacuum",
     lead: () => "Two nickel cones with tiny holes, the sampler and the skimmer, draw a slice of the plasma from atmospheric pressure into the vacuum of the mass spectrometer.",
-    body: () => ["The gas expands at supersonic speed through the cones, and the ions are skimmed into a beam. Ions of different mass do not pass through equally, which makes heavy isotopes look more abundant than they are. This instrumental mass bias drifts during a session, which is why every sample is bracketed by standards (part 9).", "High-sensitivity Jet cones raise the signal 10 to 20 times when paired with a desolvator."],
-    flags: () => flags({ pub: "Jet interface gain, " + ref("neptune") + ".", con: "Description." }) },
+    body: () => ["The gas expands at supersonic speed through the cones, and the ions are skimmed into a beam. Ions of different mass do not pass through equally, which makes heavy isotopes look more abundant than they are. This instrumental mass bias drifts during a session, which is why every sample is bracketed by standards (part 9).", "The optional Jet interface raises the signal 10 to 20 times in desolvation mode."],
+    flags: () => flags({ pub: "Jet interface gain in desolvation mode, " + ref("neptune") + ".", con: "Description." }) },
   { id: "slit", n: 5, title: "Lenses and entrance slit", sub: () => "Focus and mass resolution",
     lead: () => "Electrostatic lenses accelerate and focus the ions into a beam, which passes through a narrow entrance slit. The slit width sets the mass resolution, from low through medium to high.",
     body: e => ({
-      K: ["Potassium needs high resolution. ⁴⁰Ar¹H⁺ sits just 0.0084 mass units above ⁴¹K. The collector is wide, so the two flat-topped peaks overlap almost completely, but at high resolution their edges are sharp enough to leave a clean window. At a resolving power of about 9,000, the window on the low-mass side of the peak where only ⁴¹K enters the cup is 0.003 to 0.004 mass units wide, and ⁴¹K is measured there. ³⁸Ar¹H⁺ sits on ³⁹K the same way."],
+      K: ["On the Neptune Plus, which has no collision cell, potassium is measured at high resolution. ⁴⁰Ar¹H⁺ sits just 0.0084 mass units above ⁴¹K. The collector is wide, so the two flat-topped peaks overlap almost completely, but at high resolution their edges are sharp enough to leave a clean window. At a resolving power of about 9,000, the window on the low-mass side of the peak where only ⁴¹K enters the cup is 0.003 to 0.004 mass units wide, and ⁴¹K is measured there. ³⁸Ar¹H⁺ sits on ³⁹K the same way.", "Instruments with a collision cell take another route, removing the hydride with hydrogen gas so that ⁴¹K can be measured at the peak center."],
       Rb: ["Rubidium runs at low resolution. Its real problem is ⁸⁷Sr, which differs from ⁸⁷Rb by just 0.0003 mass units. Separating them would take a resolving power near 290,000, far beyond any MC-ICP-MS, so strontium is removed in the chemistry and any trace is corrected by monitoring ⁸⁸Sr."]
     })[e.key],
     chart: "edge",
-    flags: e => flags({ pub: (e.key === "K" ? "Resolving power and clean window, " + ref("zhang") + "." : "Low resolution and the ⁸⁸Sr correction, " + ref("nie") + ".") + " Atomic masses, " + ref("ame") + ".", con: "Mass differences and peak edges calculated. The interference size in the figure is illustrative." }) },
+    flags: e => flags({ pub: (e.key === "K" ? "Resolving power, clean window and the collision cell route, " + ref("zhang") + "." : "Low resolution and the ⁸⁸Sr correction, " + ref("nie") + ".") + " Atomic masses, " + ref("ame") + ".", con: "Mass differences calculated. Peak edges drawn as straight ramps. The interference size in the figure is illustrative." }) },
   { id: "esa", n: 6, title: "Electrostatic analyzer (ESA)", sub: () => "Filters by energy",
     lead: () => "Two curved plates, one negative and one positive, bend the beam along an arc. Only ions within a narrow band of kinetic energy follow the curve to the next slit.",
-    body: () => ["Ions leave the plasma with a spread of energies, and a magnet sorts by momentum, so on its own it would blur that spread into broad peaks. The ESA's energy dispersion is matched and opposite to the magnet's, so the two cancel and ions of one mass come to a single focus whatever their energy. This double focusing, by direction and by energy, keeps each beam sharp, which gives the flat-topped peaks that precise ratios need.", "The gas source IRMS skips this step, because electron impact ions start out with nearly the same energy."],
+    body: () => ["Ions leave the plasma with a spread of energies, and a magnet sorts by momentum, so on its own it would blur that spread into broad peaks. The ESA's energy dispersion is matched and opposite to the magnet's, so the two cancel and ions of one mass but slightly different energies come back to a single focus. This double focusing, by direction and by energy, keeps each beam sharp, which gives the flat-topped peaks that precise ratios need.", "The gas source IRMS skips this step, because electron impact ions start out with nearly the same energy."],
     flags: () => flags({ pub: "Double focusing of energy and angle, " + ref("neptune") + ".", con: "Description." }) },
   { id: "mag", n: 7, title: "Magnet", sub: () => "Sorts ions by mass",
     lead: () => "As in the gas instrument, the magnet bends lighter ions more than heavier ones and fans the beam out across the collectors.",
@@ -466,7 +466,7 @@ function drawIRMS() {
     TM(206, 322, "GC", "p-small")
   ]));
 
-  svg.appendChild(part("dual", [252, 10, 232, 186], [
+  svg.appendChild(part("dual", [252, 10, 238, 186], [
     plabel(262, 30, 2, "Dual inlet", "sample against reference"),
     bellows(272, 62, 44, 62), bellows(334, 62, 44, 62),
     TM(294, 140, "sample", "p-small"), TM(356, 140, "reference", "p-small"),
@@ -670,8 +670,8 @@ const CMP_ROWS = [
   ["Typical elements", "H, C, N, O, S and Cl, the light elements that form simple gases", "Metals such as K, Rb, Mg, Fe and Zn"],
   ["Making ions", "Electron impact, which ionizes a small fraction of the molecules", "An argon plasma at 6,000 to 10,000 K, which ionizes nearly every K or Rb atom"],
   ["Energy spread", "Narrow, so one magnet is enough", "Broad, so an electrostatic analyzer works with the magnet"],
-  ["What the cups see", "Molecules with different isotope combinations, like ¹⁶O¹⁸O", "Single atoms, like ⁴¹K⁺"],
-  ["Main interferences", "Other gases at the same mass, like NF⁺ on mass 33, removed before the inlet", "Argon-based ions and isobars, like ⁴⁰Ar¹H⁺ on ⁴¹K or ⁸⁷Sr on ⁸⁷Rb, handled by resolution, a cooler plasma or chemistry"],
+  ["What the cups see", "Molecular ions with different isotope combinations, like ¹⁶O¹⁸O⁺", "Atomic ions, like ⁴¹K⁺"],
+  ["Main interferences", "Other gases whose ions share a mass, like the NF⁺ fragment of NF₃ on mass 33, removed before the inlet", "Argon-based ions and isobars, like ⁴⁰Ar¹H⁺ on ⁴¹K or ⁸⁷Sr on ⁸⁷Rb, handled by resolution, a cooler plasma or chemistry"],
   ["Correcting bias", "The sample is compared with a reference gas, alternating in the dual inlet or as pulses in continuous flow", "Each sample is bracketed by runs of a standard"],
   ["In my work", "H, O, S and Cl isotopes, and the extraction lines that feed them", "K isotopes on a Neptune Plus, with Rb in proposed experiments"]
 ];
@@ -685,7 +685,7 @@ function renderCmp() {
   wrap.innerHTML = '<table class="cmp"><caption class="sr-only">Gas source IRMS compared with MC-ICP-MS</caption><thead><tr><th scope="col"></th><th scope="col">Gas source IRMS</th><th scope="col">MC-ICP-MS</th></tr></thead><tbody>' +
     CMP_ROWS.map(r => '<tr><th scope="row">' + r[0] + '</th><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>').join("") + '</tbody></table>';
   stage.appendChild(wrap);
-  panel.innerHTML = '<div class="pbox"><div class="ptext"><p class="lead">The same physics sorts the ions in both instruments. A magnet bends lighter ions more than heavier ones, and Faraday cups catch each beam. The difference is everything before that, and it decides which elements each instrument can measure.</p><p>Light elements become simple gases that can be purified on a vacuum line and ionized gently, so every ion starts with about the same energy. Metals like potassium stay in solution until an argon plasma tears them into ions, which leave with a spread of energies that the instrument has to correct for, here with an electrostatic analyzer.</p></div>' +
+  panel.innerHTML = '<div class="pbox"><div class="ptext"><p class="lead">The same physics sorts the ions in both instruments. A magnet bends lighter ions more than heavier ones, and Faraday cups catch each beam. The difference is everything before that, and it decides which elements each instrument can measure.</p><p>Light elements become simple gases that can be purified on a vacuum line and ionized by electron impact in a low-pressure source, so every ion starts with about the same energy. Metals like potassium stay in solution until an argon plasma tears them into ions, which leave with a spread of energies that the instrument has to correct for, here with an electrostatic analyzer.</p></div>' +
     flags({ own: "My work row (CV).", pub: "Interference examples, " + ref("rumble") + " and " + ref("zhang") + ".", con: "Comparison." }) + '</div>';
 }
 
@@ -724,23 +724,22 @@ function drawBeamChart(fig) {
   t.innerHTML = "<table><caption>Beam shares</caption><tr><th>Mass</th><th>Species</th><th>Share</th></tr>" + rows.map(b => "<tr><td>" + b.m + "</td><td>" + b.sp + "</td><td>" + fmtPct(b.ab) + "</td></tr>").join("") + "</table>";
   host.appendChild(t);
 }
-function erf(x) { const s = Math.sign(x); x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x); const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return s * y; }
 function drawEdgeChart(fig) {
   const host = fig.querySelector(".ch-body"); host.innerHTML = "";
   const I = ELS[state.el].interf;
-  const wA = I.mA / I.R * 1000, sg = wA / 3.29, dmu = I.d * 1000;
-  const Phi = z => 0.5 * (1 + erf(z / Math.SQRT2));
-  const fA = x => Phi((x - wA / 2) / sg), fB = x => I.rel * Phi((x - (dmu + wA / 2)) / sg);
+  const rw = (I.mA / I.R * 1000) / 0.9, dmu = I.d * 1000;
+  const ramp = x => Math.max(0, Math.min(1, x / rw));
+  const fA = x => ramp(x), fB = x => I.rel * ramp(x - dmu);
   const W = Math.max(280, host.clientWidth || 420), H = 232, m = { l: 34, r: 12, t: 12, b: 42 }, pw = W - m.l - m.r, ph = H - m.t - m.b;
   const X = v => m.l + (v - I.lo) / (I.hi - I.lo) * pw, ymax = 1.45, Y = v => m.t + ph - v / ymax * ph;
   const C = { a: "#2a78d6", b: "#eb6834", s: "#0b0b0b" };
   fig.querySelector(".ch-legend").innerHTML = '<span><i style="border-color:' + C.a + '"></i>' + I.a + '</span><span><i style="border-color:' + C.b + '"></i>' + I.b + '</span><span><i style="border-color:' + C.s + '"></i>Sum in the cup</span>';
-  const s = S("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": I.key === "K" ? "Line chart of the leading edge of the mass 41 peak at high resolution. 41K enters the cup 8.4 thousandths of a mass unit before argon hydride, leaving a clean window about 3.8 thousandths wide where 41K is measured." : "Line chart of the leading edges of 87Rb and 87Sr at high resolution. The two edges coincide, so no magnet setting separates them." });
-  const win = [wA, dmu];
+  const s = S("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": I.key === "K" ? "Line chart of the leading edge of the mass 41 peak at high resolution. 41K enters the cup 8.4 thousandths of a mass unit before argon hydride, leaving a clean window about 3.3 thousandths wide where 41K is measured." : "Line chart of the leading edges of 87Rb and 87Sr at high resolution. The two edges coincide, so no magnet setting separates them." });
+  const win = [rw, dmu];
   if (win[1] > win[0]) {
     s.appendChild(S("rect", { x: X(win[0]), y: m.t, width: X(win[1]) - X(win[0]), height: ph, fill: "rgba(42,120,214,0.10)" }));
     s.appendChild(S("text", { x: (X(win[0]) + X(win[1])) / 2, y: m.t + 14, "text-anchor": "middle", class: "svg-lab svg-strong" }, "measure here"));
-    s.appendChild(S("text", { x: (X(win[0]) + X(win[1])) / 2, y: m.t + 29, "text-anchor": "middle", class: "svg-lab" }, "≈ 0.004 u"));
+    s.appendChild(S("text", { x: (X(win[0]) + X(win[1])) / 2, y: m.t + 29, "text-anchor": "middle", class: "svg-lab" }, "≈ " + ((win[1] - win[0]) / 1000).toFixed(3) + " u"));
   }
   [0, 0.5, 1].forEach(v => { s.appendChild(S("line", { x1: m.l, x2: m.l + pw, y1: Y(v), y2: Y(v), stroke: v === 0 ? "#c3c2b7" : "#e1e0d9", "stroke-width": 1 })); s.appendChild(S("text", { x: m.l - 6, y: Y(v) + 3.5, "text-anchor": "end", class: "svg-tick" }, v)); });
   for (let t = Math.ceil(I.lo / 2) * 2; t <= I.hi; t += 2) s.appendChild(S("text", { x: X(t), y: m.t + ph + 15, "text-anchor": "middle", class: "svg-tick" }, t));
