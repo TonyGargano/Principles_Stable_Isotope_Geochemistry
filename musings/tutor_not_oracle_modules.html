@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tutor, Not Oracle, interactives</title>
+<style>
+/* Layout concept. Single 70ch reading column on warm paper, figures break out to 900px,
+   numbered like a journal article. Accent drawn from UNM cherry. Same system as the
+   other data briefs on this site, with added interactive-panel components. */
+:root {
+  color-scheme: light;
+  --bg: #faf9f6;
+  --surface: #ffffff;
+  --fg: #211f1a;
+  --fg-2: #52514e;
+  --muted: #898781;
+  --accent: #a50f2d;
+  --accent-ink: #8c0d26;
+  --grid: #e3e1d9;
+  --axis: #c3c2b7;
+  --border: rgba(11,11,11,0.10);
+  --tile: #f2f0ea;
+  --s1: #2a78d6;
+  --s2: #eb6834;
+  --s3: #1baf7a;
+  --s4: #eda100;
+  --s5: #e87ba4;
+  --s6: #008300;
+}
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  font-size: 1.075rem; line-height: 1.65;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 4rem;
+}
+.wrap { max-width: 70ch; margin: 0 auto; }
+.figwrap { max-width: 900px; margin: 2.2rem auto; }
+header.masthead { max-width: 70ch; margin: 3.2rem auto 2.4rem; }
+.eyebrow {
+  font-family: "Libre Franklin", system-ui, sans-serif;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--accent-ink); margin: 0 0 0.9rem;
+}
+h1 {
+  font-family: "Libre Franklin", system-ui, sans-serif;
+  font-weight: 800; font-size: clamp(1.9rem, 5.4vw, 3rem); line-height: 1.12;
+  letter-spacing: -0.015em; margin: 0 0 1rem; text-wrap: balance;
+}
+.standfirst { font-size: 1.2rem; line-height: 1.55; color: var(--fg-2); margin: 0; }
+.dateline { font-family: "Libre Franklin", system-ui, sans-serif; font-size: 0.8rem; color: var(--muted); margin-top: 1.2rem; }
+h2 {
+  font-family: "Libre Franklin", system-ui, sans-serif;
+  font-weight: 700; font-size: 1.45rem; line-height: 1.25; letter-spacing: -0.01em;
+  margin: 2.6rem 0 0.8rem; text-wrap: balance;
+}
+h3 {
+  font-family: "Libre Franklin", system-ui, sans-serif;
+  font-weight: 700; font-size: 1.05rem; margin: 1.8rem 0 0.5rem;
+}
+p { margin: 0 0 1.1rem; }
+a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+strong { font-weight: 650; }
+ul.inline { margin: 0 0 1.1rem; padding-left: 1.3rem; }
+ul.inline li { margin-bottom: 0.45rem; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin: 1.8rem 0; }
+.tile { background: var(--tile); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; min-width: 0; }
+.tile .big { font-family: "Libre Franklin", system-ui, sans-serif; font-size: 1.9rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+.tile .lab { font-family: "Libre Franklin", system-ui, sans-serif; font-size: 0.78rem; line-height: 1.4; color: var(--fg-2); margin-top: 4px; }
+.tile .src { font-size: 0.7rem; color: var(--muted); margin-top: 6px; font-family: "Libre Franklin", system-ui, sans-serif; }
+figure { margin: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 18px 18px 10px; }
+.figtitle { font-family: "Libre Franklin", system-ui, sans-serif; font-weight: 700; font-size: 1rem; margin: 0 0 2px; }
+.figsub { font-family: "Libre Franklin", system-ui, sans-serif; font-size: 0.8rem; color: var(--fg-2); margin: 0 0 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-family: "Libre Franklin", system-ui, sans-serif; font-size: 0.74rem; color: var(--fg-2); margin: 4px 0 8px; }
+.legend .key { display: inline-flex; align-items: center; gap: 6px; }
+.legend .swatch { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+figcaption { font-size: 0.85rem; color: var(--fg-2); line-height: 1.5; padding: 10px 2px 8px; border-top: 1px solid var(--grid); margin-top: 8px; }
+.prov {
+  display: inline-block; font-family: "Libre Franklin", system-ui, sans-serif;
+  font-size: 0.66rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  border: 1px solid var(--border); border-radius: 999px; padding: 2px 8px; color: var(--muted);
+  vertical-align: 2px; margin-left: 6px;
+}
+.chart { width: 100%; }
+.chart svg { display: block; width: 100%; height: auto; }
+.chart text { font-family: "Libre Franklin", system-ui, sans-serif; }
+#tooltip {
+  position: fixed; pointer-events: none; z-index: 50; display: none;
+  background: var(--surface); color: var(--fg); border: 1px solid var(--border);
+  border-radius: 6px; box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  font-family: "Libre Franklin", system-ui, sans-serif; font-size: 0.75rem; line-height: 1.5;
+  padding: 8px 10px; max-width: 260px;
+}
+#tooltip .tt-title { font-weight: 700; margin-bottom: 2px; }
+#tooltip .tt-row { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+#tooltip .tt-row .swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+#tooltip .num { font-variant-numeric: tabular-nums; margin-left: auto; padding-left: 10px; }
+details.datatable { margin-top: 8px; font-size: 0.8rem; }
+details.datatable summary { cursor: pointer; font-family: "Libre Franklin", system-ui, sans-serif; color: var(--fg-2); font-size: 0.78rem; }
+details.datatable .scroller { overflow-x: auto; }
+details.datatable table { border-collapse: collapse; margin-top: 8px; font-family: "Libre Franklin", system-ui, sans-serif; font-size: 0.74rem; min-width: 480px; }
+details.datatable th, details.datatable td { border: 1px solid var(--grid); padding: 3px 8px; text-align: right; font-variant-numeric: tabular-nums; }
+details.datatable th:first-child, details.datatable td:first-child { text-align: left; }
+.provenance { background: var(--tile); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; font-size: 0.9rem; margin: 1.6rem 0; }
+.provenance .ph { font-family: "Libre Franklin", system-ui, sans-serif; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-2); margin-bottom: 6px; }
+ol.refs { padding-left: 1.3rem; font-size: 0.92rem; }
+ol.refs li { margin-bottom: 0.55rem; }
+.rule { border: 0; border-top: 1px solid var(--grid); margin: 2.4rem 0; }
+
+/* ---------- interactive panels ---------- */
+.demo { font-family: "Libre Franklin", system-ui, sans-serif; }
+.demo .problem {
+  background: var(--tile); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px 14px; font-size: 0.92rem; margin-bottom: 14px;
+}
+.demo .problem .ptag { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-ink); display: block; margin-bottom: 4px; }
+.chatlog { display: flex; flex-direction: column; gap: 10px; margin: 10px 0; }
+.bubble { max-width: 85%; border-radius: 10px; padding: 10px 13px; font-size: 0.9rem; line-height: 1.55; border: 1px solid var(--border); }
+.bubble.ai { background: var(--surface); align-self: flex-start; border-left: 3px solid var(--s1); }
+.bubble.me { background: var(--tile); align-self: flex-end; border-right: 3px solid var(--s2); }
+.bubble .who { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 3px; }
+.note {
+  align-self: stretch; background: transparent; border: 1px dashed var(--axis); border-radius: 8px;
+  padding: 8px 12px; font-size: 0.78rem; color: var(--fg-2);
+}
+.note .ntag { font-weight: 700; color: var(--accent-ink); }
+.choices { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 4px; }
+.choices .chead { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+button.choice {
+  font-family: "Libre Franklin", system-ui, sans-serif; font-size: 0.88rem; text-align: left;
+  background: var(--surface); color: var(--fg); border: 1px solid var(--axis); border-radius: 8px;
+  padding: 9px 12px; cursor: pointer; line-height: 1.45;
+}
+button.choice:hover { border-color: var(--accent); }
+button.choice:disabled { opacity: 0.45; cursor: default; }
+button.choice.picked { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.meters { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0 4px; }
+.meter { background: var(--tile); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.meter .mlab { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-2); margin-bottom: 6px; }
+.meter .track { height: 10px; border-radius: 999px; background: var(--grid); overflow: hidden; }
+.meter .fill { height: 100%; border-radius: 999px; transition: width 0.5s ease; }
+.meter .mnum { font-size: 0.72rem; color: var(--muted); margin-top: 5px; }
+.resetrow { margin-top: 12px; }
+button.ghost {
+  font-family: "Libre Franklin", system-ui, sans-serif; font-size: 0.78rem;
+  background: transparent; color: var(--accent-ink); border: 1px solid var(--axis);
+  border-radius: 999px; padding: 5px 14px; cursor: pointer;
+}
+button.ghost:hover { border-color: var(--accent); }
+.toggles { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; margin: 6px 0 14px; }
+.toggle { background: var(--tile); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.toggle .tlab { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-2); margin-bottom: 7px; }
+.toggle .opts { display: flex; gap: 6px; flex-wrap: wrap; }
+button.opt {
+  font-family: "Libre Franklin", system-ui, sans-serif; font-size: 0.8rem;
+  background: var(--surface); color: var(--fg); border: 1px solid var(--axis);
+  border-radius: 999px; padding: 4px 12px; cursor: pointer;
+}
+button.opt.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.verdict { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--s1); border-radius: 8px; padding: 12px 14px; font-size: 0.88rem; line-height: 1.55; }
+.verdict .vtag { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; display: inline-block; border: 1px solid var(--border); border-radius: 999px; padding: 2px 8px; color: var(--muted); margin-bottom: 6px; }
+@media (max-width: 560px) { .meters { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* module page and embed mode */
+.modhead { max-width: 900px; margin: 2rem auto 0.5rem; }
+.modhead h1 { font-size: 1.6rem; margin: 0 0 0.4rem; }
+.modhead p { color: var(--fg-2); margin: 0; font-size: 0.95rem; }
+body.embed .modhead { display: none; }
+body.embed .figwrap { margin: 0 auto; }
+body.embed { padding-block: 6px; }
+body.embed .figwrap:not(.sel) { display: none; }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,650;1,8..60,400&display=swap">
+</head>
+<body>
+<header class="modhead">
+  <h1>Tutor, Not Oracle, the interactives</h1>
+  <p>Companion to the essay <em>Tutor, Not Oracle</em> on garganogeochemistry.com. One figure of published data and two scripted demonstrations. No live AI runs on this page.</p>
+</header>
+<div class="figwrap" id="card-rct">
+  <figure>
+    <p class="figtitle">Figure 1. Same model, opposite outcomes <span class="prov">Published data</span></p>
+    <p class="figsub">Practice and exam performance relative to students who never used AI, from a randomized trial with about 1,000 Turkish high school math students.</p>
+    <div class="legend" id="legend-fig1"></div>
+    <div class="chart" id="fig1"></div>
+    <figcaption>With the AI in hand, both groups beat the control. Take it away, and the unrestricted group falls 17% behind students who never used it, while the hint-only tutor shows no significant difference. Bastani et al., <em>PNAS</em> 122, e2422633122 (2025).</figcaption>
+    <details class="datatable"><summary>Show data table</summary><div class="scroller"><table id="table-fig1"></table></div></details>
+  </figure>
+</div>
+<div class="figwrap" id="card-fork">
+  <figure class="demo" id="demo1">
+    <p class="figtitle">Interactive 1. The prompt fork <span class="prov">Scripted illustration</span></p>
+    <p class="figsub">Same AI, same problem. Choose how you ask. The dialogue is written in advance to follow the research cited in the essay, and the closed-book quiz at the end is real.</p>
+    <div class="problem"><span class="ptag">The problem</span>
+      Rain gets isotopically lighter as a storm system moves inland, in both <sup>18</sup>O/<sup>16</sup>O and <sup>17</sup>O/<sup>16</sup>O. Why?
+    </div>
+    <div class="chatlog" id="d1log"></div>
+    <div class="choices" id="d1choices"></div>
+    <div class="meters" id="d1meters" style="display:none">
+      <div class="meter">
+        <div class="mlab">Felt fluency while studying</div>
+        <div class="track"><div class="fill" id="d1m1" style="width:0%;background:var(--s2)"></div></div>
+        <div class="mnum" id="d1m1n"></div>
+      </div>
+      <div class="meter">
+        <div class="mlab">Thinking your brain performed</div>
+        <div class="track"><div class="fill" id="d1m2" style="width:0%;background:var(--s3)"></div></div>
+        <div class="mnum" id="d1m2n"></div>
+      </div>
+    </div>
+    <div class="resetrow"><button class="ghost" id="d1reset" style="display:none">Start over and take a different path</button></div>
+    <figcaption>The meters are illustrative. They count scripted events on your path, the answers you generated and the errors you repaired, not anything about your brain. The answer-engine path matches the unrestricted arm of the Turkish trial, and the hint paths match its guardrailed tutor. The rainout science is standard Rayleigh distillation (Sharp, <em>Principles of Stable Isotope Geochemistry</em>, open access).</figcaption>
+  </figure>
+</div>
+<div class="figwrap" id="card-design">
+  <figure class="demo" id="demo2">
+    <p class="figtitle">Interactive 2. Design the deployment <span class="prov">Published anchors + constructed expectations</span></p>
+    <p class="figsub">Configure a classroom AI. The verdict tells you what the evidence can and cannot say about your design.</p>
+    <div class="toggles">
+      <div class="toggle">
+        <div class="tlab">When a student is stuck, the AI gives</div>
+        <div class="opts" data-key="mode">
+          <button class="opt on" data-val="answers">Full answers</button>
+          <button class="opt" data-val="hints">Hints first</button>
+        </div>
+      </div>
+      <div class="toggle">
+        <div class="tlab">The AI is grounded in</div>
+        <div class="opts" data-key="ground">
+          <button class="opt on" data-val="freeform">Its own knowledge</button>
+          <button class="opt" data-val="worked">Teacher's worked solutions</button>
+        </div>
+      </div>
+      <div class="toggle">
+        <div class="tlab">After assisted practice</div>
+        <div class="opts" data-key="retrieval">
+          <button class="opt on" data-val="none">Nothing</button>
+          <button class="opt" data-val="quiz">AI-free retrieval quiz</button>
+        </div>
+      </div>
+      <div class="toggle">
+        <div class="tlab">Teacher dashboard</div>
+        <div class="opts" data-key="dash">
+          <button class="opt on" data-val="off">Off</button>
+          <button class="opt" data-val="on">On</button>
+        </div>
+      </div>
+    </div>
+    <div class="verdict" id="d2verdict"></div>
+    <figcaption>Only two of these configurations have been tested causally at scale, and the verdict names them when you build one. Everything else is an expectation built from the learning-science literature and is labeled that way. Whatever you build, the closed-book exam at the end is the readout that counts.</figcaption>
+  </figure>
+</div>
+<div id="tooltip" role="presentation"></div>
+<script>
+(function () {
+"use strict";
+
+var SVGNS = "http://www.w3.org/2000/svg";
+var tooltip = document.getElementById("tooltip");
+
+function el(name, attrs, parent) {
+  var node = document.createElementNS(SVGNS, name);
+  for (var k in attrs) node.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(node);
+  return node;
+}
+function showTip(html, evt) {
+  tooltip.innerHTML = html;
+  tooltip.style.display = "block";
+  var pad = 14, w = tooltip.offsetWidth, h = tooltip.offsetHeight;
+  var x = evt.clientX + pad, yy = evt.clientY + pad;
+  if (x + w > window.innerWidth - 8) x = evt.clientX - w - pad;
+  if (yy + h > window.innerHeight - 8) yy = evt.clientY - h - pad;
+  tooltip.style.left = x + "px"; tooltip.style.top = yy + "px";
+}
+function hideTip() { tooltip.style.display = "none"; }
+function swatchHTML(cvar) { return '<span class="swatch" style="background:var(' + cvar + ')"></span>'; }
+
+/* ================= Figure 1, RCT ================= */
+var rct = [
+  { label: "GPT Base, assisted practice", v: 48, note: "Unrestricted chat interface in hand" },
+  { label: "GPT Base, unassisted exam", v: -17, note: "AI removed, closed book" },
+  { label: "GPT Tutor, assisted practice", v: 127, note: "Hints only, teacher-built guardrails" },
+  { label: "GPT Tutor, unassisted exam", v: 0, note: "Not significantly different from control", ns: true }
+];
+function renderFig1() {
+  var host = document.getElementById("fig1");
+  host.innerHTML = "";
+  var barH = 26, gapY = 14, m = { t: 8, r: 95, b: 30, l: 250 };
+  var W = 880, H = m.t + rct.length * (barH + gapY) + m.b;
+  var svg = el("svg", { viewBox: "0 0 " + W + " " + H, role: "img",
+    "aria-label": "Diverging bars of performance relative to control, practice versus exam, by AI condition" }, null);
+  host.appendChild(svg);
+  var iw = W - m.l - m.r;
+  var xmin = -30, xmax = 140, span = xmax - xmin;
+  var xp = function (v) { return m.l + (v - xmin) / span * iw; };
+  [-20, 0, 40, 80, 120].forEach(function (g) {
+    var gx = xp(g);
+    el("line", { x1: gx, x2: gx, y1: m.t, y2: H - m.b, stroke: g === 0 ? "var(--axis)" : "var(--grid)", "stroke-width": g === 0 ? 1.5 : 1 }, svg);
+    el("text", { x: gx, y: H - 10, "text-anchor": "middle", "font-size": 11, fill: "var(--muted)", style: "font-variant-numeric:tabular-nums" }, svg).textContent = (g > 0 ? "+" : "") + g + "%";
+  });
+  rct.forEach(function (r, i) {
+    var y0 = m.t + i * (barH + gapY);
+    el("text", { x: m.l - 10, y: y0 + barH / 2 + 4, "text-anchor": "end", "font-size": 12.5, "font-weight": 600, fill: "var(--fg)" }, svg).textContent = r.label;
+    var cvar = r.v < 0 ? "--accent" : (r.ns ? "--s4" : "--s1");
+    var x0 = xp(Math.min(0, r.v)), x1 = xp(Math.max(0, r.v));
+    var rect = el("rect", { x: x0, y: y0, width: Math.max(3, x1 - x0), height: barH, rx: 3, fill: "var(" + cvar + ")" }, svg);
+    var labTxt = r.ns ? "≈0% (n.s.)" : (r.v > 0 ? "+" + r.v + "%" : "−" + Math.abs(r.v) + "%");
+    el("text", { x: r.v >= 0 ? x1 + 8 : x0 - 8, y: y0 + barH / 2 + 4, "text-anchor": r.v >= 0 ? "start" : "end", "font-size": 11.5, "font-weight": 600, fill: "var(--fg-2)", style: "font-variant-numeric:tabular-nums" }, svg).textContent = labTxt;
+    (function (row, cv) {
+      rect.addEventListener("mousemove", function (evt) {
+        showTip('<div class="tt-title">' + row.label + '</div><div class="tt-row">' + swatchHTML(cv) + 'Vs no-AI control<span class="num">' + (row.ns ? "n.s." : (row.v > 0 ? "+" : "") + row.v + "%") + '</span></div><div class="tt-row">' + row.note + '</div>', evt);
+      });
+      rect.addEventListener("mouseleave", hideTip);
+    })(r, cvar);
+  });
+  var leg = document.getElementById("legend-fig1");
+  leg.innerHTML = "";
+  [["--s1", "Gain vs control"], ["--accent", "Loss vs control"], ["--s4", "No significant difference"]].forEach(function (pair) {
+    var k = document.createElement("span");
+    k.className = "key";
+    k.innerHTML = '<span class="swatch" style="background:var(' + pair[0] + ')"></span>' + pair[1];
+    leg.appendChild(k);
+  });
+  var t1 = document.getElementById("table-fig1");
+  t1.innerHTML = "<tr><th>Condition</th><th>Vs control (%)</th></tr>" +
+    rct.map(function (r) { return "<tr><td>" + r.label + "</td><td>" + (r.ns ? "n.s." : (r.v > 0 ? "+" : "") + r.v) + "</td></tr>"; }).join("");
+}
+renderFig1();
+
+/* ================= Interactive 1, the prompt fork ================= */
+var d1log = document.getElementById("d1log");
+var d1choices = document.getElementById("d1choices");
+var d1meters = document.getElementById("d1meters");
+var d1reset = document.getElementById("d1reset");
+var d1state = { gen: 0, fluency: 0, examScore: 0, examDone: 0, path: null };
+
+function bubble(kind, who, html) {
+  var b = document.createElement("div");
+  b.className = "bubble " + kind;
+  b.innerHTML = '<span class="who">' + who + "</span>" + html;
+  d1log.appendChild(b);
+}
+function annotate(html) {
+  var n = document.createElement("div");
+  n.className = "note";
+  n.innerHTML = '<span class="ntag">Annotation.</span> ' + html;
+  d1log.appendChild(n);
+}
+function setChoices(head, opts) {
+  d1choices.innerHTML = "";
+  if (head) {
+    var h = document.createElement("div");
+    h.className = "chead";
+    h.textContent = head;
+    d1choices.appendChild(h);
+  }
+  opts.forEach(function (o) {
+    var btn = document.createElement("button");
+    btn.className = "choice";
+    btn.innerHTML = o.label;
+    btn.addEventListener("click", function () {
+      var all = d1choices.querySelectorAll("button");
+      for (var i = 0; i < all.length; i++) all[i].disabled = true;
+      btn.classList.add("picked");
+      bubble("me", "You", o.label);
+      o.next();
+    });
+    d1choices.appendChild(btn);
+  });
+}
+
+function startD1() {
+  d1log.innerHTML = "";
+  d1choices.innerHTML = "";
+  d1meters.style.display = "none";
+  d1reset.style.display = "none";
+  d1state = { gen: 0, fluency: 0, examScore: 0, examDone: 0, path: null };
+  setChoices("Choose your opening prompt", [
+    { label: "Just explain it to me.", next: pathA },
+    { label: "Don't tell me the answer. Give me a hint about where to start.", next: pathB },
+    { label: "Here's my guess, the heavy isotopes stay in the ocean and never evaporate, so inland rain is light. Check my reasoning.", next: pathC }
+  ]);
+}
+
+/* ---- Path A, the answer engine ---- */
+function pathA() {
+  d1state.path = "A";
+  d1state.fluency = 95;
+  bubble("ai", "AI", "The heavy isotopologues of water (H<sub>2</sub><sup>18</sup>O, and the <sup>17</sup>O species behave the same way) have lower vapor pressures, so when vapor condenses to rain, the heavy molecules condense preferentially. Each rainfall therefore removes proportionally more <sup>18</sup>O and <sup>17</sup>O from the vapor. The remaining vapor gets progressively lighter as the storm moves inland, a process called Rayleigh distillation, so each successive rain forms from lighter vapor and is itself lighter. More distance means more rainout means lighter rain, in both ratios.");
+  annotate("Complete, correct, and effortless. You generated nothing. In the PNAS trial this mode inflated practice scores 48% and cut unassisted exam scores 17% (Bastani et al. 2025). Reading an explanation feels like learning because it is fluent, and fluency is a poor signal of knowledge.");
+  setChoices(null, [
+    { label: "Makes sense. I'm ready for the exam.", next: exam },
+    { label: "Wait, why do heavy molecules condense preferentially?", next: function () {
+      bubble("ai", "AI", "Lower vapor pressure. The heavier isotopologues have slightly stronger intermolecular binding in the condensed phase, so at equilibrium they partition preferentially into the liquid. The effect grows as temperature falls.");
+      annotate("A good follow-up question, answered for you. Still zero generation. Asking why is better than not asking, but the machine performed the reasoning both times.");
+      d1state.fluency = 100;
+      setChoices(null, [ { label: "Got it. Exam.", next: exam } ]);
+    } }
+  ]);
+}
+
+/* ---- Path B, hints first ---- */
+function pathB() {
+  d1state.path = "B";
+  d1state.fluency = 45;
+  bubble("ai", "AI", "Start here. When water vapor condenses into rain, do the heavy and light isotopologues condense at equal rates?");
+  setChoices("Your answer", [
+    { label: "The heavy ones condense preferentially.", next: function () { d1state.gen++; pathB2(true); } },
+    { label: "The light ones condense preferentially.", next: function () { d1state.gen++; pathB2(false); } },
+    { label: "Equal rates, condensation doesn't fractionate.", next: function () { d1state.gen++; pathB2(false); } }
+  ]);
+}
+function pathB2(correct) {
+  if (correct) {
+    bubble("ai", "AI", "Right. The heavy isotopologues have lower vapor pressures, so they prefer the liquid. Now the storm rains, moves inland, rains again. What is happening to the vapor it carries?");
+  } else {
+    bubble("ai", "AI", "Check the vapor pressures. The heavier molecule is bound slightly more strongly in the liquid. Given that, which species leaves the vapor first when rain forms?");
+    annotate("An error, met with a redirecting question instead of the answer. Error correction with feedback is among the most productive events in learning (testing effect, Roediger and Karpicke 2006).");
+    setChoices("Try again", [
+      { label: "Then the heavy ones condense preferentially, and rain is isotopically heavier than the vapor it came from.", next: function () {
+        d1state.gen++;
+        bubble("ai", "AI", "Exactly. Now the storm rains, moves inland, rains again. What is happening to the vapor it carries?");
+        pathB3();
+      } }
+    ]);
+    return;
+  }
+  pathB3();
+}
+function pathB3() {
+  setChoices("Your answer", [
+    { label: "Each rainout strips heavy isotopes, so the remaining vapor gets progressively lighter.", next: function () {
+      d1state.gen++;
+      bubble("ai", "AI", "That's the whole mechanism. Progressive condensation from a shrinking vapor reservoir, each increment preferentially removing the heavy species, is Rayleigh distillation. Rain downwind forms from ever-lighter vapor, so it arrives ever lighter, in both <sup>18</sup>O/<sup>16</sup>O and <sup>17</sup>O/<sup>16</sup>O.");
+      annotate("You produced the chain yourself from two hints. The machine supplied direction and confirmation, you supplied the reasoning. This is the structure of the guardrailed arm that showed no exam harm (Bastani et al. 2025), and it is constructive engagement in ICAP terms (Chi and Wylie 2014).");
+      setChoices(null, [ { label: "Name it and quiz me.", next: exam } ]);
+    } },
+    { label: "The vapor stays the same, the ocean resets it.", next: function () {
+      bubble("ai", "AI", "The ocean is behind the storm now. Inland, the vapor parcel is on its own. If every rainfall removes heavy isotopes preferentially and nothing replaces them, what must happen to the parcel?");
+      annotate("Another redirect, not an answer. The struggle you are feeling is the desirable difficulty (Bjork 1994), the slowness during practice that buys retention after it.");
+      setChoices("Try again", [
+        { label: "It has to get progressively lighter with each rainout.", next: function () {
+          d1state.gen++;
+          bubble("ai", "AI", "Yes. That progressive depletion is Rayleigh distillation, and it is why inland rain is lighter in both isotope ratios.");
+          setChoices(null, [ { label: "Got it. Exam.", next: exam } ]);
+        } }
+      ]);
+    } }
+  ]);
+}
+
+/* ---- Path C, submit your reasoning ---- */
+function pathC() {
+  d1state.path = "C";
+  d1state.fluency = 40;
+  bubble("ai", "AI", "Partly on track, evaporation does discriminate. But vapor still carries plenty of heavy isotopologues, just fewer than seawater. Test your own idea. If evaporation at the coast were the only fractionating step, would rain keep getting lighter as the storm moves inland, or would all the rain be equally light?");
+  setChoices("Your answer", [
+    { label: "It would be uniformly light. Something must act repeatedly along the path.", next: function () {
+      d1state.gen++;
+      bubble("ai", "AI", "Exactly, your original mechanism can't produce a gradient. So what acts over and over along the storm track, and which isotopes does it remove preferentially?");
+      setChoices("Your answer", [
+        { label: "Condensation. Each rainout preferentially removes the heavy isotopologues, so the vapor, and every later rain, gets lighter.", next: function () {
+          d1state.gen++;
+          bubble("ai", "AI", "That's it. Repeated rainout of a parcel, heavy species leaving first each time, is Rayleigh distillation, and it drives both <sup>18</sup>O/<sup>16</sup>O and <sup>17</sup>O/<sup>16</sup>O down the storm track.");
+          annotate("You arrived holding a misconception and left without it, by testing your own claim against its predicted consequence. Diagnosing and repairing an existing belief is more durable than installing a fresh explanation over it, and no answer engine does it uninvited.");
+          setChoices(null, [ { label: "Quiz me.", next: exam } ]);
+        } },
+        { label: "I'm not sure. Tell me.", next: function () {
+          d1state.fluency += 25;
+          bubble("ai", "AI", "Condensation. Heavy isotopologues condense preferentially, so each rainout leaves the vapor lighter, and later rain is lighter. Rayleigh distillation.");
+          annotate("You generated the hard first step and accepted the second. A mixed path, better than pure receiving, weaker than finishing the chain yourself.");
+          setChoices(null, [ { label: "Exam.", next: exam } ]);
+        } }
+      ]);
+    } },
+    { label: "It would still get lighter inland somehow.", next: function () {
+      bubble("ai", "AI", "Walk it through. A single fractionation at the coast sets one vapor composition. If nothing fractionates after that, every rain inland samples the same vapor. Where could a gradient come from?");
+      setChoices("Your answer", [
+        { label: "It couldn't. The gradient needs a repeated process, condensation removing heavy isotopes each time it rains.", next: function () {
+          d1state.gen += 2;
+          bubble("ai", "AI", "Right, and that repeated preferential removal is Rayleigh distillation.");
+          annotate("The machine refused to accept a hand-wave and made you locate the contradiction. That refusal is the pedagogy.");
+          setChoices(null, [ { label: "Quiz me.", next: exam } ]);
+        } }
+      ]);
+    } }
+  ]);
+}
+
+/* ---- Exam, shared ---- */
+function exam() {
+  bubble("ai", "AI", "Closed book now, no help from me. Two questions.<br><br><strong>Question 1.</strong> A second storm track crosses a mountain range early in its path. Compared to rain at the same distance inland on a flat track, rain beyond the mountains is...");
+  setChoices("Question 1 of 2", [
+    { label: "Lighter. Orographic uplift forces extra condensation and rainout early.", next: function () { d1state.examScore++; examQ2(true); } },
+    { label: "Heavier. Mountains shelter the far side from fractionation.", next: function () { examQ2(false); } },
+    { label: "The same. Distance is all that matters.", next: function () { examQ2(false); } }
+  ]);
+}
+function examQ2(gotQ1) {
+  bubble("ai", "AI", (gotQ1 ? "Correct, forced uplift means extra rainout, the mountain fast-forwards the distillation." : "Not quite, uplift forces extra condensation, so the mountain fast-forwards the distillation and the far-side rain is lighter.") + "<br><br><strong>Question 2.</strong> In a colder climate, the isotopic separation between vapor and each increment of rain is...");
+  setChoices("Question 2 of 2", [
+    { label: "Larger. Equilibrium fractionation grows as temperature falls, so depletion per rainout step is stronger.", next: function () { d1state.examScore++; debrief(); } },
+    { label: "Smaller. Cold suppresses fractionation.", next: function () { debrief(); } },
+    { label: "Unchanged. Fractionation is temperature-independent.", next: function () { debrief(); } }
+  ]);
+}
+function debrief() {
+  bubble("ai", "AI", "Equilibrium fractionation factors grow as temperature falls, so colder climates fractionate harder per step. That temperature dependence is the basis of the classic isotope paleothermometers. You scored " + d1state.examScore + " of 2.");
+  var fl = Math.min(100, d1state.fluency);
+  var gen = Math.min(100, d1state.gen * 30 + (d1state.path === "A" ? 5 : 10));
+  d1meters.style.display = "grid";
+  document.getElementById("d1m1").style.width = fl + "%";
+  document.getElementById("d1m2").style.width = gen + "%";
+  document.getElementById("d1m1n").textContent = d1state.path === "A" ? "High. Everything arrived finished and easy." : "Moderate. Progress felt slower because you were doing the work.";
+  document.getElementById("d1m2n").textContent = "Scripted count of answers you generated and errors you repaired on this path, " + d1state.gen + ".";
+  var deb;
+  if (d1state.path === "A") {
+    deb = "You took the answer-engine path, the GPT Base arm. Note what the exam could not measure here, this demo cannot test your retention next week, which is exactly where the PNAS trial found the 17% hole, after the assistant left and time passed. The fluency you felt is the mechanism that hides the hole. Press the reset button and take a hint path to feel the difference in your own reasoning.";
+  } else if (d1state.path === "B") {
+    deb = "You took the hint path, the guardrailed-tutor arm. Each answer above was generated by you and confirmed, not delivered. The trial found this mode removes the exam harm. The testing-effect literature predicts the retrieval you just performed is also why this version of the rainout story will still be in your head next month.";
+  } else {
+    deb = "You took the strongest path, submitting reasoning for critique. The machine's job became diagnosis, and yours stayed generation. Nothing in the answer-engine mode ever examines what you already believe, which is where most misconceptions survive.";
+  }
+  annotate(deb + " All meters on this panel are illustrative, they count scripted events, not your cognition.");
+  d1choices.innerHTML = "";
+  d1reset.style.display = "inline-block";
+}
+d1reset.addEventListener("click", startD1);
+startD1();
+
+/* ================= Interactive 2, design the deployment ================= */
+var d2state = { mode: "answers", ground: "freeform", retrieval: "none", dash: "off" };
+var togglewrap = document.querySelectorAll("#demo2 .opts");
+for (var ti = 0; ti < togglewrap.length; ti++) {
+  (function (grp) {
+    var key = grp.getAttribute("data-key");
+    var btns = grp.querySelectorAll("button.opt");
+    for (var bi = 0; bi < btns.length; bi++) {
+      (function (btn) {
+        btn.addEventListener("click", function () {
+          for (var j = 0; j < btns.length; j++) btns[j].classList.remove("on");
+          btn.classList.add("on");
+          d2state[key] = btn.getAttribute("data-val");
+          renderVerdict();
+        });
+      })(btns[bi]);
+    }
+  })(togglewrap[ti]);
+}
+function renderVerdict() {
+  var v = document.getElementById("d2verdict");
+  var s = d2state;
+  var html = "";
+  var extras = [];
+  if (s.retrieval === "quiz") extras.push("The AI-free retrieval quiz has no causal anchor in the AI trials, but the testing-effect literature (Roediger and Karpicke 2006) predicts it is the single highest-value addition here, it converts assisted practice into durable memory and doubles as your only honest measurement.");
+  if (s.dash === "on") extras.push("The teacher dashboard is the stated design of Korea's AI textbook program and of the trial's classroom setting, a human who can tell productive struggle from drowning. No large causal test isolates it yet.");
+  if (s.mode === "answers" && s.ground === "freeform") {
+    html = '<span class="vtag">Published anchor, Bastani et al. 2025, GPT Base arm</span><br>You built the answer engine. In the randomized trial this configuration inflated practice performance by 48% and cut unassisted exam performance by 17%, and students did not perceive the loss.' + (extras.length ? " Your additions are not in that arm, and the literature reads them as partial repairs at best, the core harm is answers replacing attempts. " + extras.join(" ") : "");
+  } else if (s.mode === "hints" && s.ground === "worked") {
+    html = '<span class="vtag">Published anchor, Bastani et al. 2025, GPT Tutor arm</span><br>You built the guardrailed tutor, hints before answers, grounded in the teacher’s worked solutions. In the trial this configuration raised practice performance 127% and showed no significant exam harm. Note the honest ceiling, it did not beat the no-AI control on exams either. The Harvard tutor result (+0.63 SD) suggests the ceiling rises when the whole pedagogy, scaffolding, load management, feedback timing, is engineered in.' + (extras.length ? " " + extras.join(" ") : "");
+  } else {
+    var parts = [];
+    if (s.mode === "hints") parts.push("hints-first is the guardrail with the causal receipt");
+    if (s.mode === "answers") parts.push("full answers is the element the trial identifies as the harm, whatever else you add");
+    if (s.ground === "worked") parts.push("grounding in the instructor’s solutions is how the effective arm avoided confident nonsense and stayed aligned with the course");
+    if (s.ground === "freeform") parts.push("freeform grounding leaves accuracy and alignment to chance");
+    html = '<span class="vtag">Constructed expectation, no published causal anchor for this exact design</span><br>This configuration has not been tested at scale. Reading it against the evidence, ' + parts.join("; ") + "." + (extras.length ? " " + extras.join(" ") : "") + " Whatever you build, the closed-book transfer exam at the end is the readout that counts.";
+  }
+  v.innerHTML = html;
+}
+renderVerdict();
+})();
+</script>
+<script>
+// Embed mode. A #card-id hash shows that card alone, and the page reports its height to a parent page.
+(function () {
+  var id = decodeURIComponent(location.hash.slice(1));
+  var card = id ? document.getElementById(id) : null;
+  if (card && card.classList.contains("figwrap")) { document.body.classList.add("embed"); card.classList.add("sel"); }
+  var last = 0;
+  function post() {
+    var h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+    if (Math.abs(h - last) < 2) return;
+    last = h;
+    try { if (window.parent !== window) window.parent.postMessage({ type: "module-height", h: h, href: location.href }, "*"); } catch (e) {}
+  }
+  if (window.ResizeObserver) new ResizeObserver(post).observe(document.body);
+  window.addEventListener("load", post);
+  post();
+})();
+</script>
+</body>
+</html>
