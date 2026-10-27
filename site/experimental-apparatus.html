@@ -48,7 +48,6 @@ html.embed .ap-head { display: none; }
 .legend b { font-weight: 600; color: var(--ink); }
 h2.sec { font-size: 16px; font-weight: 600; margin: 20px 0 8px; letter-spacing: -0.005em; }
 figure { margin: 0; }
-.mapfig svg { width: 100%; height: auto; display: block; }
 figcaption, .cap { font-size: 12px; color: var(--ink2); margin-top: 6px; line-height: 1.5; }
 
 .rail { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 10px; }
@@ -102,15 +101,6 @@ footer p { margin: 0; }
 .f-heat { fill: var(--heat); stroke: none; }
 .f-bg { fill: #fff; stroke: var(--metal); stroke-width: 1.3; }
 .dash { stroke-dasharray: 5 5; }
-.hot { cursor: pointer; }
-.hot rect, .hot circle { transition: stroke-width .1s; }
-.hot:hover rect, .hot:focus rect, .hot:hover circle, .hot:focus circle { stroke-width: 3; }
-.hot:focus { outline: none; }
-.field-gas { fill: var(--s2); fill-opacity: .13; stroke: var(--s2); stroke-width: 1.5; }
-.field-fluid { fill: var(--s1); fill-opacity: .13; stroke: var(--s1); stroke-width: 1.5; }
-.field-redox { fill: var(--s7v); fill-opacity: .15; stroke: var(--s7v); stroke-width: 1.5; }
-.field-sulf { fill: var(--s4); fill-opacity: .16; stroke: var(--s4); stroke-width: 1.5; }
-.field-dead { fill: var(--neutral); fill-opacity: .55; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; }
 .gridl { stroke: #efeee9; stroke-width: 1; }
 .axis { stroke: #c3c2b7; stroke-width: 1.2; }
 .c1 { fill: var(--s1); } .c2 { fill: var(--s2); } .c3 { fill: var(--s3); } .c4 { fill: var(--s4); }
@@ -122,11 +112,7 @@ footer p { margin: 0; }
   .ap { padding: 14px 12px 10px; border-radius: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hot rect, .hot circle, .chip { transition: none; }
-}
-@media (forced-colors: active) {
-  .hot:hover rect, .hot:focus rect { stroke: Highlight; }
-}
+  }
 </style>
 </head>
 <body>
@@ -151,94 +137,9 @@ footer p { margin: 0; }
 <div class="ap">
 <header class="ap-head">
   <h1>Building the machines</h1>
-  <p>The hand-built apparatus of experimental geochemistry, redrawn from Holloway &amp; Wood (1988) with figure and page cited on every panel.</p>
+  <p>The hand-built machines of experimental geochemistry, and the questions each one answers. After Holloway &amp; Wood (1988).</p>
 </header>
-<p class="lede">Nearly every machine of experimental geochemistry was designed before 1965 and built in-house from steel rod, ceramic tube, spooled wire, and glass. Holloway and Wood wrote their 1988 textbook partly, in their words, &ldquo;to encourage more petrologists and geochemists to become experimentalists&rdquo; (preface, p.&nbsp;ix). The craft they documented, welding your own thermocouples, winding your own furnaces, sealing your own capsules, is thinning out of graduate training even though the raw materials remain cheap and common. That is a loss, because working with common laboratory materials is the fundamentals of the science. A bench of hand-built machines runs every week of the year and answers questions that never reach the queue of a multi-million dollar instrument.</p>
-<p class="lede">Each panel below is one machine, redrawn by hand from the book with the figure and page cited, its working range and precision as the book lists them, and the reactions it serves on my bench. Gas-melt exchange, fluid-rock reaction, redox control, sulfidation. Nothing here is a reproduction; the drawings are mine, after the book's.</p>
-<div class="legend">
-    <span><b>Published</b> &middot; design and numbers from the book, original reference cited</span>
-    <span><b>Constructed</b> &middot; extends beyond the book, flagged where it does</span>
-    <span><b>My bench</b> &middot; apparatus I build and run</span>
-  </div>
-
-<h2 class="sec">Where each machine lives in pressure-temperature space</h2>
-<figure class="mapfig">
-<svg viewBox="0 0 760 470" role="img" aria-label="Pressure-temperature map of experimental machines, adapted from Figure 3.1 of Holloway and Wood 1988">
-  <!-- gridlines -->
-  <line class="gridl" x1="70" y1="42.6" x2="720" y2="42.6"/>
-  <line class="gridl" x1="70" y1="118" x2="720" y2="118"/>
-  <line class="gridl" x1="70" y1="269" x2="720" y2="269"/>
-  <line class="gridl" x1="70" y1="344.5" x2="720" y2="344.5"/>
-  <line class="gridl" x1="200" y1="30" x2="200" y2="420"/>
-  <line class="gridl" x1="330" y1="30" x2="330" y2="420"/>
-  <line class="gridl" x1="460" y1="30" x2="460" y2="420"/>
-  <line class="gridl" x1="590" y1="30" x2="590" y2="420"/>
-  <!-- axes -->
-  <line class="axis" x1="70" y1="30" x2="70" y2="420"/>
-  <line class="axis" x1="70" y1="420" x2="720" y2="420"/>
-  <text class="lblm" x="62" y="46" text-anchor="end">10&#8310; bar</text>
-  <text class="lblm" x="62" y="122" text-anchor="end">1 kbar</text>
-  <text class="lblm" x="62" y="197" text-anchor="end">1 bar</text>
-  <text class="lblm" x="62" y="273" text-anchor="end">10&#8315;&#179;</text>
-  <text class="lblm" x="62" y="348" text-anchor="end">10&#8315;&#8310;</text>
-  <text class="lblm" x="62" y="423" text-anchor="end">10&#8315;&#8313;</text>
-  <text class="lblm" x="70" y="440">0</text>
-  <text class="lblm" x="200" y="440" text-anchor="middle">500</text>
-  <text class="lblm" x="330" y="440" text-anchor="middle">1000</text>
-  <text class="lblm" x="460" y="440" text-anchor="middle">1500</text>
-  <text class="lblm" x="590" y="440" text-anchor="middle">2000</text>
-  <text class="lblm" x="720" y="440" text-anchor="end">2500</text>
-  <text class="lblm" x="395" y="459" text-anchor="middle">temperature (&deg;C)</text>
-  <!-- big iron, not clickable -->
-  <rect class="field-dead" x="70" y="35" width="598" height="32"/>
-  <text class="lblm" x="80" y="55">anvil cells &middot; shock tube (pp. 32-36)</text>
-  <rect class="field-dead" x="70" y="73" width="468" height="26"/>
-  <text class="lblm" x="80" y="90">piston-cylinders (pp. 29-31) &middot; the big iron, not on this bench</text>
-  <!-- cold-seal -->
-  <g class="hot" data-s="s3" role="button" tabindex="0" aria-label="Cold-seal vessel">
-    <rect class="field-fluid" x="122" y="96" width="195" height="52" rx="4"/>
-    <text class="lblb" x="132" y="117">cold-seals</text>
-    <text class="lblm" x="132" y="132">to 12 kbar, 950 &deg;C</text>
-  </g>
-  <!-- gas vessels -->
-  <g class="hot" data-s="s5" role="button" tabindex="0" aria-label="Internally heated gas vessel">
-    <rect class="field-gas" x="322" y="96" width="138" height="52" rx="4"/>
-    <text class="lblb" x="332" y="117">gas vessels</text>
-    <text class="lblm" x="332" y="132">to 10 kbar, 1500 &deg;C</text>
-  </g>
-  <!-- rocker -->
-  <g class="hot" data-s="s4" role="button" tabindex="0" aria-label="Rocking autoclave">
-    <rect class="field-fluid" x="76" y="152" width="150" height="40" rx="4"/>
-    <text class="lblb" x="86" y="169">rocker bombs</text>
-    <text class="lblm" x="86" y="184">to 2 kbar, 600 &deg;C</text>
-  </g>
-  <!-- 1 bar line + markers -->
-  <line class="axis dash" x1="70" y1="193.5" x2="720" y2="193.5"/>
-  <g class="hot" data-s="s8" role="button" tabindex="0" aria-label="Sealed silica tube">
-    <circle cx="278" cy="193.5" r="9" style="fill:var(--s4);stroke:var(--bg);stroke-width:2"/>
-    <line class="lead" x1="272" y1="200" x2="240" y2="222"/>
-    <text class="lbl" x="236" y="236" text-anchor="end">sealed silica tube</text>
-  </g>
-  <g class="hot" data-s="s7" role="button" tabindex="0" aria-label="Zirconia oxygen sensor">
-    <circle cx="317" cy="193.5" r="9" style="fill:var(--s7v);stroke:var(--bg);stroke-width:2"/>
-    <line class="lead" x1="317" y1="203" x2="317" y2="244"/>
-    <text class="lbl" x="312" y="258">O&#8322; sensor</text>
-  </g>
-  <g class="hot" data-s="s1" role="button" tabindex="0" aria-label="Quench and gas-mixing furnace">
-    <circle cx="356" cy="193.5" r="9" style="fill:var(--s2);stroke:var(--bg);stroke-width:2"/>
-    <line class="lead" x1="363" y1="200" x2="402" y2="222"/>
-    <text class="lbl" x="406" y="236">quench + gas-mixing furnace</text>
-  </g>
-  <text class="lblm" x="80" y="288" font-style="italic">the sub-kilobar region and the vacuum strip are additions to the book's diagram</text>
-  <!-- vacuum -->
-  <g class="hot" data-s="s2" role="button" tabindex="0" aria-label="Vacuum evaporation furnace">
-    <rect class="field-gas" x="278" y="300" width="364" height="56" rx="4"/>
-    <text class="lblb" x="290" y="322">vacuum evaporation furnaces</text>
-    <text class="lblm" x="290" y="338">free evaporation below 10&#8315;&#8310; bar &middot; my bench</text>
-  </g>
-</svg>
-<figcaption>Adapted and simplified from Fig. 3.1, p. 19. The book's diagram spans roughly 1 to 3000 kbar; the one-bar markers and the vacuum strip are added here. Grey dashed fields are the high-pressure machines of mantle petrology, covered on pp. 29-36 and outside the scope of this bench. Click a field or marker to open its panel; the ƒO&#8322; toolkit and the maker's bench live in capsules and on benchtops, so they sit in the list below rather than on the map.</figcaption>
-</figure>
+<p class="lede">The classic machines of experimental geochemistry are simple instruments, built from steel rod, ceramic tube, wire, and glass, and each one is matched to a kind of question. Gas-melt exchange at one atmosphere, fluid-rock reaction at pressure, redox control, sulfidation. Each panel covers one machine, what it is built from, its working range and precision as Holloway and Wood (1988) list them, and the questions it is suited to, with the source figure and page cited.</p>
 
 <h2 class="sec">The machines</h2>
 <nav class="rail" aria-label="Apparatus">
@@ -310,7 +211,7 @@ footer p { margin: 0; }
     <text class="lbl" x="456" y="252">drop quench in seconds</text>
     <line class="lead" x1="336" y1="260" x2="452" y2="248"/>
   </svg>
-  <figcaption>Redrawn after Holloway &amp; Wood (1988), Fig. 3.3, p. 21. Sample and quench-loop detail simplified.</figcaption>
+  <figcaption>After Holloway &amp; Wood (1988), Fig. 3.3, p. 21. Sample and quench-loop detail simplified.</figcaption>
   </figure>
   <div class="facts">
     <dl class="spec">
@@ -319,10 +220,10 @@ footer p { margin: 0; }
       <div><dt>Sample</dt><dd>about 0.1 ml, hung on a Pt wire loop (pp. 19-20)</dd></div>
       <div><dt>Built from</dt><dd>ceramic muffle tube, resistance windings, insulation, two gas flowmeters, a mixing chamber, Pt wire</dd></div>
       <div><dt>Original design</dt><dd>Darken &amp; Gurrey (1945); applied to magmas by Osborn (1959) (p. 19)</dd></div>
+      <div><dt>Suited to</dt><dd>liquidus relations in iron-bearing systems, mineral and glass synthesis, element partitioning (p. 20)</dd></div>
       <div><dt>In the book</dt><dd>entry pp. 18-22; schematic Fig. 3.3, p. 21</dd></div>
     </dl>
     <p><b>What it does.</b> Two feed gases, CO-CO&#8322; or H&#8322;-CO&#8322;, are mixed at set flow ratios and flowed over the sample, fixing ƒO&#8322; through the gas equilibrium (pp. 21-22, 172). A current pulse melts the fine quench wire and the sample drops into a bath, quenching in seconds, with nearly zero iron loss to containers and several samples per run (pp. 19-21).</p>
-    <div class="research"><h4>On my bench</h4><p>The book lists one major problem, sodium volatilization above 1,100 &deg;C when ƒO&#8322; sits below QFM (p. 20). That nuisance is precisely the gas-melt exchange I study. Run deliberately, with the loop weighed before and after, the flaw becomes the experiment.</p></div>
   </div>
   </div>
 </article>
@@ -332,7 +233,7 @@ footer p { margin: 0; }
   <h3>Vacuum evaporation furnace</h3>
   <div class="tagrow">
     <span class="tag"><span class="dot t-gas"></span>gas-melt &middot; volatility</span>
-    <span class="tag prov own">My bench &middot; drawing constructed</span>
+    <span class="tag prov own">My bench</span>
   </div>
   <div class="cols">
   <figure>
@@ -371,16 +272,16 @@ footer p { margin: 0; }
     <text class="lbl" x="504" y="78">viewport</text>
     <text class="lbl" x="186" y="86">vacuum chamber</text>
   </svg>
-  <figcaption>Constructed schematic of my own apparatus class, not redrawn from the book. The book's quench-furnace pressure column already begins at vacuum (p. 18); this is that idea pushed to its limit.</figcaption>
+  <figcaption>Not from the book. The book's quench-furnace pressure column already begins at vacuum (p. 18); this is that idea pushed to its limit.</figcaption>
   </figure>
   <div class="facts">
     <dl class="spec">
       <div><dt>Range</dt><dd>below about 10&#8315;&#8310; bar; to silicate liquidus temperatures and beyond</dd></div>
       <div><dt>Built from</dt><dd>a vacuum chamber, a pumping stack, W or Mo heater and fixtures, a thermocouple or pyrometer, power feedthroughs</dd></div>
-      <div><dt>Provenance</dt><dd>my bench; schematic constructed, not from the book</dd></div>
+      <div><dt>Suited to</dt><dd>evaporation and condensation kinetics, volatile loss from melts and regolith, kinetic isotope fractionation</dd></div>
+      <div><dt>Provenance</dt><dd>my bench</dd></div>
     </dl>
     <p><b>What it does.</b> Free (Langmuir) evaporation into vacuum. With no returning gas flux, the evaporating surface sets the chemistry, and the escaping vapor carries a kinetic isotope fractionation that the condensed residue records.</p>
-    <div class="research"><h4>On my bench</h4><p>Evaporation and condensation of the moderately volatile elements from silicate melts, volatile loss from lunar regolith materials during heating events, and the isotope fractionations those processes leave behind.</p></div>
   </div>
   </div>
 </article>
@@ -425,7 +326,7 @@ footer p { margin: 0; }
     <text class="lblm" x="500" y="236">water pressure medium,</text>
     <text class="lblm" x="500" y="250">argon above 8 kbar (p. 27)</text>
   </svg>
-  <figcaption>Redrawn after Holloway &amp; Wood (1988), Fig. 3.5, p. 26, with the capsule and seal insets merged into one view.</figcaption>
+  <figcaption>After Holloway &amp; Wood (1988), Fig. 3.5, p. 26, with the capsule and seal insets merged into one view.</figcaption>
   </figure>
   <div class="facts">
     <dl class="spec">
@@ -434,10 +335,10 @@ footer p { margin: 0; }
       <div><dt>Sample</dt><dd>0.1 to 0.5 ml welded capsules (p. 25)</dd></div>
       <div><dt>Built from</dt><dd>one superalloy rod (Stellite-25 or Rene-41) drilled nearly through, a cone seal, a water line, a gauge and hand pump, a Kanthal-wound tube furnace (p. 27)</dd></div>
       <div><dt>Original design</dt><dd>Tuttle (1949); 12 kbar version Luth &amp; Tuttle (1963) (p. 25)</dd></div>
+      <div><dt>Suited to</dt><dd>granite and metamorphic phase equilibria, hydrothermal mineral synthesis, diffusion and fluid-phase chemistry (p. 27)</dd></div>
       <div><dt>In the book</dt><dd>entry pp. 25-27; schematic Fig. 3.5, p. 26</dd></div>
     </dl>
     <p><b>What it does.</b> The book ranks it the simplest and least expensive of the common high-pressure systems (p. 27). The seal sits outside the furnace, hence cold-seal, so a simple cone seal survives. This is the machine of Tuttle and Bowen's granite melting experiments and the long-standing workhorse of metamorphic and hydrothermal synthesis work (p. 27).</p>
-    <div class="research"><h4>On my bench</h4><p>Hydrothermal carbonate synthesis and fluid-rock exchange. The analog apparatus for carbonate-forming fluids in CM chondrites and for the diversity of dolomitizing fluids.</p></div>
   </div>
   </div>
 </article>
@@ -485,7 +386,7 @@ footer p { margin: 0; }
     <path class="sv" d="M210,336 Q310,378 410,336" marker-start="url(#arr)" marker-end="url(#arr)"/>
     <text class="lblm" x="310" y="400" text-anchor="middle">rocked through 180&deg;, external furnace above and below</text>
   </svg>
-  <figcaption>Redrawn after Holloway &amp; Wood (1988), Fig. 3.4, p. 23, cross-section view.</figcaption>
+  <figcaption>After Holloway &amp; Wood (1988), Fig. 3.4, p. 23, cross-section view.</figcaption>
   </figure>
   <div class="facts">
     <dl class="spec">
@@ -494,10 +395,10 @@ footer p { margin: 0; }
       <div><dt>Sample</dt><dd>about 250 ml of fluid plus rock powder (p. 22)</dd></div>
       <div><dt>Built from</dt><dd>an externally heated steel vessel, a flexible gold (now titanium) sample bag, a gold-filtered sampling line and valve, a rocking drive (pp. 23-24)</dd></div>
       <div><dt>Original design</dt><dd>Dickson et al. (1963); current form Seyfried et al. (1979); fixed-volume variant Barnes (1963) (pp. 22, 24)</dd></div>
+      <div><dt>Suited to</dt><dd>hydrothermal alteration of rocks, mineral solubilities, reaction kinetics (p. 24)</dd></div>
       <div><dt>In the book</dt><dd>entry pp. 22-25; schematic Fig. 3.4, p. 23</dd></div>
     </dl>
     <p><b>What it does.</b> The rocking keeps fluid and rock stirred, and fluid aliquots are drawn at pressure and temperature through the gold filter, so a single run yields a time series of fluid chemistry. An H&#8322; membrane reads or sets ƒO&#8322; (p. 24). Quench takes hours and runs last weeks to months, so it is a machine for fluids, not crystals (p. 24). The Barnes fixed-volume variant samples both liquid and vapor, built for aqueous sulfide work (pp. 24-25).</p>
-    <div class="research"><h4>On my bench</h4><p>Evolving fluid chemistry during carbonation and dolomitization, where the fluid itself, not the quenched solid, is the measurement.</p></div>
   </div>
   </div>
 </article>
@@ -550,7 +451,7 @@ footer p { margin: 0; }
     <text class="lbl" x="150" y="334">H&#8322; membrane</text>
     <text class="lblm" x="386" y="380">argon pumped in stages to 10 kbar (p. 29)</text>
   </svg>
-  <figcaption>Redrawn after Holloway &amp; Wood (1988), Fig. 3.6, p. 28, with the pumping unit simplified.</figcaption>
+  <figcaption>After Holloway &amp; Wood (1988), Fig. 3.6, p. 28, with the pumping unit simplified.</figcaption>
   </figure>
   <div class="facts">
     <dl class="spec">
@@ -559,10 +460,10 @@ footer p { margin: 0; }
       <div><dt>Sample</dt><dd>0.6 to 4 ml, up to 30 ml (p. 27)</dd></div>
       <div><dt>Built from</dt><dd>a thick-walled steel vessel with closure heads, an internal double-wound furnace, an argon intensifier chain, optionally a Shaw H&#8322; membrane (pp. 28-29)</dd></div>
       <div><dt>Original design</dt><dd>Yoder (1950); large volume Burnham et al. (1969) (p. 27)</dd></div>
+      <div><dt>Suited to</dt><dd>melting of hydrous magmas, fluid-melt and fluid-crystal equilibria, synthesizing large volumes of starting material (p. 29)</dd></div>
       <div><dt>In the book</dt><dd>entry pp. 27-29; schematic Fig. 3.6, p. 28</dd></div>
     </dl>
     <p><b>What it does.</b> The furnace sits inside the vessel, so pressure and temperature limits are not inversely linked the way they are in a cold-seal. Argon at 5 kbar and 1,000 &deg;C is about as dense as room-temperature water, and its convection is tamed with double windings and vertical operation (p. 29). The machine for volatile solubility in melts and for fluid-melt equilibria needing large fluid volumes (pp. 27-29). The honest caveat, this is the one entry on this page whose pumping system the book concedes is relatively complicated and expensive (p. 27).</p>
-    <div class="research"><h4>On my bench</h4><p>Gas-melt equilibria at pressures where dissolved volatiles matter, with enough fluid to analyze.</p></div>
   </div>
   </div>
 </article>
@@ -572,7 +473,7 @@ footer p { margin: 0; }
   <h3>Three ways to fix ƒO&#8322;</h3>
   <div class="tagrow">
     <span class="tag"><span class="dot t-redox"></span>redox</span>
-    <span class="tag prov">Published &middot; capsule drawn from text</span>
+    <span class="tag prov">Published</span>
   </div>
   <div class="cols">
   <figure>
@@ -629,7 +530,7 @@ footer p { margin: 0; }
     <text class="lbl" x="634" y="346" text-anchor="middle">never exhausted</text>
     <text class="lblm" x="634" y="364" text-anchor="middle">(pp. 173-174)</text>
   </svg>
-  <figcaption>Gas mixer after Fig. 3.3, p. 21; membrane after the Fig. 3.6 inset, p. 28. The double capsule is drawn from the text description on pp. 172-173; the book prints no figure for it.</figcaption>
+  <figcaption>Gas mixer after Fig. 3.3, p. 21; membrane after the Fig. 3.6 inset, p. 28. The double capsule follows the text description on pp. 172-173; the book prints no figure for it.</figcaption>
   </figure>
   <div class="facts">
     <dl class="spec">
@@ -637,10 +538,10 @@ footer p { margin: 0; }
       <div><dt>Solid buffers</dt><dd>MH, Ni-NiO, QFM, IW assemblages plus H&#8322;O, sealed in an outer capsule (pp. 172-173)</dd></div>
       <div><dt>Membrane</dt><dd>Shaw Pd-Ag tube fed from an external H&#8322; reservoir (pp. 173-174)</dd></div>
       <div><dt>Original designs</dt><dd>gas mixing Darken &amp; Gurrey (1945); buffers Eugster (1957); membrane Shaw (1963, 1967) (pp. 172-173)</dd></div>
+      <div><dt>Suited to</dt><dd>fixing redox state in any sealed-capsule or gas-flow experiment</dd></div>
       <div><dt>In the book</dt><dd>Appendix A.3, pp. 171-174</dd></div>
     </dl>
     <p><b>What it does.</b> In the double capsule, H&#8322; generated by the buffer diffuses through the Pd-Ag or Pt inner wall and fixes ƒO&#8322; inside through the water reaction (p. 173). Permeabilities run PdAg &gt; Pt &gt;&gt; Au &gt; Ag (p. 174). Buffers are consumed in long runs and sit at widely spaced ƒO&#8322; values; the membrane varies ƒO&#8322; continuously and never runs out (pp. 173-174).</p>
-    <div class="research"><h4>On my bench</h4><p>Oxidation state is the master variable in how I think about chondrite redox, and these are the three hand-built handles on it. No machine at all beyond the vessel it rides in. Buffer powder, noble metal tube stock, a welded crimp.</p></div>
   </div>
   </div>
 </article>
@@ -691,7 +592,7 @@ footer p { margin: 0; }
     <text class="lbl" x="474" y="413">both faces carry the emf</text>
     <line class="lead" x1="390" y1="368" x2="470" y2="396"/>
   </svg>
-  <figcaption>Redrawn after Holloway &amp; Wood (1988), Fig. 3.14, p. 44.</figcaption>
+  <figcaption>After Holloway &amp; Wood (1988), Fig. 3.14, p. 44.</figcaption>
   </figure>
   <div class="facts">
     <dl class="spec">
@@ -700,10 +601,10 @@ footer p { margin: 0; }
       <div><dt>Sample</dt><dd>small chips or pellets; equilibration in hours (p. 43)</dd></div>
       <div><dt>Built from</dt><dd>a Y&#8322;O&#8323;- or CaO-doped ZrO&#8322; plug sealed into an alumina tube, two Pt-Rh thermocouples, a high-impedance millivoltmeter (pp. 43-44)</dd></div>
       <div><dt>Original design</dt><dd>Kiukkola &amp; Wagner (1957); geological use Sato (1971) (p. 43)</dd></div>
+      <div><dt>Suited to</dt><dd>intrinsic &fnof;O&#8322; of rocks and minerals, free energies of redox equilibria (p. 43)</dd></div>
       <div><dt>In the book</dt><dd>entry pp. 43-45; schematic Fig. 3.14, p. 44</dd></div>
     </dl>
     <p><b>What it does.</b> Doped zirconia conducts oxygen ions, so the emf across the plug reads the oxygen activity difference between sample and reference through the Nernst relation, E = (RT/4F) ln(a<sub>O&#8322;</sub><sup>sample</sup>/a<sub>O&#8322;</sub><sup>ref</sup>) (p. 45). It measures the intrinsic ƒO&#8322; of rocks and minerals directly. Watch for iron poisoning of the cell and electronic conduction at very low ƒO&#8322; (p. 43).</p>
-    <div class="research"><h4>On my bench</h4><p>The sensor you build to check the atmosphere every other machine on this page claims to deliver, and the standard monitor on a gas-mixing furnace.</p></div>
   </div>
   </div>
 </article>
@@ -713,7 +614,7 @@ footer p { margin: 0; }
   <h3>Sealed silica tube</h3>
   <div class="tagrow">
     <span class="tag"><span class="dot t-sulf"></span>sulfidation</span>
-    <span class="tag prov">Published in passing &middot; extension constructed</span>
+    <span class="tag prov">Published + constructed</span>
   </div>
   <div class="cols">
   <figure>
@@ -738,17 +639,17 @@ footer p { margin: 0; }
     <text class="lbl" x="580" y="320" text-anchor="end">cooler zone, buffer T</text>
     <text class="lblm" x="360" y="348" text-anchor="middle">a two-zone gradient furnace sets sample and buffer temperatures independently</text>
   </svg>
-  <figcaption>Constructed schematic. The book's mention is textual, one sentence on p. 180; the sulfidation arrangement shown is standard practice in meteoritics beyond this book.</figcaption>
+  <figcaption>The book's mention is one sentence on p. 180; the sulfidation arrangement shown is standard practice in meteoritics.</figcaption>
   </figure>
   <div class="facts">
     <dl class="spec">
       <div><dt>Range</dt><dd>internal pressure set by the charge; usable to the devitrification limit of silica glass near 1,250 &deg;C (Fig. A.1, p. 175)</dd></div>
       <div><dt>Built from</dt><dd>a silica tube, a torch, a vacuum line</dd></div>
+      <div><dt>Suited to</dt><dd>metal-sulfide equilibria, sulfidation of metal and silicates, sealed-tube vapor transport</dd></div>
       <div><dt>In the book</dt><dd>one sentence on p. 180, reacting an oxide pellet in an evacuated sealed silica-glass tube when no controlled-atmosphere furnace is available</dd></div>
       <div><dt>Extension</dt><dd>the sulfidation arrangement is standard cosmochemistry practice beyond this book, flagged constructed</dd></div>
     </dl>
     <p><b>What it does.</b> Weld one end shut, load the charge, neck the tube, evacuate, and seal with the torch. Sulfur fugacity can be buffered by pyrite-pyrrhotite at one end of a thermal gradient while the sample reacts at the other, and the sealed volume doubles as a vapor-transport cell.</p>
-    <div class="research"><h4>On my bench</h4><p>Metal-sulfide equilibria and sulfidation of Fe metal and silicates, the reactions behind enstatite chondrite mineralogy, plus sealed-tube transport of alkali halides. The cheapest apparatus on this page by two orders of magnitude.</p></div>
   </div>
   </div>
 </article>
@@ -830,7 +731,7 @@ footer p { margin: 0; }
     <text class="lblm" x="640" y="524" text-anchor="middle">2500</text>
     <text class="lblm" x="415" y="544" text-anchor="middle">working temperature limit (&deg;C)</text>
   </svg>
-  <figcaption>Working limits redrawn from Fig. A.1, p. 175, and Fig. A.3, p. 176. Materials usable only in reducing atmospheres are marked; capsule alloy values are read from the chart, pure-metal melting points are standard constants.</figcaption>
+  <figcaption>Working limits from Fig. A.1, p. 175, and Fig. A.3, p. 176. Materials usable only in reducing atmospheres are marked; capsule alloy values are read from the chart, pure-metal melting points are standard constants.</figcaption>
   </figure>
   <div class="facts">
     <dl class="spec">
@@ -840,7 +741,6 @@ footer p { margin: 0; }
       <div><dt>In the book</dt><dd>Appendix A.1 to A.5, pp. 169-181</dd></div>
     </dl>
     <p><b>What it is.</b> Every machine above reduces to these parts. The Appendix teaches the parts themselves, which wire to weld, which ceramic survives which atmosphere, which metal passes hydrogen and which blocks it, and how to make a starting material more homogeneous than anything you can buy.</p>
-    <div class="research"><h4>On my bench</h4><p>High-purity carbonates and oxides, noble metal tube stock, ceramic, and wire. Working upward from raw materials is not nostalgia, it is the fundamentals of the science, and it is how a lab keeps answering questions the other ten months of the year.</p></div>
   </div>
   </div>
 </article>
@@ -848,7 +748,7 @@ footer p { margin: 0; }
 </main>
 
 <footer>
-  <p><strong>Source.</strong> Holloway, J. R. and Wood, B. J. (1988). <em>Simulating the Earth: Experimental Geochemistry.</em> Unwin Hyman, Boston. All schematics on this page were redrawn by hand for this site and are cited to the figure and page they follow; panels marked constructed or my bench go beyond the book. Original apparatus references are as listed in the book's machine entries.</p>
+  <p><strong>Source.</strong> Holloway, J. R. and Wood, B. J. (1988). <em>Simulating the Earth: Experimental Geochemistry.</em> Unwin Hyman, Boston. Figure and page numbers on each panel refer to this book; original apparatus references are as listed in its machine entries.</p>
 </footer>
 </div>
 
@@ -892,13 +792,6 @@ footer p { margin: 0; }
   }
   document.querySelectorAll(".chip").forEach(function(c){
     c.addEventListener("click", function(){ select(c.getAttribute("data-s")); });
-  });
-  document.querySelectorAll(".hot").forEach(function(g){
-    var go = function(){ select(g.getAttribute("data-s")); };
-    g.addEventListener("click", go);
-    g.addEventListener("keydown", function(e){
-      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); }
-    });
   });
   var pv = document.getElementById("prev"), nx = document.getElementById("next");
   if (pv) pv.addEventListener("click", function(){ step(-1); });
