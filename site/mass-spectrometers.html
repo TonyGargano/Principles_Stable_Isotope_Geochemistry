@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mass Spectrometers</title>
+<meta name="description" content="Interactive schematics of a gas source IRMS (Thermo MAT 253) and an MC-ICP-MS (Thermo Neptune Plus) set up for K and Rb isotopes, with notes on how Tony Gargano uses each.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink2: #52514e;
+  --muted: #898781;
+  --hair: #e1e0d9;
+  --border: rgba(11,11,11,0.10);
+  --own: #6f5587;
+  --ion: #2a78d6;
+  --heat: #eb6834;
+  --metal: #52514e;
+  --fill: #f3f2ee;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: transparent; }
+body {
+  font-family: "Epilogue", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.ms { max-width: 1240px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px 14px; }
+.ms-head { margin: 0 0 12px; }
+.ms-head h1 { font-size: 22px; font-weight: 500; margin: 0 0 2px; letter-spacing: -0.01em; }
+.ms-head p { margin: 0; color: var(--ink2); font-size: 14px; }
+html.embed .ms-head { display: none; }
+
+/* controls */
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin-bottom: 10px; }
+.seg { display: inline-flex; border: 1px solid var(--ink); border-radius: 999px; overflow: hidden; }
+.seg button { border: 0; background: transparent; cursor: pointer; padding: 7px 15px; font-size: 13.5px; border-right: 1px solid var(--ink); transition: background-color .15s, color .15s; }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-checked="true"] { background: var(--ink); color: #fff; }
+.seg button:not([aria-checked="true"]):hover { background: rgba(11,11,11,0.06); }
+.pick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pick:empty { display: none; }
+.pick-lab { font-size: 12.5px; color: var(--ink2); margin-right: 2px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--hair); background: #fff; border-radius: 999px; padding: 4px 11px; font-size: 13px; cursor: pointer; line-height: 1.2; color: var(--ink); }
+.chip b { font-weight: 600; }
+.chip span { color: var(--ink2); }
+.chip:hover { border-color: var(--ink2); }
+.chip[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.intro { font-size: 14px; color: var(--ink2); margin: 0 0 8px; max-width: 100ch; }
+
+/* schematic */
+.schem { overflow-x: auto; padding: 2px 0 4px; }
+.schem svg { display: block; width: 100%; min-width: 880px; height: auto; }
+.scroll-hint { display: none; font-size: 12px; color: var(--muted); margin: 0 0 4px; }
+.schem-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 16px; font-size: 12.5px; color: var(--ink2); margin: 2px 0 0; }
+.key { display: inline-flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+.key span { display: inline-flex; align-items: center; gap: 6px; }
+.key i { width: 20px; height: 0; display: inline-block; }
+.key i.k-ion { border-top: 3px solid var(--ion); border-radius: 2px; }
+.key i.k-gas { border-top: 2px dotted #6f6e69; }
+.walk { border: 1px solid var(--ink); background: #fff; border-radius: 999px; padding: 5px 13px; font-size: 13px; cursor: pointer; }
+.walk:hover { background: var(--ink); color: #fff; }
+
+svg text { font-family: inherit; }
+.t-title { font-size: 17px; font-weight: 600; fill: var(--ink); }
+.t-sub { font-size: 12.5px; fill: var(--ink2); }
+.t-note { font-size: 12px; fill: var(--muted); }
+.p-name { font-size: 13px; font-weight: 600; fill: var(--ink); }
+.p-sub { font-size: 11px; fill: var(--ink2); }
+.p-small { font-size: 10.5px; fill: var(--muted); }
+.badge-c { fill: var(--ink); }
+.badge-t { fill: #fff; font-size: 11px; font-weight: 600; text-anchor: middle; }
+.hw { fill: var(--fill); stroke: var(--metal); stroke-width: 1.4; }
+.hw-w { fill: #fff; stroke: var(--metal); stroke-width: 1.4; }
+.hw-line { fill: none; stroke: var(--metal); stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.tube { fill: none; stroke: #d4d2ca; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.flow { fill: none; stroke: #6f6e69; stroke-width: 1.6; stroke-dasharray: 2 7; stroke-linecap: round; stroke-linejoin: round; animation: flowGas 1.6s linear infinite; }
+.flight { fill: none; stroke: #ecebe6; stroke-width: 16; stroke-linecap: round; stroke-linejoin: round; }
+.ion-base { fill: none; stroke: rgba(42,120,214,0.28); stroke-linecap: round; stroke-linejoin: round; }
+.ion { fill: none; stroke: var(--ion); stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 10 8; animation: flowIon 1s linear infinite; }
+.guide { fill: none; stroke: #9a988f; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.heat { fill: none; stroke: var(--heat); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ln2 { fill: #dde9f7; }
+.liquid { fill: #cfe1f6; }
+.magnet { fill: #d9d7cf; stroke: #b7b5ac; stroke-width: 1.2; }
+.esa { fill: none; stroke: #8d8b83; stroke-width: 6; stroke-linecap: round; }
+.cup { fill: #fff; stroke: var(--metal); stroke-width: 1.4; stroke-linejoin: round; }
+.cup.on { fill: #e3eefb; }
+.cup.idle { stroke: #b9b7ae; }
+.cup-t { font-size: 10px; fill: var(--ink); text-anchor: middle; font-variant-numeric: tabular-nums; }
+.iso-t { font-size: 11.5px; fill: var(--ink); }
+.box-t { font-size: 12px; fill: var(--ink); }
+.box-t.strong { font-weight: 600; }
+.cell-t { font-size: 12.5px; fill: var(--ink); text-anchor: middle; font-weight: 600; }
+.cell-s { font-size: 11px; fill: var(--ink2); text-anchor: middle; }
+.cell-n { font-size: 11.5px; fill: var(--muted); text-anchor: middle; }
+@keyframes flowIon { to { stroke-dashoffset: -18; } }
+@keyframes flowGas { to { stroke-dashoffset: -9; } }
+.alt-a { animation: altA 5s steps(1, end) infinite; }
+.alt-b { animation: altB 5s steps(1, end) infinite; }
+@keyframes altA { 0% { stroke: #52514e; } 50% { stroke: #d6d4cc; } 100% { stroke: #d6d4cc; } }
+@keyframes altB { 0% { stroke: #d6d4cc; } 50% { stroke: #52514e; } 100% { stroke: #52514e; } }
+
+.shared { pointer-events: none; transition: opacity .2s; }
+.part { cursor: pointer; outline: none; transition: opacity .2s; }
+.part .hit { fill: transparent; stroke: transparent; stroke-width: 2; transition: fill .15s, stroke .15s; }
+.part:hover .hit { fill: rgba(11,11,11,0.025); stroke: #d3d1c9; }
+.part:focus-visible .hit { stroke: var(--ink); }
+.part.is-sel .hit { fill: rgba(42,120,214,0.05); stroke: var(--ink); }
+.part.off:not(.is-sel), .route.off { opacity: .3; }
+svg.has-sel .part:not(.is-sel), svg.has-sel .shared, svg.has-sel .route { opacity: .28; }
+
+/* panel beneath */
+.panel { border-top: 1px solid var(--hair); margin-top: 12px; padding-top: 14px; }
+.pbox { border: 1px solid var(--hair); background: #fff; border-radius: 14px; padding: 14px 16px 12px; }
+.pbox-head { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+.num { width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; flex: none; margin-top: 1px; font-variant-numeric: tabular-nums; }
+.pbox h3 { margin: 0; font-size: 19px; font-weight: 500; line-height: 1.2; outline: none; }
+.pbox .sub { font-size: 12.5px; color: var(--ink2); margin-top: 2px; }
+.pnav { margin-left: auto; display: flex; gap: 6px; }
+.pnav button { border: 1px solid var(--hair); background: #fff; border-radius: 999px; height: 30px; min-width: 30px; padding: 0 11px; font-size: 12.5px; cursor: pointer; color: var(--ink2); }
+.pnav button:hover { border-color: var(--ink2); color: var(--ink); }
+.pnav button:disabled { opacity: .4; cursor: default; }
+.pbody { margin-top: 10px; }
+.pbody.with-chart { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.ptext { max-width: 80ch; }
+.lead { font-size: 15px; margin: 0 0 10px; }
+.ptext p { margin: 0 0 10px; font-size: 14px; }
+.ptext p.route-note { font-size: 13px; color: var(--ink2); }
+.research { border-left: 3px solid var(--own); padding: 2px 0 2px 12px; margin: 2px 0 12px; }
+.research h4 { margin: 0 0 4px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--ink2); }
+.research p { margin: 0; font-size: 14px; }
+.src { font-size: 11.5px; color: var(--muted); margin: 8px 0 0; line-height: 1.6; }
+.src a { color: var(--ink2); text-decoration: underline; text-decoration-color: rgba(11,11,11,0.3); text-underline-offset: 2px; }
+.src a:hover { color: var(--ink); text-decoration-color: var(--ink); }
+.flag { display: inline-block; font-size: 10.5px; border-radius: 999px; padding: 0 6px; margin-right: 3px; border: 1px solid var(--hair); color: var(--ink2); background: #faf9f6; }
+.flag.own { border-color: var(--own); color: var(--own); }
+.ov h3 { font-size: 18px; }
+.ov-steps { list-style: none; margin: 4px 0 12px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.ov-steps button { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--hair); background: #fff; border-radius: 999px; padding: 3px 11px 3px 3px; font-size: 13px; cursor: pointer; }
+.ov-steps button:hover { border-color: var(--ink2); }
+.ov-steps .num { width: 22px; height: 22px; font-size: 11.5px; margin: 0; }
+
+figure.chart { margin: 0; border: 1px solid var(--hair); background: #fff; border-radius: 12px; padding: 12px 12px 10px; position: relative; }
+figure.chart + figure.chart { margin-top: 12px; }
+figure.chart .ch-title { font-size: 14px; font-weight: 600; margin: 0 0 2px; }
+figure.chart .ch-sub { font-size: 12px; color: var(--ink2); margin: 0 0 6px; }
+figure.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+figure.chart figcaption { font-size: 12px; color: var(--ink2); margin-top: 6px; }
+.ch-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--ink2); margin: 0 0 4px; }
+.ch-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.ch-legend i { width: 14px; height: 0; border-top: 2px solid; display: inline-block; }
+.svg-tick { font-size: 10.5px; fill: var(--muted); font-variant-numeric: tabular-nums; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; stroke-linejoin: round; }
+.svg-lab { font-size: 11.5px; fill: var(--ink2); paint-order: stroke; stroke: #ffffff; stroke-width: 3px; stroke-linejoin: round; }
+.svg-val { font-size: 11px; fill: var(--ink); font-variant-numeric: tabular-nums; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; stroke-linejoin: round; }
+.svg-strong { font-weight: 600; fill: var(--ink); }
+
+/* comparison */
+.cmp-fig { margin: 0; overflow-x: auto; }
+.cmp-fig svg { display: block; width: 100%; min-width: 880px; height: auto; }
+.cmp-fig figcaption { font-size: 12.5px; color: var(--ink2); margin-top: 4px; }
+.cmp-wrap { overflow-x: auto; margin-top: 12px; }
+table.cmp { width: 100%; min-width: 600px; border-collapse: collapse; font-size: 13.5px; background: #fff; border: 1px solid var(--hair); border-radius: 12px; }
+table.cmp th, table.cmp td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid #efeee9; }
+table.cmp tr:last-child th, table.cmp tr:last-child td { border-bottom: 0; }
+table.cmp thead th { font-size: 12.5px; color: var(--ink2); font-weight: 600; border-bottom: 1px solid var(--hair); }
+table.cmp tbody th { font-weight: 600; width: 18%; }
+table.cmp td { width: 41%; }
+
+.foot { margin-top: 10px; font-size: 12px; color: var(--muted); }
+.tip { position: fixed; z-index: 40; pointer-events: none; background: #0b0b0b; color: #fff; font-size: 12px; padding: 5px 8px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, calc(-100% - 10px)); line-height: 1.4; }
+.tip[hidden] { display: none; }
+
+@media (max-width: 900px) {
+  .pbody.with-chart { grid-template-columns: minmax(0, 1fr); }
+  .scroll-hint { display: block; }
+}
+@media (max-width: 700px) {
+  .ms { padding: 14px 12px 10px; border-radius: 12px; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; border-radius: 12px; }
+  .seg button { font-size: 12.5px; padding: 8px 6px; line-height: 1.2; text-align: center; }
+  .pnav { margin-left: 0; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ion, .flow, .alt-a, .alt-b { animation: none; }
+  .ion, .flow { stroke-dasharray: none; }
+  .part, .part .hit, .shared, .seg button { transition: none; }
+}
+@media (forced-colors: active) {
+  .part.is-sel .hit { stroke: Highlight; }
+}
+</style>
+</head>
+<body>
+<div class="ms" id="ms">
+  <div class="ms-head">
+    <h1>Mass spectrometers</h1>
+    <p>How a gas source IRMS and an MC-ICP-MS measure isotope ratios. Tony Gargano, Center for Stable Isotopes, University of New Mexico.</p>
+  </div>
+  <div class="controls">
+    <div class="seg" role="radiogroup" aria-label="Instrument">
+      <button type="button" role="radio" data-inst="irms">Gas source IRMS</button>
+      <button type="button" role="radio" data-inst="mc">MC-ICP-MS</button>
+      <button type="button" role="radio" data-inst="cmp">Gas vs liquid</button>
+    </div>
+    <div class="pick" id="pick"></div>
+  </div>
+  <p class="intro" id="intro"></p>
+  <div id="stage"></div>
+  <section class="panel" id="panel" aria-live="polite"></section>
+  <div class="foot">Simplified schematics, not to scale.</div>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+(() => {
+"use strict";
+const params = new URLSearchParams(location.search);
+if (params.get("embed") === "1") document.documentElement.classList.add("embed");
+
+const NS = "http://www.w3.org/2000/svg";
+const $ = id => document.getElementById(id);
+const tip = $("tip"), stage = $("stage"), panel = $("panel");
+
+/* ---------- references ---------- */
+const REF = {
+  mat: ["Thermo MAT 253 manual", "https://cactiweb.uvigo.es/docs/manuales/MAT253.pdf"],
+  csi: ["UNM Center for Stable Isotopes", "https://csi.unm.edu/node/185"],
+  rumble: ["Rumble et al. (1997), GCA 61, 4229", "https://faculty.epss.ucla.edu/~eyoung/reprints/Rumble_etal_1997.pdf"],
+  uw: ["UW IsoLab triple oxygen protocol", "https://isolab.ess.washington.edu/laboratory/water-D17O.php"],
+  zhang: ["Zhang, Nie and Lin (2025), JAAS", "https://doi.org/10.1039/d5ja00189g"],
+  chen: ["Chen et al. (2019), JAAS 34, 160", "https://doi.org/10.1039/C8JA00303C"],
+  nie: ["Nie and Dauphas (2019), ApJL", "https://arxiv.org/abs/1910.08530"],
+  neptune: ["Thermo Fisher, Neptune Plus", "https://www.thermofisher.com/order/catalog/product/IQLAAEGAASFADOMAJL"],
+  nubase: ["NUBASE2020", null],
+  ame: ["AME2020", null],
+  nist: ["NIST", null]
+};
+const ref = k => { const r = REF[k]; return r[1] ? '<a href="' + r[1] + '" target="_blank" rel="noopener">' + r[0] + '</a>' : r[0]; };
+function flags(f) {
+  const out = [];
+  if (f.own) out.push('<span class="flag own">my work</span>' + f.own);
+  if (f.pub) out.push('<span class="flag">published</span>' + f.pub);
+  if (f.con) out.push('<span class="flag">constructed</span>' + f.con);
+  return '<p class="src">' + out.join(" ") + '</p>';
+}
+
+/* ---------- gases and elements ---------- */
+const GASES = {
+  O2: { key: "O2", chip: "O₂", el: "oxygen", route: "dual", method: "Laser fluorination", reagent: "BrF₅", laser: true,
+    beams: [{ m: 32, sp: "¹⁶O¹⁶O", ab: 99.515 }, { m: 33, sp: "¹⁶O¹⁷O", ab: 0.0765 }, { m: 34, sp: "¹⁶O¹⁸O", ab: 0.408 }],
+    ratios: [["33/32", "δ¹⁷O"], ["34/32", "δ¹⁸O"]], extra: "both → Δ′¹⁷O" },
+  SF6: { key: "SF6", chip: "SF₆", el: "sulfur", route: "dual", method: "Fluorination to SF₆", reagent: "F₂, nickel vessel",
+    beams: [{ m: 127, sp: "³²SF₅⁺", ab: 94.85 }, { m: 128, sp: "³³SF₅⁺", ab: 0.763 }, { m: 129, sp: "³⁴SF₅⁺", ab: 4.365 }, { m: 131, sp: "³⁶SF₅⁺", ab: 0.0158 }],
+    ratios: [["128/127", "δ³³S"], ["129/127", "δ³⁴S"], ["131/127", "δ³⁶S"]] },
+  CH3Cl: { key: "CH3Cl", chip: "CH₃Cl", el: "chlorine", route: "cf", method: "Methyl chloride synthesis", reagent: "AgCl + CH₃I",
+    beams: [{ m: 50, sp: "CH₃³⁵Cl⁺", ab: 75.8 }, { m: 52, sp: "CH₃³⁷Cl⁺", ab: 24.2 }],
+    ratios: [["52/50", "δ³⁷Cl"]] },
+  H2: { key: "H2", chip: "H₂", el: "hydrogen", route: "cf", method: "High-temperature conversion", reagent: "glassy carbon",
+    beams: [{ m: 2, sp: "H₂⁺", ab: 99.971 }, { m: 3, sp: "HD⁺", ab: 0.029 }],
+    ratios: [["3/2", "δD"]] }
+};
+const ELS = {
+  K: { key: "K", chip: "K", name: "potassium", delta: "δ⁴¹K", std: "NIST SRM 3141a", stdShort: "vs SRM 3141a",
+    beams: [{ m: 39, sp: "³⁹K", ab: 93.258, k: 6 }, { m: 41, sp: "⁴¹K", ab: 6.730, k: 2 }],
+    interf: { key: "K", a: "⁴¹K", b: "⁴⁰Ar¹H⁺", mA: 40.96182525, d: 0.008383, R: 9000, rel: 0.25, lo: -2, hi: 16 } },
+  Rb: { key: "Rb", chip: "Rb", name: "rubidium", delta: "δ⁸⁷Rb", std: "NIST SRM 984", stdShort: "vs SRM 984",
+    beams: [{ m: 85, sp: "⁸⁵Rb", ab: 72.17, k: 6 }, { m: 87, sp: "⁸⁷Rb", ab: 27.83, k: 4 }, { m: 88, sp: "⁸⁸Sr", ab: null, k: 3, monitor: true }],
+    interf: { key: "Rb", a: "⁸⁷Rb", b: "⁸⁷Sr", mA: 86.90918053, d: -0.000303, R: 9000, rel: 0.25, lo: -3, hi: 14 } }
+};
+
+/* ---------- part content ---------- */
+const IRMS_OVERVIEW = {
+  title: "How the gas source IRMS works",
+  lead: "Light elements like oxygen, sulfur, chlorine and hydrogen form simple gases, so the sample is converted to one pure gas before it reaches the instrument. Inside, the gas is ionized and accelerated, and a magnet splits the beam by mass so that each isotope variant lands in its own collector. Comparing those ratios with a reference gas gives the isotope composition.",
+  mine: "I have measured H, O, S and Cl isotopes by IRMS, and I design, build and maintain the high-vacuum extraction lines that feed these instruments. Triple oxygen isotopes, with δ¹⁷O and δ¹⁸O measured together, run through my lunar regolith and early solar system work.",
+  flags: () => flags({ own: "Instrument experience (CV).", con: "Description." })
+};
+const MC_OVERVIEW = {
+  title: "How the MC-ICP-MS works",
+  lead: "Metals like potassium and rubidium do not form convenient gases, so they go in as a liquid. The rock is dissolved and the element purified, then the solution is sprayed into an argon plasma hot enough to ionize nearly every atom. An electrostatic analyzer and a magnet sort the ions by energy and by mass, and a row of collectors measures the isotopes at the same moment.",
+  mine: "I measure K isotopes by solution MC-ICP-MS on a Thermo Neptune Plus, from digestion and column chemistry through to the measurement. Rb isotopes, measured the same way, are part of the alkali vapor and melt experiments I have proposed as lead PI.",
+  flags: () => flags({ own: "Instrument experience and proposed work (CV).", con: "Description." })
+};
+
+const IRMS_PARTS = [
+  { id: "extract", n: 1, title: "Extraction line", sub: g => g.method,
+    lead: () => "Most of the work happens before the mass spectrometer. The extraction line is a glass and metal vacuum system that turns a solid or liquid sample into one pure gas, ready for measurement.",
+    body: g => ({
+      O2: ["For oxygen, a CO₂ laser heats a small silicate sample in bromine pentafluoride (BrF₅), which releases its oxygen as O₂. Liquid nitrogen traps freeze out the excess reagent and by-products, and a gas chromatograph column purifies the O₂.", "Nitrogen trifluoride has to go, because its NF⁺ fragment lands on mass 33, the same mass as ¹⁶O¹⁷O."],
+      SF6: ["For sulfur, sulfide is converted to silver sulfide and heated with fluorine gas in a nickel vessel, making sulfur hexafluoride (SF₆). Cryogenic traps and a gas chromatograph then purify it.", "Fluorine has only one isotope, so each mass in the spectrum maps to a single sulfur isotope."],
+      CH3Cl: ["For chlorine, chloride is precipitated as silver chloride and reacted with methyl iodide (CH₃I) to make methyl chloride (CH₃Cl). A gas chromatograph separates the CH₃Cl from leftover CH₃I on its way to the instrument."],
+      H2: ["For hydrogen, water is converted to H₂ by reaction with hot glassy carbon, and a stream of helium carries the H₂ to the instrument."]
+    })[g.key],
+    mine: () => "I design, build and maintain high-vacuum glass and metal lines like this, including laser fluorination systems and fluorination pressure vessels for oxygen, with cryogenic traps and GC interfaces for purification.",
+    flags: g => flags({ own: "Extraction lines and fluorination methods I use (CV).", pub: g.key === "O2" ? "NF⁺ on mass 33, " + ref("rumble") + ". GC purification before the dual inlet, " + ref("csi") + "." : null, con: "Description." }) },
+  { id: "dual", n: 2, title: "Dual inlet", sub: () => "Sample against reference",
+    lead: () => "The dual inlet compares the sample with a reference gas, back and forth, many times. Each gas sits in its own adjustable bellows and flows through a thin capillary to a changeover valve. The valve sends one gas into the ion source and the other to waste, then switches.",
+    body: g => ["The bellows are adjusted until both gases enter the source at the same pressure, so the instrument treats them identically. The capillaries keep the gas in viscous flow, where it moves as a whole and the light isotopes cannot run ahead. Switching many times cancels slow drift, and one published triple oxygen protocol makes 90 sample-to-reference comparisons per analysis.", "On the MAT 253 the bellows adjust between 3 and 40 mL, and the changeover valve is mounted on the ion source housing.",
+      { note: g.route === "dual" ? g.chip + " takes this route, where precision matters most." : g.chip + " takes the continuous flow route instead (part 3)." }],
+    flags: () => flags({ pub: "Bellows and valve, " + ref("mat") + ". 90 comparisons, " + ref("uw") + ".", con: "Description." }) },
+  { id: "cf", n: 3, title: "Continuous flow", sub: () => "Helium carrier",
+    lead: () => "In continuous flow, a stream of helium carries the sample gas through a gas chromatograph and into the ion source as a short pulse. Pulses of reference gas are injected before and after it.",
+    body: g => ["An open split, a small tube open to the helium stream, lets the source draw a steady flow whatever happens upstream. Continuous flow needs far less sample than the dual inlet and suits gases made one sample at a time, like CH₃Cl or H₂. The ion source, magnet and collectors are the same.",
+      { note: g.route === "cf" ? g.chip + " takes this route." : g.chip + " takes the dual inlet route instead (part 2)." }],
+    mine: () => "Chlorine isotopes, the thread through my PhD, run this way at UNM, as CH₃Cl in continuous flow on a Delta Plus XL, a close relative of the MAT 253.",
+    flags: () => flags({ own: "Chlorine on the Delta Plus XL.", pub: "Reference gas pulses, " + ref("mat") + ".", con: "Description." }) },
+  { id: "source", n: 4, title: "Ion source", sub: () => "Electron impact",
+    lead: () => "The ion source turns gas molecules into positive ions. Electrons from a hot filament cross the gas, and when one strikes a molecule hard enough it knocks out an electron, leaving a positive ion.",
+    body: () => ["Charged plates draw the ions out and accelerate them through 10 kV into a narrow beam. Electron impact gives every ion nearly the same energy, so a magnet alone can sort them. It also breaks some molecules apart, which is why sulfur is measured on the SF₅⁺ fragment of SF₆.", "The source and flight tube are pumped to high vacuum, so the ions travel without hitting stray gas."],
+    flags: () => flags({ pub: "10 kV acceleration and electron impact source, " + ref("mat") + ".", con: "Description." }) },
+  { id: "magnet", n: 5, title: "Magnet", sub: () => "Sorts ions by mass",
+    lead: () => "The magnet bends the beam. Every ion has the same energy, so heavier ions bend less than lighter ones, and the single beam fans out into separate beams by mass.",
+    body: () => ["For ions of equal charge and energy, the bending radius grows with the square root of mass. Isotope variants of these gases differ by whole mass units, so modest resolution is enough. The MAT 253 reaches a mass resolving power of about 200 for carbon, nitrogen, oxygen and sulfur gases and spreads the beams over a 460 mm dispersion.", "Hydrogen is so light that it is collected on a smaller radius."],
+    flags: () => flags({ pub: "Resolving power, dispersion and the hydrogen radius, " + ref("mat") + ".", con: "Description." }) },
+  { id: "cups", n: 6, title: "Faraday cups", sub: () => "One cup per mass",
+    lead: () => "Each beam lands in its own Faraday cup, a small metal bucket that catches the ions and passes their charge to an amplifier. All beams are collected at once, so any flicker in the source affects them equally and cancels in the ratios.",
+    body: g => ({
+      O2: ["For O₂ the cups sit at masses 32, 33 and 34. The ¹⁶O¹⁶O beam is more than a thousand times larger than the ¹⁶O¹⁷O beam, so the small beams are read through much higher-gain amplifiers."],
+      SF6: ["For SF₆ the cups catch SF₅⁺ at masses 127, 128, 129 and 131, one for each sulfur isotope. The ³⁶S beam is about six thousand times smaller than the ³²S beam."],
+      CH3Cl: ["For CH₃Cl the cups sit at masses 50 and 52, the molecules carrying ³⁵Cl and ³⁷Cl. Small contributions from ¹³C and deuterium land on masses 51 and 53, which are not used."],
+      H2: ["For H₂ the cups sit at masses 2 and 3. Some H₃⁺ forms in the source and adds to mass 3, so its contribution is measured and removed. The mass 3 cup sits behind a retardation lens, which rejects scattered ions that would otherwise add to the small HD⁺ signal."]
+    })[g.key].concat(["The MAT 253 holds up to eight cups, arranged for the gas being measured."]),
+    chart: "beams",
+    flags: g => flags({ pub: "Up to eight cups" + (g.key === "H2" ? " and the mass 3 lens" : "") + ", " + ref("mat") + "." + (g.key === "O2" ? " Cups at 32, 33 and 34, " + ref("csi") + "." : "") + " Isotope abundances, " + ref("nubase") + ".", con: "Beam shares calculated from the abundances. Description." }) },
+  { id: "ratio", n: 7, title: "Amplifiers and ratios", sub: () => "From current to δ values",
+    lead: () => "Amplifiers turn each tiny ion current into a voltage. The minor beams are divided by the major beam, and the same ratios are measured on the reference gas.",
+    body: g => ["The result is a delta value, the difference from a standard in parts per thousand (per mil), δ = (R sample ÷ R standard − 1) × 1000. The reference gas is calibrated against international standards, so results from different labs line up.", ({
+      O2: "For oxygen, 33/32 and 34/32 give δ¹⁷O and δ¹⁸O together, reported against VSMOW. Δ′¹⁷O, the small departure from the mass-dependent line, is calculated from both.",
+      SF6: "For sulfur, 128/127, 129/127 and 131/127 give δ³³S, δ³⁴S and δ³⁶S against VCDT, and the departures from mass-dependent behavior (Δ³³S, Δ³⁶S) follow from them.",
+      CH3Cl: "For chlorine, 52/50 gives δ³⁷Cl against Standard Mean Ocean Chloride (SMOC).",
+      H2: "For hydrogen, 3/2 gives δD (δ²H) against VSMOW, after the H₃⁺ correction."
+    })[g.key]],
+    flags: () => flags({ con: "Description and equation." }) }
+];
+
+const MC_PARTS = [
+  { id: "chem", n: 1, title: "Digestion and column chemistry", sub: () => "Rock to pure solution",
+    lead: () => "The rock powder is dissolved in hydrofluoric and nitric acids. The solution then passes through columns of ion-exchange resin that hold back other elements and release the target element on its own.",
+    body: e => ({
+      K: ["Potassium has to be separated from sodium, calcium and the rest of the rock, because other elements change how efficiently the plasma ionizes the sample. Recovery must be near complete, since a column can fractionate isotopes as the element washes through. The purified K is dried down and taken up in dilute nitric acid."],
+      Rb: ["Rubidium has to be separated from potassium and, above all, from strontium, because ⁸⁷Sr has the same mass as ⁸⁷Rb. One published scheme combines cation resin, an anion resin step and a strontium-specific resin, with yields above 95%."]
+    })[e.key],
+    mine: () => "I do HF–HNO₃ digestions and K purification by column chromatography in ultra-clean labs.",
+    flags: e => flags({ own: "Digestion and K column chemistry (CV).", pub: e.key === "Rb" ? "Rb chemistry and yields, " + ref("nie") + "." : null, con: "Description." }) },
+  { id: "neb", n: 2, title: "Nebulizer and spray chamber", sub: () => "Liquid to mist",
+    lead: () => "A fine capillary draws the solution into a nebulizer, where a jet of argon shatters it into a mist. A spray chamber, or a heated desolvator, removes the large droplets and most of the water, so a fine aerosol reaches the plasma.",
+    body: () => ["A desolvator makes a dry plasma, which raises the signal and cuts down hydride ions such as ⁴⁰Ar¹H⁺. Published K and Rb methods take up about 100 to 150 µL of solution per minute, at tens of parts per billion of the element."],
+    flags: () => flags({ pub: "Uptake rates and concentrations, " + ref("zhang") + " and " + ref("nie") + ".", con: "Description." }) },
+  { id: "plasma", n: 3, title: "Argon plasma", sub: () => "Atoms to ions",
+    lead: () => "The plasma is argon gas heated to 6,000 to 10,000 K by a radio-frequency coil, at atmospheric pressure. Droplets dry, molecules break apart and atoms lose an electron. Potassium (4.34 eV) and rubidium (4.18 eV) give up an electron so easily that nearly all of their atoms become ions.",
+    body: e => ({
+      K: ["The catch is argon itself, which makes ⁴⁰Ar⁺ and argon hydride ions. A standard hot plasma runs near 1,200 W. A cold plasma at about 500 to 800 W makes far fewer argon-based ions, because argon (15.76 eV) is much harder to ionize than potassium, at the cost of some signal."],
+      Rb: ["Rubidium's masses, 85 and 87, are clear of the argon-based ions that trouble potassium."]
+    })[e.key],
+    flags: e => flags({ pub: (e.key === "K" ? "Plasma powers, " + ref("zhang") + ". " : "") + "Ionization energies, " + ref("nist") + ".", con: "Description." }) },
+  { id: "cones", n: 4, title: "Interface cones", sub: () => "Air to vacuum",
+    lead: () => "Two nickel cones with tiny holes, the sampler and the skimmer, draw a slice of the plasma from atmospheric pressure into the vacuum of the mass spectrometer.",
+    body: () => ["The gas expands at supersonic speed through the cones, and the ions are skimmed into a beam. Ions of different mass do not pass through equally, which makes heavy isotopes look more abundant than they are. This instrumental mass bias drifts during a session, which is why every sample is bracketed by standards (part 9).", "High-sensitivity Jet cones raise the signal 10 to 20 times when paired with a desolvator."],
+    flags: () => flags({ pub: "Jet interface gain, " + ref("neptune") + ".", con: "Description." }) },
+  { id: "slit", n: 5, title: "Lenses and entrance slit", sub: () => "Focus and mass resolution",
+    lead: () => "Electrostatic lenses accelerate and focus the ions into a beam, which passes through a narrow entrance slit. The slit width sets the mass resolution, from low through medium to high.",
+    body: e => ({
+      K: ["Potassium needs high resolution. ⁴⁰Ar¹H⁺ sits just 0.0084 mass units above ⁴¹K. The collector is wide, so the two flat-topped peaks overlap almost completely, but at high resolution their edges are sharp enough to leave a clean window. At a resolving power of about 9,000, the window on the low-mass side of the peak where only ⁴¹K enters the cup is 0.003 to 0.004 mass units wide, and ⁴¹K is measured there. ³⁸Ar¹H⁺ sits on ³⁹K the same way."],
+      Rb: ["Rubidium runs at low resolution. Its real problem is ⁸⁷Sr, which differs from ⁸⁷Rb by just 0.0003 mass units. Separating them would take a resolving power near 290,000, far beyond any MC-ICP-MS, so strontium is removed in the chemistry and any trace is corrected by monitoring ⁸⁸Sr."]
+    })[e.key],
+    chart: "edge",
+    flags: e => flags({ pub: (e.key === "K" ? "Resolving power and clean window, " + ref("zhang") + "." : "Low resolution and the ⁸⁸Sr correction, " + ref("nie") + ".") + " Atomic masses, " + ref("ame") + ".", con: "Mass differences and peak edges calculated. The interference size in the figure is illustrative." }) },
+  { id: "esa", n: 6, title: "Electrostatic analyzer (ESA)", sub: () => "Filters by energy",
+    lead: () => "Two curved plates, one negative and one positive, bend the beam along an arc. Only ions within a narrow band of kinetic energy follow the curve to the next slit.",
+    body: () => ["Ions leave the plasma with a spread of energies, and a magnet sorts by momentum, so on its own it would blur that spread into broad peaks. The ESA's energy dispersion is matched and opposite to the magnet's, so the two cancel and ions of one mass come to a single focus whatever their energy. This double focusing, by direction and by energy, keeps each beam sharp, which gives the flat-topped peaks that precise ratios need.", "The gas source IRMS skips this step, because electron impact ions start out with nearly the same energy."],
+    flags: () => flags({ pub: "Double focusing of energy and angle, " + ref("neptune") + ".", con: "Description." }) },
+  { id: "mag", n: 7, title: "Magnet", sub: () => "Sorts ions by mass",
+    lead: () => "As in the gas instrument, the magnet bends lighter ions more than heavier ones and fans the beam out across the collectors.",
+    body: e => ({
+      K: ["For potassium, ³⁹K and ⁴¹K are collected. ⁴⁰K is not measured, because ⁴⁰Ar⁺ from the plasma gas and ⁴⁰Ca⁺ sit on the same mass."],
+      Rb: ["For rubidium, ⁸⁵Rb and ⁸⁷Rb are collected, with ⁸⁸Sr alongside as a monitor for any strontium left after the chemistry."]
+    })[e.key],
+    flags: e => flags({ pub: e.key === "K" ? ref("zhang") + "." : ref("nie") + ".", con: "Description." }) },
+  { id: "fc", n: 8, title: "Faraday cups", sub: () => "Measured together",
+    lead: () => "A row of Faraday cups catches several isotopes at the same moment. The plasma flickers constantly, and collecting the isotopes simultaneously cancels that flicker in the ratios. That is the point of multicollection.",
+    body: e => ["The Neptune Plus has nine Faraday cups machined from carbon, and up to 10 amplifiers whose gains are set independently.", ({
+      K: "³⁹K makes up 93.3% of potassium and ⁴¹K 6.7%, so the two beams differ by a factor of about fourteen.",
+      Rb: "In one published setup ⁸⁵Rb, ⁸⁷Rb and ⁸⁸Sr sit in the L2, axial and H1 cups, each read through a 10¹¹ Ω amplifier."
+    })[e.key]],
+    chart: "beams",
+    flags: e => flags({ pub: "Carbon cups and amplifiers, " + ref("neptune") + ". Nine collectors" + (e.key === "Rb" ? " and the Rb setup" : "") + ", " + ref("nie") + ". Isotope abundances, " + ref("nubase") + ".", con: "Description." }) },
+  { id: "sbb", n: 9, title: "Standard bracketing and δ", sub: () => "Correcting the bias",
+    lead: () => "Every sample is run between two runs of a standard with a known composition. The instrument's bias drifts slowly, so the average of the standards on either side gives the bias at the moment the sample was measured.",
+    body: e => ({
+      K: ["For potassium the standard is NIST SRM 3141a, and results are δ⁴¹K, the per mil difference in ⁴¹K/³⁹K from it. Sample and standard are matched in concentration and acid, and acid blanks are measured and subtracted. One dedicated lab reported long-term reproducibility of 0.11‰ (2SD) on a Neptune Plus in cold plasma."],
+      Rb: ["For rubidium the standard is NIST SRM 984, and results are δ⁸⁷Rb, the per mil difference in ⁸⁷Rb/⁸⁵Rb from it. In one published method, sample and standard concentrations were matched within 1%, and acid blanks were subtracted."]
+    })[e.key],
+    mine: e => e.key === "K" ? "I measure δ⁴¹K by solution MC-ICP-MS on a Neptune Plus, and K isotopes are half of my study of Cl and K in non-carbonaceous chondrites (Icarus, in review)." : "Rb isotopes, measured this way alongside K, are part of my proposed experiments on alkali exchange between vapor and melt.",
+    flags: e => flags({ own: e.key === "K" ? "K isotope work (CV)." : "Proposed Rb experiments (CV).", pub: e.key === "K" ? "Bracketing practice, " + ref("zhang") + ". Reproducibility, " + ref("chen") + "." : "Bracketing with SRM 984, " + ref("nie") + ".", con: "Description." }) }
+];
+
+/* ---------- state ---------- */
+const state = { inst: "irms", gas: "O2", el: "K", part: null };
+const PARTS = () => state.inst === "irms" ? IRMS_PARTS : MC_PARTS;
+const cur = () => state.inst === "irms" ? GASES[state.gas] : ELS[state.el];
+
+/* ---------- svg helpers ---------- */
+function S(tag, attrs, ...kids) {
+  const n = document.createElementNS(NS, tag);
+  if (attrs) for (const k in attrs) if (attrs[k] != null && attrs[k] !== false) n.setAttribute(k, attrs[k]);
+  kids.flat(Infinity).forEach(c => { if (c == null || c === false) return; n.appendChild(typeof c === "object" ? c : document.createTextNode(String(c))); });
+  return n;
+}
+const T = (x, y, s, cls, extra) => S("text", Object.assign({ x, y, class: cls }, extra || {}), s);
+const TM = (x, y, s, cls) => T(x, y, s, cls, { "text-anchor": "middle" });
+function badge(x, y, n) { return S("g", { "aria-hidden": "true" }, S("circle", { cx: x, cy: y, r: 10, class: "badge-c" }), T(x, y + 3.9, n, "badge-t")); }
+function plabel(x, y, n, name, sub) { return S("g", null, badge(x, y - 4, n), T(x + 16, y, name, "p-name"), sub ? T(x + 16, y + 15, sub, "p-sub") : null); }
+const r1 = v => Math.round(v * 10) / 10;
+function pt(cx, cy, r, deg) { const a = deg * Math.PI / 180; return [r1(cx + r * Math.cos(a)), r1(cy + r * Math.sin(a))]; }
+function arc(cx, cy, r, a1, a2) { const p1 = pt(cx, cy, r, a1), p2 = pt(cx, cy, r, a2); return "M" + p1.join(" ") + " A" + r + " " + r + " 0 0 " + (a2 > a1 ? 1 : 0) + " " + p2.join(" "); }
+function sector(cx, cy, ri, ro, a1, a2) {
+  const p1 = pt(cx, cy, ro, a1), p2 = pt(cx, cy, ro, a2), p3 = pt(cx, cy, ri, a2), p4 = pt(cx, cy, ri, a1);
+  return "M" + p1.join(" ") + " A" + ro + " " + ro + " 0 0 1 " + p2.join(" ") + " L" + p3.join(" ") + " A" + ri + " " + ri + " 0 0 0 " + p4.join(" ") + " Z";
+}
+function zigzag(x1, y, x2, amp, n) { let d = "M" + x1 + " " + y; const step = (x2 - x1) / n; for (let i = 1; i <= n; i++) d += " L" + r1(x1 + step * (i - 0.5)) + " " + (y + (i % 2 ? -amp : amp)) + " L" + r1(x1 + step * i) + " " + y; return d; }
+function pipe(d, live) { return [S("path", { class: "tube", d }), live ? S("path", { class: "flow", d }) : null]; }
+function arrowHead(x, y, dir) { const s = 5; const pts = dir === "right" ? [[x, y], [x - s * 1.6, y - s], [x - s * 1.6, y + s]] : dir === "down" ? [[x, y], [x - s, y - s * 1.6], [x + s, y - s * 1.6]] : [[x, y], [x - s, y + s * 1.6], [x + s, y + s * 1.6]]; return S("polygon", { points: pts.map(p => p.join(",")).join(" "), fill: "#9a988f" }); }
+function beamWidth(ab) { return ab == null ? 1.4 : ab >= 50 ? 4 : ab >= 1 ? 2.6 : 1.6; }
+function ionPath(d, w) { return [S("path", { class: "ion-base", d, "stroke-width": w }), S("path", { class: "ion", d, "stroke-width": w })]; }
+function part(id, hit, kids) {
+  const P = PARTS().find(p => p.id === id);
+  return S("g", { class: "part", "data-part": id, role: "button", tabindex: "0", "aria-pressed": "false", "aria-label": P.n + ". " + P.title },
+    S("rect", { class: "hit", x: hit[0], y: hit[1], width: hit[2], height: hit[3], rx: 12 }), kids);
+}
+function bellows(x, y, w, h) { const lines = []; for (let i = 1; i < 6; i++) lines.push(S("line", { x1: x + 2, x2: x + w - 2, y1: y + i * h / 6, y2: y + i * h / 6, stroke: "#c9c7bf", "stroke-width": 1 })); return S("g", null, S("rect", { class: "hw", x, y, width: w, height: h, rx: 4 }), lines); }
+
+/* ---------- IRMS schematic ---------- */
+function drawIRMS() {
+  const g = GASES[state.gas], dual = g.route === "dual";
+  const svg = S("svg", { viewBox: "0 0 1160 380", role: "group", "aria-label": "Schematic of a gas source isotope ratio mass spectrometer, with seven clickable parts, set up for " + g.chip });
+  svg.appendChild(S("g", { "aria-hidden": "true" }, T(16, 34, "Thermo MAT 253", "t-title"), T(16, 54, "Gas source IRMS", "t-sub"), T(16, 72, "The sample goes in as a gas", "t-note")));
+  svg.appendChild(S("g", { class: "shared", "aria-hidden": "true" }, S("path", { class: "flight", d: "M596 270 L690 270 A140 140 0 0 0 830 130 L830 96" })));
+  // routes from the extraction line to each inlet
+  svg.appendChild(S("g", { class: "route" + (dual ? "" : " off"), "aria-hidden": "true" }, pipe("M240 228 V93 H272", dual)));
+  svg.appendChild(S("g", { class: "route" + (dual ? " off" : ""), "aria-hidden": "true" }, pipe("M240 228 V340 H304 V300", !dual)));
+
+  svg.appendChild(part("extract", [10, 150, 236, 226], [
+    plabel(22, 172, 1, "Extraction line", g.method),
+    g.laser ? [S("rect", { class: "hw-w", x: 30, y: 194, width: 56, height: 20, rx: 4 }), TM(58, 208, "CO₂ laser", "p-small"), S("path", { class: "heat", d: "M58 214 V276" })]
+            : S("path", { class: "heat", d: zigzag(34, 303, 82, 3.5, 6) }),
+    S("rect", { class: "hw", x: 28, y: 244, width: 60, height: 50, rx: 8 }),
+    S("rect", { x: 46, y: 240, width: 24, height: 6, rx: 2, fill: "#dbe8f8", stroke: "#52514e", "stroke-width": 1 }),
+    S("rect", { x: 50, y: 278, width: 16, height: 8, rx: 1.5, fill: "#52514e" }),
+    TM(58, 326, g.reagent, "p-small"),
+    g.key === "H2" ? pipe("M80 244 V228 H178 V290 H190", true) : [
+      S("rect", { class: "ln2", x: 110, y: 262, width: 48, height: 62, rx: 6 }),
+      pipe("M80 244 V228 H120 V300 A14 14 0 0 0 148 300 V228 H178 V290 H190", true),
+      TM(134, 340, "LN₂ trap", "p-small")],
+    S("circle", { class: "hw-line", cx: 206, cy: 290, r: 16 }), S("circle", { class: "hw-line", cx: 206, cy: 290, r: 9 }),
+    pipe("M222 290 H232 V228 H240", true),
+    TM(206, 322, "GC", "p-small")
+  ]));
+
+  svg.appendChild(part("dual", [252, 10, 232, 186], [
+    plabel(262, 30, 2, "Dual inlet", "sample against reference"),
+    bellows(272, 62, 44, 62), bellows(334, 62, 44, 62),
+    TM(294, 140, "sample", "p-small"), TM(356, 140, "reference", "p-small"),
+    S("path", { class: "hw-line" + (dual ? " alt-a" : ""), d: "M294 124 V160 H426" }),
+    S("path", { class: "hw-line" + (dual ? " alt-b" : ""), d: "M356 124 V168 H426" }),
+    S("rect", { class: "hw-w", x: 426, y: 151, width: 30, height: 26, rx: 4 }),
+    TM(441, 168.5, "⇄", "box-t"),
+    TM(441, 143, "changeover valve", "p-small"),
+    pipe("M456 164 H476 V262 H512", dual)
+  ]));
+
+  svg.appendChild(part("cf", [252, 206, 232, 170], [
+    plabel(262, 228, 3, "Continuous flow", "helium carrier"),
+    S("circle", { class: "hw", cx: 276, cy: 300, r: 14 }), TM(276, 304, "He", "box-t"),
+    pipe("M290 300 H321", !dual),
+    S("circle", { class: "hw-line", cx: 336, cy: 300, r: 15 }), S("circle", { class: "hw-line", cx: 336, cy: 300, r: 8 }),
+    TM(336, 330, "GC", "p-small"),
+    pipe("M351 300 H372 V312 H392", !dual),
+    S("path", { class: "hw-line", d: "M386 290 V320 H406 V290" }),
+    TM(396, 342, "open split", "p-small"),
+    S("rect", { class: "hw-w", x: 422, y: 306, width: 28, height: 16, rx: 3 }), TM(436, 317.5, "ref", "p-small"),
+    pipe("M398 314 V280 H512", !dual), pipe("M436 306 V280", !dual)
+  ]));
+
+  svg.appendChild(part("source", [494, 194, 120, 130], [
+    plabel(504, 216, 4, "Ion source", "electron impact"),
+    S("rect", { class: "hw", x: 512, y: 240, width: 78, height: 60, rx: 6 }),
+    S("path", { class: "heat", d: zigzag(530, 250, 572, 3, 6) }),
+    S("path", { class: "heat", d: "M551 255 V292", style: "stroke-width:1.2", opacity: 0.75 }),
+    S("path", { class: "hw-line", d: "M596 252 V264 M596 276 V288 M602 252 V264 M602 276 V288 M608 252 V264 M608 276 V288", style: "stroke-width:2" }),
+    TM(551, 316, "filament", "p-small")
+  ]));
+
+  svg.appendChild(part("magnet", [622, 134, 256, 190], [
+    plabel(636, 200, 5, "Magnet", "bends by mass"),
+    S("path", { class: "magnet", d: sector(690, 130, 104, 176, 0, 90) })
+  ]));
+
+  const ms = g.beams.map(b => b.m), m0 = Math.min(...ms), m1 = Math.max(...ms);
+  const xs = g.beams.map(b => r1(791 + 120 * (b.m - m0) / (m1 - m0)));
+  svg.appendChild(part("cups", [632, 10, 292, 120], [
+    plabel(640, 42, 6, "Faraday cups", "one cup per mass"),
+    xs.map(x => S("path", { class: "hw-line", d: "M" + x + " 56 V44" })),
+    S("path", { class: "hw-line", d: "M" + xs[0] + " 44 H930" }),
+    g.beams.map((b, i) => [S("path", { class: "cup on", d: "M" + (xs[i] - 10) + " 78 V56 H" + (xs[i] + 10) + " V78" }), TM(xs[i], 71.5, b.m, "cup-t")])
+  ]));
+
+  svg.appendChild(part("ratio", [926, 10, 230, 186], [
+    S("rect", { class: "hw-w", x: 930, y: 30, width: 58, height: 28, rx: 6 }),
+    [940, 955, 970].map(x => S("path", { class: "hw-line", d: "M" + x + " 37 L" + (x + 10) + " 44 L" + x + " 51 Z", style: "stroke-width:1.2" })),
+    S("path", { class: "hw-line", d: "M988 44 H1010" }),
+    S("rect", { class: "hw-w", x: 1010, y: 16, width: 140, height: 118, rx: 8 }),
+    T(1022, 36, "vs reference gas", "p-small"),
+    g.ratios.map((r, i) => T(1022, 60 + i * 21, r[0] + "  →  " + r[1], "box-t")),
+    g.extra ? T(1022, 60 + g.ratios.length * 21, g.extra, "box-t strong") : null,
+    plabel(1018, 160, 7, "Ratios", "current to δ values")
+  ]));
+
+  // ion beams on top
+  const beams = S("g", { class: "shared", "aria-hidden": "true" });
+  beams.appendChild(S("g", null, ionPath("M556 270 L690 270 A140 140 0 0 0 830 130", 4)));
+  g.beams.forEach((b, i) => beams.appendChild(S("g", null, ionPath("M830 130 L" + xs[i] + " 80", beamWidth(b.ab)))));
+  svg.appendChild(beams);
+  return svg;
+}
+
+/* ---------- MC-ICP-MS schematic ---------- */
+function drawMC() {
+  const e = ELS[state.el];
+  const svg = S("svg", { viewBox: "0 0 1160 380", role: "group", "aria-label": "Schematic of a multicollector ICP mass spectrometer, with nine clickable parts, set up for " + e.name + " isotopes" });
+  const defs = S("defs", null, S("radialGradient", { id: "plasmaG", cx: "0.3", cy: "0.5", r: "0.75" },
+    S("stop", { offset: "0", "stop-color": "#fff7d6" }), S("stop", { offset: "0.45", "stop-color": "#f8c45c" }), S("stop", { offset: "1", "stop-color": "#eb6834", "stop-opacity": "0.85" })));
+  svg.appendChild(defs);
+  svg.appendChild(S("g", { "aria-hidden": "true" }, T(16, 34, "Thermo Neptune Plus", "t-title"), T(16, 54, "MC-ICP-MS", "t-sub"), T(16, 72, "The sample goes in as a liquid", "t-note")));
+  const ionD = "M452 280 L630 280 A100 100 0 0 0 730 180 A100 100 0 0 1 830 80 L850 80";
+  svg.appendChild(S("g", { class: "shared", "aria-hidden": "true" }, S("path", { class: "flight", d: ionD }),
+    S("path", { class: "guide", d: "M86 362 H150" }), arrowHead(158, 362, "right"), TM(122, 354, "dilute HNO₃", "p-small"),
+    S("path", { class: "guide", d: "M1010 150 V176 H1096 V190" }), arrowHead(1096, 196, "down")));
+
+  svg.appendChild(part("chem", [8, 136, 144, 244], [
+    plabel(20, 154, 1, "Chemistry", "dissolve, purify"),
+    S("rect", { x: 18, y: 292, width: 30, height: 6, rx: 2, fill: "#e6e4dc", stroke: "#52514e", "stroke-width": 1.2 }),
+    S("rect", { class: "hw-w", x: 20, y: 298, width: 26, height: 40, rx: 5 }), S("rect", { class: "liquid", x: 21.5, y: 318, width: 23, height: 18.5, rx: 3 }),
+    TM(33, 356, "HF–HNO₃", "p-small"),
+    S("path", { class: "guide", d: "M33 288 C33 236 42 206 50 203" }),
+    S("rect", { class: "hw-w", x: 54, y: 192, width: 36, height: 20, rx: 3 }), S("rect", { class: "liquid", x: 55.5, y: 200, width: 33, height: 10.5 }),
+    S("rect", { x: 64, y: 212, width: 16, height: 104, fill: "#f6f5f1", stroke: "#52514e", "stroke-width": 1.4 }),
+    S("rect", { x: 65.4, y: 246, width: 13.2, height: 66, fill: "#e7dcc6" }),
+    S("path", { class: "hw", d: "M64 316 L72 328 L80 316 Z" }),
+    S("circle", { class: "liquid", cx: 72, cy: 338, r: 3 }),
+    S("rect", { class: "hw-w", x: 60, y: 348, width: 24, height: 24, rx: 3 }), S("rect", { class: "liquid", x: 61.5, y: 360, width: 21, height: 10.5, rx: 2 }),
+    T(88, 282, "resin", "p-small")
+  ]));
+
+  svg.appendChild(part("neb", [156, 136, 134, 244], [
+    plabel(166, 154, 2, "Nebulizer", "liquid to mist"),
+    S("rect", { class: "hw-w", x: 166, y: 340, width: 24, height: 32, rx: 3 }), S("rect", { class: "liquid", x: 167.5, y: 352, width: 21, height: 18.5, rx: 2 }),
+    S("path", { class: "hw-line", d: "M178 356 V280 H214", style: "stroke-width:1.2" }),
+    S("path", { class: "hw-w", d: "M214 274 L238 277 L238 283 L214 286 Z" }),
+    S("path", { class: "hw-line", d: "M226 320 V286", style: "stroke-width:1.2" }), TM(226, 334, "Ar", "p-small"),
+    S("circle", { class: "hw", cx: 264, cy: 280, r: 24 }),
+    S("path", { class: "guide", d: "M252 280 A12 12 0 1 1 264 292", style: "stroke-width:1" }),
+    [[246, 276], [251, 285], [258, 272], [270, 279], [276, 287], [281, 273]].map(p => S("circle", { cx: p[0], cy: p[1], r: 1.7, fill: "#7fb0e6" })),
+    S("path", { class: "hw-line", d: "M264 304 V322" }), TM(264, 334, "drain", "p-small"),
+    pipe("M288 280 H316", true)
+  ]));
+
+  svg.appendChild(part("plasma", [294, 136, 140, 216], [
+    plabel(300, 154, 3, "Plasma", "atoms to ions"),
+    TM(392, 250, "6,000–10,000 K", "p-small"),
+    S("rect", { x: 300, y: 264, width: 86, height: 32, rx: 3, fill: "#fbfaf7", stroke: "#52514e", "stroke-width": 1.4 }),
+    S("rect", { class: "hw-w", x: 308, y: 270, width: 78, height: 20 }),
+    S("rect", { class: "hw-w", x: 316, y: 276, width: 70, height: 8 }),
+    S("path", { class: "hw-line", d: "M326 312 V296", style: "stroke-width:1.2" }), TM(326, 326, "Ar", "p-small"),
+    S("path", { d: "M384 266 C410 266 438 274 448 280 C438 286 410 294 384 294 Z", fill: "url(#plasmaG)" }),
+    [360, 368, 376].map(x => S("ellipse", { cx: x, cy: 280, rx: 3.2, ry: 21, fill: "none", stroke: "#b0773a", "stroke-width": 2 })),
+    TM(368, 316, "RF coil", "p-small")
+  ]));
+
+  svg.appendChild(part("cones", [436, 186, 62, 186], [
+    plabel(440, 208, 4, "Cones", "vacuum"),
+    S("path", { class: "hw-line", d: "M452 254 L464 276 M452 306 L464 284", style: "stroke-width:4" }),
+    S("path", { class: "hw-line", d: "M474 262 L486 277 M474 298 L486 283", style: "stroke-width:3" }),
+    S("line", { x1: 468, x2: 468, y1: 338, y2: 362, stroke: "#c9c7bf", "stroke-width": 1 }),
+    T(463, 354, "air", "p-small", { "text-anchor": "end" }), T(473, 354, "vac.", "p-small")
+  ]));
+
+  svg.appendChild(part("slit", [502, 136, 102, 200], [
+    plabel(512, 154, 5, "Lenses, slit", "resolution"),
+    [512, 524, 536].map(x => [S("rect", { x: x - 2, y: 262, width: 4, height: 12, fill: "#52514e" }), S("rect", { x: x - 2, y: 286, width: 4, height: 12, fill: "#52514e" })]),
+    S("rect", { x: 563.5, y: 252, width: 5, height: 25, fill: "#0b0b0b" }), S("rect", { x: 563.5, y: 283, width: 5, height: 25, fill: "#0b0b0b" }),
+    TM(566, 324, "slit", "p-small")
+  ]));
+
+  const pm = pt(630, 180, 72, 45), pp = pt(630, 180, 128, 45);
+  svg.appendChild(part("esa", [636, 186, 140, 180], [
+    plabel(652, 334, 6, "ESA", "filters by energy"),
+    S("path", { class: "esa", d: arc(630, 180, 86, 80, 10) }), S("path", { class: "esa", d: arc(630, 180, 114, 80, 10) }),
+    TM(pm[0], pm[1] + 4, "−", "box-t strong"), TM(pp[0], pp[1] + 4, "+", "box-t strong")
+  ]));
+
+  svg.appendChild(part("mag", [612, 28, 220, 154], [
+    plabel(624, 78, 7, "Magnet", "sorts by mass"),
+    S("path", { class: "magnet", d: sector(830, 180, 64, 136, 180, 270) })
+  ]));
+
+  const active = new Map(e.beams.map(b => [b.k, b]));
+  const cupY = k => 80 + (k - 4) * 15;
+  svg.appendChild(part("fc", [860, 0, 176, 182], [
+    plabel(870, 154, 8, "Faraday cups", "measured together"),
+    [0, 1, 2, 3, 4, 5, 6, 7, 8].map(k => S("path", { class: "cup " + (active.has(k) ? "on" : "idle"), d: "M984 " + (cupY(k) - 6) + " H1002 V" + (cupY(k) + 6) + " H984" })),
+    e.beams.map(b => T(1008, cupY(b.k) + 4, b.sp, "iso-t"))
+  ]));
+
+  svg.appendChild(part("sbb", [1034, 188, 124, 130], [
+    S("rect", { class: "hw-w", x: 1040, y: 198, width: 112, height: 60, rx: 8 }),
+    [["std", 1050, false], ["sample", 1082, true], ["std", 1114, false]].map(b => [S("rect", { x: b[1], y: 208, width: 28, height: 18, rx: 3, fill: b[2] ? "#e3eefb" : "#f3f2ee", stroke: "#52514e", "stroke-width": 1 }), TM(b[1] + 14, 220.5, b[0] === "sample" ? "smp" : b[0], "p-small")]),
+    TM(1096, 246, e.delta, "box-t strong"),
+    plabel(1040, 288, 9, "Bracketing", e.stdShort)
+  ]));
+
+  const beams = S("g", { class: "shared", "aria-hidden": "true" });
+  beams.appendChild(S("g", null, ionPath(ionD, 4)));
+  e.beams.forEach(b => beams.appendChild(S("g", null, ionPath("M850 80 L984 " + cupY(b.k), beamWidth(b.ab)))));
+  svg.appendChild(beams);
+  return svg;
+}
+
+/* ---------- comparison ---------- */
+function drawDiff() {
+  const cols = ["Sample", "Goes in as", "Ionization", "Energy filter", "Mass filter", "Detection", "Bias correction"];
+  const diff = [false, true, true, true, false, false, true];
+  const rows = [
+    { name: "Gas source IRMS", sub: "Thermo MAT 253", cells: [["Rock, mineral", "or water"], ["Pure gas", "O₂, SF₆, CH₃Cl, H₂"], ["Electron impact", "hot filament"], null, ["Magnet", "sorts by mass"], ["Faraday cups", "one per mass"], ["Reference gas", "measured alongside"]] },
+    { name: "MC-ICP-MS", sub: "Thermo Neptune Plus", cells: [["Rock", "powdered"], ["Acid solution", "K or Rb in HNO₃"], ["Argon plasma", "6,000–10,000 K"], ["ESA", "energy focusing"], ["Magnet", "sorts by mass"], ["Faraday cups", "measured together"], ["Bracketing", "SRM 3141a, SRM 984"]] }
+  ];
+  const x0 = 150, cw = 128, gap = 16, top = 44, rh = 62, rg = 26;
+  const svg = S("svg", { viewBox: "0 0 1160 " + (top + 2 * rh + rg + 12), role: "img", "aria-label": "Side by side steps of the two instruments. They differ in how the sample goes in, how it is ionized, whether an energy filter is needed, and how instrument bias is corrected. Both use a magnet and Faraday cups." });
+  cols.forEach((c, i) => svg.appendChild(TM(x0 + i * (cw + gap) + cw / 2, 26, c, "cell-n")));
+  rows.forEach((r, ri) => {
+    const y = top + ri * (rh + rg);
+    svg.appendChild(T(12, y + rh / 2 - 2, r.name, "p-name"));
+    svg.appendChild(T(12, y + rh / 2 + 14, r.sub, "p-sub"));
+    r.cells.forEach((c, i) => {
+      const x = x0 + i * (cw + gap);
+      if (!c) {
+        svg.appendChild(S("rect", { x, y, width: cw, height: rh, rx: 10, fill: "none", stroke: "#c3c2b7", "stroke-width": 1.2, "stroke-dasharray": "4 4" }));
+        svg.appendChild(TM(x + cw / 2, y + rh / 2 + 4, "not needed", "cell-n"));
+      } else {
+        svg.appendChild(S("rect", { x, y, width: cw, height: rh, rx: 10, fill: diff[i] ? "#eef4fc" : "#f3f2ee", stroke: diff[i] ? "#2a78d6" : "#e1e0d9", "stroke-width": diff[i] ? 1.6 : 1 }));
+        svg.appendChild(TM(x + cw / 2, y + 27, c[0], "cell-t"));
+        svg.appendChild(TM(x + cw / 2, y + 44, c[1], "cell-s"));
+      }
+      if (i < cols.length - 1) svg.appendChild(S("path", { d: "M" + (x + cw + 5) + " " + (y + rh / 2 - 5) + " L" + (x + cw + 11) + " " + (y + rh / 2) + " L" + (x + cw + 5) + " " + (y + rh / 2 + 5), fill: "none", stroke: "#9a988f", "stroke-width": 1.6, "stroke-linecap": "round", "stroke-linejoin": "round" }));
+    });
+  });
+  return svg;
+}
+const CMP_ROWS = [
+  ["What goes in", "A purified gas, such as O₂, SF₆, CH₃Cl or H₂", "One purified element in dilute nitric acid"],
+  ["Typical elements", "H, C, N, O, S and Cl, the light elements that form simple gases", "Metals such as K, Rb, Mg, Fe and Zn"],
+  ["Making ions", "Electron impact, which ionizes a small fraction of the molecules", "An argon plasma at 6,000 to 10,000 K, which ionizes nearly every K or Rb atom"],
+  ["Energy spread", "Narrow, so one magnet is enough", "Broad, so an electrostatic analyzer works with the magnet"],
+  ["What the cups see", "Molecules with different isotope combinations, like ¹⁶O¹⁸O", "Single atoms, like ⁴¹K⁺"],
+  ["Main interferences", "Other gases at the same mass, like NF⁺ on mass 33, removed before the inlet", "Argon-based ions and isobars, like ⁴⁰Ar¹H⁺ on ⁴¹K or ⁸⁷Sr on ⁸⁷Rb, handled by resolution, a cooler plasma or chemistry"],
+  ["Correcting bias", "The sample is compared with a reference gas, alternating in the dual inlet or as pulses in continuous flow", "Each sample is bracketed by runs of a standard"],
+  ["In my work", "H, O, S and Cl isotopes, and the extraction lines that feed them", "K isotopes on a Neptune Plus, with Rb in proposed experiments"]
+];
+function renderCmp() {
+  stage.innerHTML = "";
+  const fig = document.createElement("figure"); fig.className = "cmp-fig";
+  fig.appendChild(drawDiff());
+  const cap = document.createElement("figcaption"); cap.textContent = "Blue outlines mark the steps where the two instruments differ. Both end with a magnet and Faraday cups."; fig.appendChild(cap);
+  stage.appendChild(fig);
+  const wrap = document.createElement("div"); wrap.className = "cmp-wrap";
+  wrap.innerHTML = '<table class="cmp"><caption class="sr-only">Gas source IRMS compared with MC-ICP-MS</caption><thead><tr><th scope="col"></th><th scope="col">Gas source IRMS</th><th scope="col">MC-ICP-MS</th></tr></thead><tbody>' +
+    CMP_ROWS.map(r => '<tr><th scope="row">' + r[0] + '</th><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>').join("") + '</tbody></table>';
+  stage.appendChild(wrap);
+  panel.innerHTML = '<div class="pbox"><div class="ptext"><p class="lead">The same physics sorts the ions in both instruments. A magnet bends lighter ions more than heavier ones, and Faraday cups catch each beam. The difference is everything before that, and it decides which elements each instrument can measure.</p><p>Light elements become simple gases that can be purified on a vacuum line and ionized gently, so every ion starts with about the same energy. Metals like potassium stay in solution until an argon plasma tears them into ions, which leave with a spread of energies that the instrument has to correct for, here with an electrostatic analyzer.</p></div>' +
+    flags({ own: "My work row (CV).", pub: "Interference examples, " + ref("rumble") + " and " + ref("zhang") + ".", con: "Comparison." }) + '</div>';
+}
+
+/* ---------- charts ---------- */
+function showTipAt(x, y, html) { tip.innerHTML = html; tip.hidden = false; const half = tip.offsetWidth / 2; tip.style.left = Math.max(half + 6, Math.min(window.innerWidth - half - 6, x)) + "px"; tip.style.top = Math.max(tip.offsetHeight + 16, y) + "px"; }
+const fmtPct = v => (v >= 10 ? (Math.round(v * 10) / 10).toFixed(1) : +v.toPrecision(3)) + "%";
+function drawBeamChart(fig) {
+  const host = fig.querySelector(".ch-body"); host.innerHTML = "";
+  const c = cur(), rows = c.beams.filter(b => b.ab != null);
+  const W = Math.max(280, host.clientWidth || 420), rowH = 30, m = { l: 112, r: 16, t: 6, b: 24 };
+  const H = m.t + rows.length * rowH + m.b, pw = W - m.l - m.r;
+  const lo = Math.min(0, Math.floor(Math.log10(Math.min(...rows.map(b => b.ab))))), hi = 2;
+  const X = v => m.l + (Math.log10(v) - lo) / (hi - lo) * pw;
+  const what = state.inst === "irms" ? c.chip : c.name;
+  const s = S("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": "Dot plot on a log scale of the share of " + what + " in each collected beam: " + rows.map(b => "mass " + b.m + " " + fmtPct(b.ab)).join(", ") });
+  for (let d = lo; d <= hi; d++) {
+    const x = X(Math.pow(10, d));
+    s.appendChild(S("line", { x1: x, x2: x, y1: m.t, y2: m.t + rows.length * rowH, stroke: d === lo ? "#c3c2b7" : "#e1e0d9", "stroke-width": 1 }));
+    s.appendChild(S("text", { x, y: H - 6, "text-anchor": "middle", class: "svg-tick" }, (d >= 0 ? Math.pow(10, d) : Math.pow(10, d).toFixed(-d)) + "%"));
+  }
+  rows.forEach((b, i) => {
+    const y = m.t + i * rowH + rowH / 2, x = X(b.ab);
+    const gEl = S("g", { tabindex: "0", "aria-label": "Mass " + b.m + ", " + b.sp + ", " + fmtPct(b.ab) });
+    gEl.appendChild(S("rect", { x: 0, y: y - rowH / 2, width: W, height: rowH, fill: "transparent" }));
+    gEl.appendChild(S("text", { x: m.l - 12, y: y + 4, "text-anchor": "end", class: "svg-lab" }, S("tspan", { class: "svg-strong" }, String(b.m)), "  " + b.sp));
+    gEl.appendChild(S("circle", { cx: x, cy: y, r: 5, fill: "#2a78d6", stroke: "#ffffff", "stroke-width": 2 }));
+    const right = x > W - m.r - 54;
+    gEl.appendChild(S("text", { x: right ? x - 10 : x + 10, y: y + 4, "text-anchor": right ? "end" : "start", class: "svg-val" }, fmtPct(b.ab)));
+    const show = ev => { const r = gEl.getBoundingClientRect(); showTipAt(ev && ev.clientX ? ev.clientX : r.left + r.width / 2, (ev && ev.clientY ? ev.clientY : r.top) - 4, "<b>Mass " + b.m + "</b> · " + b.sp + "<br>" + fmtPct(b.ab) + " of the " + (state.inst === "irms" ? c.chip : c.name)); };
+    gEl.addEventListener("pointermove", show); gEl.addEventListener("focus", () => show());
+    gEl.addEventListener("pointerleave", () => tip.hidden = true); gEl.addEventListener("blur", () => tip.hidden = true);
+    s.appendChild(gEl);
+  });
+  host.appendChild(s);
+  const t = document.createElement("div"); t.className = "sr-only";
+  t.innerHTML = "<table><caption>Beam shares</caption><tr><th>Mass</th><th>Species</th><th>Share</th></tr>" + rows.map(b => "<tr><td>" + b.m + "</td><td>" + b.sp + "</td><td>" + fmtPct(b.ab) + "</td></tr>").join("") + "</table>";
+  host.appendChild(t);
+}
+function erf(x) { const s = Math.sign(x); x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x); const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return s * y; }
+function drawEdgeChart(fig) {
+  const host = fig.querySelector(".ch-body"); host.innerHTML = "";
+  const I = ELS[state.el].interf;
+  const wA = I.mA / I.R * 1000, sg = wA / 3.29, dmu = I.d * 1000;
+  const Phi = z => 0.5 * (1 + erf(z / Math.SQRT2));
+  const fA = x => Phi((x - wA / 2) / sg), fB = x => I.rel * Phi((x - (dmu + wA / 2)) / sg);
+  const W = Math.max(280, host.clientWidth || 420), H = 232, m = { l: 34, r: 12, t: 12, b: 42 }, pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const X = v => m.l + (v - I.lo) / (I.hi - I.lo) * pw, ymax = 1.45, Y = v => m.t + ph - v / ymax * ph;
+  const C = { a: "#2a78d6", b: "#eb6834", s: "#0b0b0b" };
+  fig.querySelector(".ch-legend").innerHTML = '<span><i style="border-color:' + C.a + '"></i>' + I.a + '</span><span><i style="border-color:' + C.b + '"></i>' + I.b + '</span><span><i style="border-color:' + C.s + '"></i>Sum in the cup</span>';
+  const s = S("svg", { viewBox: "0 0 " + W + " " + H, role: "img", "aria-label": I.key === "K" ? "Line chart of the leading edge of the mass 41 peak at high resolution. 41K enters the cup 8.4 thousandths of a mass unit before argon hydride, leaving a clean window about 3.8 thousandths wide where 41K is measured." : "Line chart of the leading edges of 87Rb and 87Sr at high resolution. The two edges coincide, so no magnet setting separates them." });
+  const win = [wA, dmu];
+  if (win[1] > win[0]) {
+    s.appendChild(S("rect", { x: X(win[0]), y: m.t, width: X(win[1]) - X(win[0]), height: ph, fill: "rgba(42,120,214,0.10)" }));
+    s.appendChild(S("text", { x: (X(win[0]) + X(win[1])) / 2, y: m.t + 14, "text-anchor": "middle", class: "svg-lab svg-strong" }, "measure here"));
+    s.appendChild(S("text", { x: (X(win[0]) + X(win[1])) / 2, y: m.t + 29, "text-anchor": "middle", class: "svg-lab" }, "≈ 0.004 u"));
+  }
+  [0, 0.5, 1].forEach(v => { s.appendChild(S("line", { x1: m.l, x2: m.l + pw, y1: Y(v), y2: Y(v), stroke: v === 0 ? "#c3c2b7" : "#e1e0d9", "stroke-width": 1 })); s.appendChild(S("text", { x: m.l - 6, y: Y(v) + 3.5, "text-anchor": "end", class: "svg-tick" }, v)); });
+  for (let t = Math.ceil(I.lo / 2) * 2; t <= I.hi; t += 2) s.appendChild(S("text", { x: X(t), y: m.t + ph + 15, "text-anchor": "middle", class: "svg-tick" }, t));
+  s.appendChild(S("text", { x: m.l + pw / 2, y: H - 6, "text-anchor": "middle", class: "svg-lab" }, "Magnet setting, thousandths of a mass unit"));
+  const N = 160, xs = Array.from({ length: N + 1 }, (_, i) => I.lo + (I.hi - I.lo) * i / N);
+  const line = (f, col, w) => S("path", { d: xs.map((x, i) => (i ? "L" : "M") + X(x).toFixed(1) + " " + Y(f(x)).toFixed(1)).join(" "), fill: "none", stroke: col, "stroke-width": w, "stroke-linejoin": "round", "stroke-linecap": "round" });
+  s.appendChild(line(x => fA(x) + fB(x), C.s, 2)); s.appendChild(line(fA, C.a, 2)); s.appendChild(line(fB, C.b, 2));
+  if (!(win[1] > win[0])) s.appendChild(S("text", { x: X(I.hi) - 4, y: Y(0.45), "text-anchor": "end", class: "svg-lab svg-strong" }, "no clean window"));
+  const cross = S("line", { x1: 0, x2: 0, y1: m.t, y2: m.t + ph, stroke: "#c3c2b7", "stroke-width": 1, visibility: "hidden" }); s.appendChild(cross);
+  const hit = S("rect", { x: m.l, y: m.t, width: pw, height: ph, fill: "transparent" }); s.appendChild(hit);
+  hit.addEventListener("pointermove", ev => {
+    const r = s.getBoundingClientRect(), sx = (ev.clientX - r.left) * (W / r.width);
+    const x = Math.max(I.lo, Math.min(I.hi, I.lo + (sx - m.l) / pw * (I.hi - I.lo)));
+    cross.setAttribute("x1", X(x)); cross.setAttribute("x2", X(x)); cross.setAttribute("visibility", "visible");
+    showTipAt(ev.clientX, ev.clientY - 6, "<b>" + (x >= 0 ? "+" : "") + x.toFixed(1) + "</b> thousandths<br>" + I.a + " " + fA(x).toFixed(2) + "<br>" + I.b + " " + fB(x).toFixed(2) + "<br>Sum " + (fA(x) + fB(x)).toFixed(2));
+  });
+  hit.addEventListener("pointerleave", () => { cross.setAttribute("visibility", "hidden"); tip.hidden = true; });
+  host.appendChild(s);
+  const t = document.createElement("div"); t.className = "sr-only";
+  t.innerHTML = "<table><caption>Signal by magnet setting</caption><tr><th>Setting</th><th>" + I.a + "</th><th>" + I.b + "</th><th>Sum</th></tr>" + [I.lo, 0, 2, 4, 6, 8, 10, 12, 14].filter(v => v >= I.lo && v <= I.hi).map(v => "<tr><td>" + v + "</td><td>" + fA(v).toFixed(2) + "</td><td>" + fB(v).toFixed(2) + "</td><td>" + (fA(v) + fB(v)).toFixed(2) + "</td></tr>").join("") + "</table>";
+  host.appendChild(t);
+}
+function chartHtml(kind) {
+  const c = cur();
+  if (kind === "beams") {
+    const title = "How big each beam is";
+    const sub = state.inst === "irms" ? "Share of the " + c.chip + " in each collected beam, log scale" : "Share of " + c.name + " in each collected beam, log scale";
+    const cap = state.inst === "irms" ? "Calculated from isotope abundances (NUBASE2020)." : (state.el === "Rb" ? "⁸⁸Sr is a monitor and should be near zero after chemistry. Abundances from NUBASE2020." : "⁴⁰K (0.0117%) is not collected. Abundances from NUBASE2020.");
+    return '<figure class="chart" data-chart="beams"><p class="ch-title">' + title + '</p><p class="ch-sub">' + sub + '</p><div class="ch-body"></div><figcaption>' + cap + '</figcaption></figure>';
+  }
+  const I = ELS[state.el].interf;
+  const title = I.key === "K" ? "Measuring ⁴¹K on the clean edge" : "⁸⁷Sr hides under ⁸⁷Rb";
+  const sub = I.key === "K" ? "Leading edge of the mass 41 peak at high resolution (about 9,000)" : "Leading edges at mass 87, even at high resolution (about 9,000)";
+  const cap = I.key === "K" ? "With a wide collector, each beam makes a flat-topped peak. ⁴¹K is 0.0084 u lighter than ⁴⁰Ar¹H⁺, so it enters the cup first, and the narrow window before the hydride arrives is where ⁴¹K is measured. Hydride size is illustrative." : "⁸⁷Sr is 0.0003 u lighter than ⁸⁷Rb, far less than the width of the peak edge, so no magnet setting separates them. Strontium is removed in the chemistry instead. Strontium size is illustrative.";
+  return '<figure class="chart" data-chart="edge"><p class="ch-title">' + title + '</p><p class="ch-sub">' + sub + '</p><div class="ch-legend"></div><div class="ch-body"></div><figcaption>' + cap + '</figcaption></figure>';
+}
+function drawCharts() { panel.querySelectorAll("figure.chart").forEach(f => f.dataset.chart === "beams" ? drawBeamChart(f) : drawEdgeChart(f)); }
+
+/* ---------- rendering ---------- */
+function renderControls() {
+  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-checked", String(b.dataset.inst === state.inst)));
+  const pick = $("pick");
+  if (state.inst === "irms") pick.innerHTML = '<span class="pick-lab">Gas</span>' + Object.values(GASES).map(g => '<button type="button" class="chip" data-gas="' + g.key + '" aria-pressed="' + (g.key === state.gas) + '"><b>' + g.chip + '</b><span>' + g.el + '</span></button>').join("");
+  else if (state.inst === "mc") pick.innerHTML = '<span class="pick-lab">Element</span>' + Object.values(ELS).map(e => '<button type="button" class="chip" data-el="' + e.key + '" aria-pressed="' + (e.key === state.el) + '"><b>' + e.chip + '</b><span>' + e.name + '</span></button>').join("");
+  else pick.innerHTML = "";
+  $("intro").textContent = state.inst === "irms" ? "Light elements are converted to a simple gas before measurement. Pick a gas to see how the inlet and collectors change, then click any numbered part."
+    : state.inst === "mc" ? "Metals are dissolved, purified and sprayed in as a liquid. Pick an element to see how its interferences are handled, then click any numbered part."
+    : "One instrument takes gas, the other takes liquid. Here is where they part ways.";
+}
+function renderStage() {
+  if (state.inst === "cmp") { renderCmp(); return; }
+  stage.innerHTML = "";
+  const hint = document.createElement("p"); hint.className = "scroll-hint"; hint.textContent = "Scroll sideways to see the whole instrument."; stage.appendChild(hint);
+  const wrap = document.createElement("div"); wrap.className = "schem"; wrap.id = "schem";
+  wrap.appendChild(state.inst === "irms" ? drawIRMS() : drawMC());
+  stage.appendChild(wrap);
+  const foot = document.createElement("div"); foot.className = "schem-foot";
+  foot.innerHTML = '<span class="key"><span><i class="k-ion"></i>Ion beams, thicker for bigger beams</span><span><i class="k-gas"></i>' + (state.inst === "irms" ? "Gas on the move" : "Sample aerosol on the move") + '</span></span><button type="button" class="walk" data-walk="1">Walk through it in order</button>';
+  stage.appendChild(foot);
+  applySel();
+}
+function applySel() {
+  const svg = stage.querySelector(".schem svg"); if (!svg) return;
+  svg.classList.toggle("has-sel", !!state.part);
+  svg.querySelectorAll(".part").forEach(p => {
+    const on = p.dataset.part === state.part;
+    p.classList.toggle("is-sel", on); p.setAttribute("aria-pressed", String(on));
+    if (state.inst === "irms") { const g = GASES[state.gas]; p.classList.toggle("off", (p.dataset.part === "dual" && g.route !== "dual") || (p.dataset.part === "cf" && g.route !== "cf")); }
+  });
+}
+function paras(arr) {
+  return arr.map(p => typeof p === "string" ? "<p>" + p + "</p>" : '<p class="route-note">' + p.note + "</p>").join("");
+}
+function renderPanel(focusTitle) {
+  if (state.inst === "cmp") return;
+  const c = cur(), parts = PARTS();
+  if (!state.part) {
+    const ov = state.inst === "irms" ? IRMS_OVERVIEW : MC_OVERVIEW;
+    panel.innerHTML = '<div class="pbox ov"><h3>' + ov.title + '</h3><div class="ptext"><p class="lead" style="margin-top:6px">' + ov.lead + '</p></div>' +
+      '<ol class="ov-steps" aria-label="Parts in order">' + parts.map(p => '<li><button type="button" data-goto="' + p.id + '"><span class="num">' + p.n + '</span>' + p.title + '</button></li>').join("") + '</ol>' +
+      '<section class="research"><h4>In my work</h4><p>' + ov.mine + '</p></section>' + ov.flags() + '</div>';
+    return;
+  }
+  const i = parts.findIndex(p => p.id === state.part), P = parts[i];
+  const body = P.body(c), mine = P.mine ? P.mine(c) : null;
+  const text = '<div class="ptext"><p class="lead">' + P.lead(c) + '</p>' + paras(body) + (mine ? '<section class="research"><h4>In my work</h4><p>' + mine + '</p></section>' : "") + '</div>';
+  panel.innerHTML = '<div class="pbox"><header class="pbox-head"><span class="num">' + P.n + '</span><div><h3 tabindex="-1" id="pTitle">' + P.title + '</h3><div class="sub">' + P.sub(c) + '</div></div>' +
+    '<div class="pnav"><button type="button" data-goto="' + (i > 0 ? parts[i - 1].id : "") + '"' + (i > 0 ? "" : " disabled") + ' aria-label="Previous part">← Prev</button><button type="button" data-goto="' + (i < parts.length - 1 ? parts[i + 1].id : "") + '"' + (i < parts.length - 1 ? "" : " disabled") + ' aria-label="Next part">Next →</button><button type="button" data-close="1" aria-label="Close and show the overview">×</button></div></header>' +
+    '<div class="pbody' + (P.chart ? " with-chart" : "") + '">' + text + (P.chart ? '<div>' + chartHtml(P.chart) + '</div>' : "") + '</div>' + P.flags(c) + '</div>';
+  drawCharts();
+  if (focusTitle) { const h = $("pTitle"); if (h) h.focus({ preventScroll: true }); }
+}
+function render(opts) { renderControls(); renderStage(); renderPanel(opts && opts.focus); updateHash(); postHeight(); }
+
+/* ---------- actions ---------- */
+function selectPart(id, focus) {
+  if (!PARTS().some(p => p.id === id)) return;
+  state.part = id; applySel(); renderPanel(focus); updateHash(); postHeight();
+}
+function closePart() { const was = state.part; state.part = null; applySel(); renderPanel(); updateHash(); postHeight(); const g = was && stage.querySelector('.part[data-part="' + was + '"]'); if (g) g.focus({ preventScroll: true }); }
+
+document.addEventListener("click", ev => {
+  const t = ev.target;
+  const seg = t.closest(".seg button");
+  if (seg) { if (seg.dataset.inst !== state.inst) { state.inst = seg.dataset.inst; state.part = null; render(); } return; }
+  const gc = t.closest("[data-gas]"); if (gc) { if (gc.dataset.gas !== state.gas) { state.gas = gc.dataset.gas; render(); } return; }
+  const ec = t.closest("[data-el]"); if (ec) { if (ec.dataset.el !== state.el) { state.el = ec.dataset.el; render(); } return; }
+  const pg = t.closest && t.closest(".part"); if (pg) { tip.hidden = true; if (state.part === pg.dataset.part) closePart(); else selectPart(pg.dataset.part); return; }
+  const go = t.closest("[data-goto]"); if (go && go.dataset.goto) { selectPart(go.dataset.goto, true); return; }
+  if (t.closest("[data-close]")) { closePart(); return; }
+  if (t.closest("[data-walk]")) { selectPart(PARTS()[0].id, true); return; }
+});
+document.addEventListener("keydown", ev => {
+  const pg = ev.target.closest && ev.target.closest(".part");
+  if (pg && (ev.key === "Enter" || ev.key === " ")) { ev.preventDefault(); if (state.part === pg.dataset.part) closePart(); else selectPart(pg.dataset.part); return; }
+  if (pg && (ev.key === "ArrowRight" || ev.key === "ArrowLeft")) {
+    ev.preventDefault(); const all = [...stage.querySelectorAll(".part")]; const i = all.indexOf(pg);
+    const n = all[(i + (ev.key === "ArrowRight" ? 1 : all.length - 1)) % all.length]; if (n) n.focus(); return;
+  }
+  if (ev.key === "Escape" && state.part) { ev.preventDefault(); closePart(); }
+});
+
+/* ---------- hash + height ---------- */
+function updateHash() {
+  const p = new URLSearchParams(); p.set("inst", state.inst);
+  if (state.inst === "irms") p.set("gas", state.gas); if (state.inst === "mc") p.set("el", state.el);
+  if (state.part) p.set("part", state.part);
+  try { history.replaceState(null, "", location.pathname + location.search + "#" + p.toString()); } catch (_) {}
+}
+let lastH = 0;
+function postHeight() {
+  if (window.parent === window) return;
+  const h = Math.ceil($("ms").getBoundingClientRect().height + 4);
+  if (Math.abs(h - lastH) < 2) return; lastH = h;
+  try { window.parent.postMessage({ type: "gg-ms-height", height: h }, "*"); } catch (_) {}
+}
+let rz; window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { drawCharts(); postHeight(); }, 120); });
+if (window.ResizeObserver) new ResizeObserver(() => postHeight()).observe($("ms"));
+window.addEventListener("load", postHeight);
+
+/* ---------- init ---------- */
+const hp = new URLSearchParams(location.hash.slice(1));
+if (["irms", "mc", "cmp"].includes(hp.get("inst"))) state.inst = hp.get("inst");
+if (GASES[hp.get("gas")]) state.gas = hp.get("gas");
+if (ELS[hp.get("el")]) state.el = hp.get("el");
+if (hp.get("part") && PARTS().some(p => p.id === hp.get("part"))) state.part = hp.get("part");
+render();
+})();
+</script>
+</body>
+</html>
