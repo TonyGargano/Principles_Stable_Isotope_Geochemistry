@@ -6,96 +6,127 @@
 <title>Building the machines</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#faf9f6; --bg0:#fdfcfa; --ink:#20201e; --ink2:#52514e; --ink3:#898781;
-  --rule:#ddd9d1; --grid:#e7e4dd; --accent:#9c4a2f;
-  --metal:#d8d3c9; --ins:#b9b2a5; --gold:#dfbd55; --fluid:#9db8cc; --heat:#cf7a4e;
-  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s7v:#6250d6;
-  --chipbg:#f1efe9;
+:root {
+  color-scheme: light;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink2: #52514e;
+  --muted: #898781;
+  --hair: #e1e0d9;
+  --border: rgba(11,11,11,0.10);
+  --fill: #f3f2ee;
+  --neutral: #e9e8e3;
+  --own: #6f5587;
+  --ion: #2a78d6;
+  --heat: #eb6834;
+  --gold: #d9b64a;
+  --liquid: #cfe1f6;
+  --mfill: #d9d7cf;
+  --metal: #52514e;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s7v: #6f5587;
 }
-@media (prefers-color-scheme: dark){
-  :root{
-    --bg:#191816; --bg0:#201f1c; --ink:#eceae4; --ink2:#c2c0b6; --ink3:#8f8d85;
-    --rule:#3a3833; --grid:#2c2b27; --accent:#d08a6b;
-    --metal:#4c4942; --ins:#5c5748; --gold:#a8873a; --fluid:#4d6b80; --heat:#b5663f;
-    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s7v:#9085e9;
-    --chipbg:#242320;
-  }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: transparent; }
+body {
+  font-family: "Epilogue", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink); font-size: 15px; line-height: 1.45; -webkit-font-smoothing: antialiased;
 }
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{background:var(--bg);color:var(--ink);font-family:'Source Serif 4',Georgia,serif;line-height:1.55;font-size:16.5px}
-.wrap{max-width:1080px;margin:0 auto;padding:36px 16px 48px}
-body.embed .wrap{padding-top:14px}
-.kicker{font-family:'Libre Franklin',sans-serif;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
-h1{font-family:'Libre Franklin',sans-serif;font-weight:700;font-size:clamp(26px,4.5vw,38px);line-height:1.12;margin:0 0 14px}
-h2{font-family:'Libre Franklin',sans-serif;font-weight:700;font-size:20px;margin:36px 0 10px}
-.lede{max-width:72ch;margin:0 0 12px}
-.legend{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px;font-family:'Libre Franklin',sans-serif;font-size:12.5px}
-.legend span{border:1px solid var(--rule);border-radius:999px;padding:3px 11px;background:var(--chipbg);color:var(--ink2)}
-.legend b{color:var(--ink);font-weight:600}
-figure{margin:0}
-.mapfig svg{width:100%;height:auto;display:block}
-figcaption,.cap{font-family:'Libre Franklin',sans-serif;font-size:12.5px;color:var(--ink3);margin-top:8px;line-height:1.45}
-.rail{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 14px}
-.chip{font-family:'Libre Franklin',sans-serif;font-size:13px;font-weight:600;color:var(--ink2);background:var(--chipbg);border:1px solid var(--rule);border-radius:999px;padding:7px 13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:border-color .12s, color .12s}
-.chip:hover{border-color:var(--ink3)}
-.chip[aria-pressed="true"]{border-color:var(--accent);color:var(--ink);box-shadow:inset 0 0 0 1px var(--accent)}
-.dot{width:9px;height:9px;border-radius:50%;flex:none}
-.t-gas{background:var(--s2)} .t-fluid{background:var(--s1)} .t-redox{background:var(--s7v)} .t-sulf{background:var(--s4)} .t-craft{background:var(--s3)}
-.ctrls{display:flex;align-items:center;gap:12px;margin:6px 0 10px;font-family:'Libre Franklin',sans-serif}
-.ctrls button{font-family:inherit;font-size:13px;font-weight:600;border:1px solid var(--rule);background:var(--bg0);color:var(--ink);border-radius:8px;padding:7px 14px;cursor:pointer}
-.ctrls button:hover{border-color:var(--accent)}
-.count{font-size:12.5px;color:var(--ink3)}
-.slide{border:1px solid var(--rule);border-radius:14px;background:var(--bg0);padding:22px 22px 18px;margin-bottom:14px}
-.slide h3{font-family:'Libre Franklin',sans-serif;font-size:21px;font-weight:700;margin:0}
-.tagrow{display:flex;flex-wrap:wrap;gap:7px;margin:9px 0 16px;font-family:'Libre Franklin',sans-serif;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.tag{border-radius:5px;padding:3px 8px;color:var(--ink2);background:var(--chipbg);border:1px solid var(--rule);display:inline-flex;align-items:center;gap:6px}
-.tag .dot{width:8px;height:8px}
-.tag.prov{color:var(--accent);border-color:var(--accent);background:transparent}
-.cols{display:grid;grid-template-columns:minmax(300px,7fr) minmax(280px,5fr);gap:22px;align-items:start}
-@media (max-width:760px){.cols{grid-template-columns:1fr}}
-.cols svg{width:100%;height:auto;display:block}
-.spec{margin:0 0 14px;font-family:'Libre Franklin',sans-serif;font-size:13.5px;border-top:1px solid var(--rule)}
-.spec>div{display:grid;grid-template-columns:118px 1fr;gap:10px;padding:7px 0;border-bottom:1px solid var(--rule)}
-.spec dt{font-weight:700;color:var(--ink2);margin:0}
-.spec dd{margin:0}
-.facts p{margin:0 0 10px;font-size:15px}
-.facts p b{font-family:'Libre Franklin',sans-serif;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
-footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-family:'Libre Franklin',sans-serif;font-size:12.5px;color:var(--ink3);max-width:80ch;line-height:1.5}
+button { font: inherit; color: inherit; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.ap { max-width: 1240px; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px 14px; }
+.ap-head { margin: 0 0 10px; }
+.ap-head h1 { font-size: 22px; font-weight: 500; margin: 0 0 2px; letter-spacing: -0.01em; }
+.ap-head p { margin: 0; color: var(--ink2); font-size: 14px; }
+html.embed .ap-head { display: none; }
+.lede { font-size: 14px; color: var(--ink2); margin: 0 0 8px; max-width: 110ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 4px; }
+.legend span { display: inline-block; font-size: 11.5px; border-radius: 999px; padding: 2px 9px; border: 1px solid var(--hair); color: var(--ink2); background: #fff; }
+.legend b { font-weight: 600; color: var(--ink); }
+h2.sec { font-size: 16px; font-weight: 600; margin: 20px 0 8px; letter-spacing: -0.005em; }
+figure { margin: 0; }
+.mapfig svg { width: 100%; height: auto; display: block; }
+figcaption, .cap { font-size: 12px; color: var(--ink2); margin-top: 6px; line-height: 1.5; }
+
+.rail { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 10px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--hair); background: #fff; border-radius: 999px; padding: 5px 12px; font-size: 13px; cursor: pointer; line-height: 1.2; color: var(--ink); }
+.chip:hover { border-color: var(--ink2); }
+.chip[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+.t-gas { background: var(--s2); } .t-fluid { background: var(--s1); } .t-redox { background: var(--s7v); } .t-sulf { background: var(--s4); } .t-craft { background: var(--s3); }
+.ctrls { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; }
+.ctrls button { border: 1px solid var(--hair); background: #fff; border-radius: 999px; height: 30px; padding: 0 13px; font-size: 12.5px; cursor: pointer; color: var(--ink2); }
+.ctrls button:hover { border-color: var(--ink2); color: var(--ink); }
+.count { font-size: 12.5px; color: var(--muted); margin-left: 6px; }
+
+main#slides { counter-reset: slide; }
+.slide { counter-increment: slide; border: 1px solid var(--hair); background: #fff; border-radius: 14px; padding: 14px 16px 12px; margin-bottom: 12px; }
+.slide h3 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 19px; font-weight: 500; line-height: 1.2; }
+.slide h3::before { content: counter(slide); width: 26px; height: 26px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 13px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; flex: none; font-variant-numeric: tabular-nums; }
+.tagrow { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0 12px; }
+.tag { display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; border-radius: 999px; padding: 1px 8px; border: 1px solid var(--hair); color: var(--ink2); background: #faf9f6; text-transform: uppercase; letter-spacing: .05em; font-weight: 500; }
+.tag .dot { width: 7px; height: 7px; }
+.tag.prov { border-color: var(--hair); color: var(--ink2); background: #fff; }
+.tag.prov.own { border-color: var(--own); color: var(--own); }
+.cols { display: grid; grid-template-columns: minmax(300px, 7fr) minmax(280px, 5fr); gap: 20px; align-items: start; }
+@media (max-width: 760px) { .cols { grid-template-columns: 1fr; } }
+.cols svg { width: 100%; height: auto; display: block; }
+.spec { margin: 0 0 12px; font-size: 13px; border-top: 1px solid var(--hair); }
+.spec > div { display: grid; grid-template-columns: 118px 1fr; gap: 10px; padding: 6px 0; border-bottom: 1px solid #efeee9; }
+.spec dt { font-weight: 600; color: var(--ink2); margin: 0; font-size: 12.5px; }
+.spec dd { margin: 0; }
+.facts p { margin: 0 0 10px; font-size: 14px; }
+.facts p b { font-weight: 600; }
+.research { border-left: 3px solid var(--own); padding: 2px 0 2px 12px; margin: 2px 0 10px; }
+.research h4 { margin: 0 0 4px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--ink2); }
+.research p { margin: 0; font-size: 14px; }
+footer { margin-top: 14px; border-top: 1px solid var(--hair); padding-top: 10px; font-size: 12px; color: var(--muted); max-width: 110ch; line-height: 1.55; }
+footer p { margin: 0; }
+
 /* SVG shared */
-.sv{stroke:var(--ink);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.sv3{stroke:var(--ink);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-.thin{stroke:var(--ink2);fill:none;stroke-width:1.1}
-.lead{stroke:var(--ink3);stroke-width:1;fill:none}
-.lbl{font:12px 'Libre Franklin',sans-serif;fill:var(--ink2)}
-.lblm{font:11.5px 'Libre Franklin',sans-serif;fill:var(--ink3)}
-.lblb{font:700 12px 'Libre Franklin',sans-serif;fill:var(--ink)}
-.coil{stroke:var(--heat);stroke-width:5;stroke-dasharray:0 10;stroke-linecap:round;fill:none}
-.f-metal{fill:var(--metal);stroke:var(--ink);stroke-width:1.6}
-.f-gold{fill:var(--gold);stroke:var(--ink);stroke-width:1.6}
-.f-ins{fill:var(--ins);stroke:var(--ink);stroke-width:1.6}
-.f-fluid{fill:var(--fluid);fill-opacity:.45;stroke:none}
-.f-heat{fill:var(--heat);stroke:none}
-.f-bg{fill:var(--bg0);stroke:var(--ink);stroke-width:1.6}
-.dash{stroke-dasharray:5 5}
-.hot{cursor:pointer}
-.hot rect,.hot circle{transition:stroke-width .1s}
-.hot:hover rect,.hot:focus rect,.hot:hover circle,.hot:focus circle{stroke-width:3}
-.hot:focus{outline:none}
-.field-gas{fill:var(--s2);fill-opacity:.16;stroke:var(--s2);stroke-width:1.6}
-.field-fluid{fill:var(--s1);fill-opacity:.16;stroke:var(--s1);stroke-width:1.6}
-.field-redox{fill:var(--s7v);fill-opacity:.18;stroke:var(--s7v);stroke-width:1.6}
-.field-sulf{fill:var(--s4);fill-opacity:.2;stroke:var(--s4);stroke-width:1.6}
-.field-dead{fill:var(--rule);fill-opacity:.4;stroke:var(--ink3);stroke-width:1;stroke-dasharray:4 4}
-.gridl{stroke:var(--grid);stroke-width:1}
-.axis{stroke:var(--ink3);stroke-width:1.2}
-.c1{fill:var(--s1)} .c2{fill:var(--s2)} .c3{fill:var(--s3)} .c4{fill:var(--s4)}
-.val{font:12px 'Libre Franklin',sans-serif;fill:var(--ink2)}
-.rowlbl{font:12.5px 'Libre Franklin',sans-serif;fill:var(--ink)}
-.ghead{font:700 13px 'Libre Franklin',sans-serif;fill:var(--ink)}
+.sv { stroke: var(--metal); fill: none; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.sv3 { stroke: var(--metal); fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.thin { stroke: var(--metal); fill: none; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+.lead { stroke: #b7b5ac; stroke-width: 1; fill: none; }
+.lbl { font: 11.5px "Epilogue", sans-serif; fill: var(--ink2); }
+.lblm { font: 10.5px "Epilogue", sans-serif; fill: var(--muted); }
+.lblb { font: 600 12.5px "Epilogue", sans-serif; fill: var(--ink); }
+.coil { stroke: var(--heat); stroke-width: 4.5; stroke-dasharray: 0 9; stroke-linecap: round; fill: none; }
+.f-metal { fill: var(--mfill); stroke: var(--metal); stroke-width: 1.3; }
+.f-gold { fill: var(--gold); stroke: var(--metal); stroke-width: 1.3; }
+.f-ins { fill: var(--neutral); stroke: var(--metal); stroke-width: 1.3; }
+.f-fluid { fill: var(--liquid); stroke: none; }
+.f-heat { fill: var(--heat); stroke: none; }
+.f-bg { fill: #fff; stroke: var(--metal); stroke-width: 1.3; }
+.dash { stroke-dasharray: 5 5; }
+.hot { cursor: pointer; }
+.hot rect, .hot circle { transition: stroke-width .1s; }
+.hot:hover rect, .hot:focus rect, .hot:hover circle, .hot:focus circle { stroke-width: 3; }
+.hot:focus { outline: none; }
+.field-gas { fill: var(--s2); fill-opacity: .13; stroke: var(--s2); stroke-width: 1.5; }
+.field-fluid { fill: var(--s1); fill-opacity: .13; stroke: var(--s1); stroke-width: 1.5; }
+.field-redox { fill: var(--s7v); fill-opacity: .15; stroke: var(--s7v); stroke-width: 1.5; }
+.field-sulf { fill: var(--s4); fill-opacity: .16; stroke: var(--s4); stroke-width: 1.5; }
+.field-dead { fill: var(--neutral); fill-opacity: .55; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 4 4; }
+.gridl { stroke: #efeee9; stroke-width: 1; }
+.axis { stroke: #c3c2b7; stroke-width: 1.2; }
+.c1 { fill: var(--s1); } .c2 { fill: var(--s2); } .c3 { fill: var(--s3); } .c4 { fill: var(--s4); }
+.val { font: 11px "Epilogue", sans-serif; fill: var(--ink); font-variant-numeric: tabular-nums; paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; }
+.rowlbl { font: 11.5px "Epilogue", sans-serif; fill: var(--ink2); }
+.ghead { font: 600 12.5px "Epilogue", sans-serif; fill: var(--ink); }
+
+@media (max-width: 700px) {
+  .ap { padding: 14px 12px 10px; border-radius: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hot rect, .hot circle, .chip { transition: none; }
+}
+@media (forced-colors: active) {
+  .hot:hover rect, .hot:focus rect { stroke: Highlight; }
+}
 </style>
 </head>
 <body>
@@ -117,20 +148,20 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
   </defs>
 </svg>
 
-<div class="wrap">
-<header>
-  <p class="kicker">Experimental apparatus</p>
+<div class="ap">
+<header class="ap-head">
   <h1>Building the machines</h1>
-  <p class="lede">Nearly every machine of experimental geochemistry was designed before 1965 and built in-house from steel rod, ceramic tube, spooled wire, and glass. Holloway and Wood wrote their 1988 textbook partly, in their words, &ldquo;to encourage more petrologists and geochemists to become experimentalists&rdquo; (preface, p.&nbsp;ix). The craft they documented, welding your own thermocouples, winding your own furnaces, sealing your own capsules, is thinning out of graduate training even though the raw materials remain cheap and common. That is a loss, because working with common laboratory materials is the fundamentals of the science. A bench of hand-built machines runs every week of the year and answers questions that never reach the queue of a multi-million dollar instrument.</p>
-  <p class="lede">Each panel below is one machine, redrawn by hand from the book with the figure and page cited, its working range and precision as the book lists them, and the reactions it serves on my bench. Gas-melt exchange, fluid-rock reaction, redox control, sulfidation. Nothing here is a reproduction; the drawings are mine, after the book's.</p>
-  <div class="legend">
+  <p>The hand-built apparatus of experimental geochemistry, redrawn from Holloway &amp; Wood (1988) with figure and page cited on every panel.</p>
+</header>
+<p class="lede">Nearly every machine of experimental geochemistry was designed before 1965 and built in-house from steel rod, ceramic tube, spooled wire, and glass. Holloway and Wood wrote their 1988 textbook partly, in their words, &ldquo;to encourage more petrologists and geochemists to become experimentalists&rdquo; (preface, p.&nbsp;ix). The craft they documented, welding your own thermocouples, winding your own furnaces, sealing your own capsules, is thinning out of graduate training even though the raw materials remain cheap and common. That is a loss, because working with common laboratory materials is the fundamentals of the science. A bench of hand-built machines runs every week of the year and answers questions that never reach the queue of a multi-million dollar instrument.</p>
+<p class="lede">Each panel below is one machine, redrawn by hand from the book with the figure and page cited, its working range and precision as the book lists them, and the reactions it serves on my bench. Gas-melt exchange, fluid-rock reaction, redox control, sulfidation. Nothing here is a reproduction; the drawings are mine, after the book's.</p>
+<div class="legend">
     <span><b>Published</b> &middot; design and numbers from the book, original reference cited</span>
     <span><b>Constructed</b> &middot; extends beyond the book, flagged where it does</span>
     <span><b>My bench</b> &middot; apparatus I build and run</span>
   </div>
-</header>
 
-<h2>Where each machine lives in pressure-temperature space</h2>
+<h2 class="sec">Where each machine lives in pressure-temperature space</h2>
 <figure class="mapfig">
 <svg viewBox="0 0 760 470" role="img" aria-label="Pressure-temperature map of experimental machines, adapted from Figure 3.1 of Holloway and Wood 1988">
   <!-- gridlines -->
@@ -209,7 +240,7 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
 <figcaption>Adapted and simplified from Fig. 3.1, p. 19. The book's diagram spans roughly 1 to 3000 kbar; the one-bar markers and the vacuum strip are added here. Grey dashed fields are the high-pressure machines of mantle petrology, covered on pp. 29-36 and outside the scope of this bench. Click a field or marker to open its panel; the ƒO&#8322; toolkit and the maker's bench live in capsules and on benchtops, so they sit in the list below rather than on the map.</figcaption>
 </figure>
 
-<h2>The machines</h2>
+<h2 class="sec">The machines</h2>
 <nav class="rail" aria-label="Apparatus">
   <button class="chip" data-s="s1"><span class="dot t-gas"></span>Quench + gas-mixing furnace</button>
   <button class="chip" data-s="s2"><span class="dot t-gas"></span>Vacuum evaporation furnace</button>
@@ -291,7 +322,7 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
       <div><dt>In the book</dt><dd>entry pp. 18-22; schematic Fig. 3.3, p. 21</dd></div>
     </dl>
     <p><b>What it does.</b> Two feed gases, CO-CO&#8322; or H&#8322;-CO&#8322;, are mixed at set flow ratios and flowed over the sample, fixing ƒO&#8322; through the gas equilibrium (pp. 21-22, 172). A current pulse melts the fine quench wire and the sample drops into a bath, quenching in seconds, with nearly zero iron loss to containers and several samples per run (pp. 19-21).</p>
-    <p><b>On my bench.</b> The book lists one major problem, sodium volatilization above 1,100 &deg;C when ƒO&#8322; sits below QFM (p. 20). That nuisance is precisely the gas-melt exchange I study. Run deliberately, with the loop weighed before and after, the flaw becomes the experiment.</p>
+    <div class="research"><h4>On my bench</h4><p>The book lists one major problem, sodium volatilization above 1,100 &deg;C when ƒO&#8322; sits below QFM (p. 20). That nuisance is precisely the gas-melt exchange I study. Run deliberately, with the loop weighed before and after, the flaw becomes the experiment.</p></div>
   </div>
   </div>
 </article>
@@ -301,7 +332,7 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
   <h3>Vacuum evaporation furnace</h3>
   <div class="tagrow">
     <span class="tag"><span class="dot t-gas"></span>gas-melt &middot; volatility</span>
-    <span class="tag prov">My bench &middot; drawing constructed</span>
+    <span class="tag prov own">My bench &middot; drawing constructed</span>
   </div>
   <div class="cols">
   <figure>
@@ -349,7 +380,7 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
       <div><dt>Provenance</dt><dd>my bench; schematic constructed, not from the book</dd></div>
     </dl>
     <p><b>What it does.</b> Free (Langmuir) evaporation into vacuum. With no returning gas flux, the evaporating surface sets the chemistry, and the escaping vapor carries a kinetic isotope fractionation that the condensed residue records.</p>
-    <p><b>On my bench.</b> Evaporation and condensation of the moderately volatile elements from silicate melts, volatile loss from lunar regolith materials during heating events, and the isotope fractionations those processes leave behind.</p>
+    <div class="research"><h4>On my bench</h4><p>Evaporation and condensation of the moderately volatile elements from silicate melts, volatile loss from lunar regolith materials during heating events, and the isotope fractionations those processes leave behind.</p></div>
   </div>
   </div>
 </article>
@@ -406,7 +437,7 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
       <div><dt>In the book</dt><dd>entry pp. 25-27; schematic Fig. 3.5, p. 26</dd></div>
     </dl>
     <p><b>What it does.</b> The book ranks it the simplest and least expensive of the common high-pressure systems (p. 27). The seal sits outside the furnace, hence cold-seal, so a simple cone seal survives. This is the machine of Tuttle and Bowen's granite melting experiments and the long-standing workhorse of metamorphic and hydrothermal synthesis work (p. 27).</p>
-    <p><b>On my bench.</b> Hydrothermal carbonate synthesis and fluid-rock exchange. The analog apparatus for carbonate-forming fluids in CM chondrites and for the diversity of dolomitizing fluids.</p>
+    <div class="research"><h4>On my bench</h4><p>Hydrothermal carbonate synthesis and fluid-rock exchange. The analog apparatus for carbonate-forming fluids in CM chondrites and for the diversity of dolomitizing fluids.</p></div>
   </div>
   </div>
 </article>
@@ -466,7 +497,7 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
       <div><dt>In the book</dt><dd>entry pp. 22-25; schematic Fig. 3.4, p. 23</dd></div>
     </dl>
     <p><b>What it does.</b> The rocking keeps fluid and rock stirred, and fluid aliquots are drawn at pressure and temperature through the gold filter, so a single run yields a time series of fluid chemistry. An H&#8322; membrane reads or sets ƒO&#8322; (p. 24). Quench takes hours and runs last weeks to months, so it is a machine for fluids, not crystals (p. 24). The Barnes fixed-volume variant samples both liquid and vapor, built for aqueous sulfide work (pp. 24-25).</p>
-    <p><b>On my bench.</b> Evolving fluid chemistry during carbonation and dolomitization, where the fluid itself, not the quenched solid, is the measurement.</p>
+    <div class="research"><h4>On my bench</h4><p>Evolving fluid chemistry during carbonation and dolomitization, where the fluid itself, not the quenched solid, is the measurement.</p></div>
   </div>
   </div>
 </article>
@@ -531,7 +562,7 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
       <div><dt>In the book</dt><dd>entry pp. 27-29; schematic Fig. 3.6, p. 28</dd></div>
     </dl>
     <p><b>What it does.</b> The furnace sits inside the vessel, so pressure and temperature limits are not inversely linked the way they are in a cold-seal. Argon at 5 kbar and 1,000 &deg;C is about as dense as room-temperature water, and its convection is tamed with double windings and vertical operation (p. 29). The machine for volatile solubility in melts and for fluid-melt equilibria needing large fluid volumes (pp. 27-29). The honest caveat, this is the one entry on this page whose pumping system the book concedes is relatively complicated and expensive (p. 27).</p>
-    <p><b>On my bench.</b> Gas-melt equilibria at pressures where dissolved volatiles matter, with enough fluid to analyze.</p>
+    <div class="research"><h4>On my bench</h4><p>Gas-melt equilibria at pressures where dissolved volatiles matter, with enough fluid to analyze.</p></div>
   </div>
   </div>
 </article>
@@ -609,7 +640,7 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
       <div><dt>In the book</dt><dd>Appendix A.3, pp. 171-174</dd></div>
     </dl>
     <p><b>What it does.</b> In the double capsule, H&#8322; generated by the buffer diffuses through the Pd-Ag or Pt inner wall and fixes ƒO&#8322; inside through the water reaction (p. 173). Permeabilities run PdAg &gt; Pt &gt;&gt; Au &gt; Ag (p. 174). Buffers are consumed in long runs and sit at widely spaced ƒO&#8322; values; the membrane varies ƒO&#8322; continuously and never runs out (pp. 173-174).</p>
-    <p><b>On my bench.</b> Oxidation state is the master variable in how I think about chondrite redox, and these are the three hand-built handles on it. No machine at all beyond the vessel it rides in. Buffer powder, noble metal tube stock, a welded crimp.</p>
+    <div class="research"><h4>On my bench</h4><p>Oxidation state is the master variable in how I think about chondrite redox, and these are the three hand-built handles on it. No machine at all beyond the vessel it rides in. Buffer powder, noble metal tube stock, a welded crimp.</p></div>
   </div>
   </div>
 </article>
@@ -672,7 +703,7 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
       <div><dt>In the book</dt><dd>entry pp. 43-45; schematic Fig. 3.14, p. 44</dd></div>
     </dl>
     <p><b>What it does.</b> Doped zirconia conducts oxygen ions, so the emf across the plug reads the oxygen activity difference between sample and reference through the Nernst relation, E = (RT/4F) ln(a<sub>O&#8322;</sub><sup>sample</sup>/a<sub>O&#8322;</sub><sup>ref</sup>) (p. 45). It measures the intrinsic ƒO&#8322; of rocks and minerals directly. Watch for iron poisoning of the cell and electronic conduction at very low ƒO&#8322; (p. 43).</p>
-    <p><b>On my bench.</b> The sensor you build to check the atmosphere every other machine on this page claims to deliver, and the standard monitor on a gas-mixing furnace.</p>
+    <div class="research"><h4>On my bench</h4><p>The sensor you build to check the atmosphere every other machine on this page claims to deliver, and the standard monitor on a gas-mixing furnace.</p></div>
   </div>
   </div>
 </article>
@@ -717,7 +748,7 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
       <div><dt>Extension</dt><dd>the sulfidation arrangement is standard cosmochemistry practice beyond this book, flagged constructed</dd></div>
     </dl>
     <p><b>What it does.</b> Weld one end shut, load the charge, neck the tube, evacuate, and seal with the torch. Sulfur fugacity can be buffered by pyrite-pyrrhotite at one end of a thermal gradient while the sample reacts at the other, and the sealed volume doubles as a vapor-transport cell.</p>
-    <p><b>On my bench.</b> Metal-sulfide equilibria and sulfidation of Fe metal and silicates, the reactions behind enstatite chondrite mineralogy, plus sealed-tube transport of alkali halides. The cheapest apparatus on this page by two orders of magnitude.</p>
+    <div class="research"><h4>On my bench</h4><p>Metal-sulfide equilibria and sulfidation of Fe metal and silicates, the reactions behind enstatite chondrite mineralogy, plus sealed-tube transport of alkali halides. The cheapest apparatus on this page by two orders of magnitude.</p></div>
   </div>
   </div>
 </article>
@@ -809,7 +840,7 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
       <div><dt>In the book</dt><dd>Appendix A.1 to A.5, pp. 169-181</dd></div>
     </dl>
     <p><b>What it is.</b> Every machine above reduces to these parts. The Appendix teaches the parts themselves, which wire to weld, which ceramic survives which atmosphere, which metal passes hydrogen and which blocks it, and how to make a starting material more homogeneous than anything you can buy.</p>
-    <p><b>On my bench.</b> High-purity carbonates and oxides, noble metal tube stock, ceramic, and wire. Working upward from raw materials is not nostalgia, it is the fundamentals of the science, and it is how a lab keeps answering questions the other ten months of the year.</p>
+    <div class="research"><h4>On my bench</h4><p>High-purity carbonates and oxides, noble metal tube stock, ceramic, and wire. Working upward from raw materials is not nostalgia, it is the fundamentals of the science, and it is how a lab keeps answering questions the other ten months of the year.</p></div>
   </div>
   </div>
 </article>
@@ -873,9 +904,10 @@ footer{margin-top:30px;border-top:1px solid var(--rule);padding-top:14px;font-fa
   if (pv) pv.addEventListener("click", function(){ step(-1); });
   if (nx) nx.addEventListener("click", function(){ step(1); });
   try {
-    if (new URLSearchParams(location.search).has("embed")) document.body.classList.add("embed");
+    if (new URLSearchParams(location.search).has("embed")) document.documentElement.classList.add("embed");
   } catch(e){}
   select("s1");
+  if (window.ResizeObserver) { try { new ResizeObserver(schedH).observe(document.querySelector(".ap")); } catch(e){} }
   window.addEventListener("load", postH);
   window.addEventListener("resize", schedH);
 })();
