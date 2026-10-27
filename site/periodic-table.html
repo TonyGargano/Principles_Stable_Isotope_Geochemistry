@@ -222,7 +222,6 @@ if (params.get("embed") === "1") document.documentElement.classList.add("embed")
 
 const SUPD = {"0":"⁰","1":"¹","2":"²","3":"³","4":"⁴","5":"⁵","6":"⁶","7":"⁷","8":"⁸","9":"⁹","-":"⁻"};
 const supU = n => String(n).split("").map(d => SUPD[d] || d).join("");
-const WORDS = ["no","one","two","three","four","five","six","seven","eight","nine","ten"];
 
 /* ---------- categories ---------- */
 const GOLD = {
@@ -326,10 +325,10 @@ const SYSTEMS = {
         summary: "Chromium carries two isotope signals. ε⁵⁴Cr anomalies fingerprint inherited stellar material, and ⁵³Cr made by decay of extinct ⁵³Mn (half-life 3.7 Myr) dates early solar system events.",
         research: "Chromium is part of my expertise in nucleosynthetic isotopes and early solar system chronology, with ε⁵⁴Cr separating non-carbonaceous from carbonaceous meteorites and ⁵³Mn–⁵³Cr providing ages.",
         notation: "ε⁵³Cr and ε⁵⁴Cr, parts per 10,000 after internal normalization.", papers: [] },
-  Mo: { group: "nucleo", tag: "εᶦMo",
+  Mo: { group: "nucleo", tag: "εⁱMo",
         summary: "Molybdenum is an iron-loving metal with seven stable isotopes. Its nucleosynthetic variations record the mix of s-process and r-process material in each planetary body.",
         research: "Molybdenum is part of my expertise in nucleosynthetic isotopes, where Mo variations distinguish non-carbonaceous from carbonaceous meteorite groups.",
-        notation: "εᶦMo (for example ε⁹⁴Mo, ε⁹⁵Mo), parts per 10,000 after internal normalization.", papers: [] },
+        notation: "εⁱMo (for example ε⁹⁴Mo, ε⁹⁵Mo), parts per 10,000 after internal normalization.", papers: [] },
   Ru: { group: "nucleo", tag: "ε¹⁰⁰Ru",
         summary: "Ruthenium is a highly siderophile metal. Most of the ruthenium in Earth’s mantle is thought to have arrived late in accretion, so its nucleosynthetic anomalies help identify where that late material came from.",
         research: "Ruthenium is part of my expertise in nucleosynthetic isotopes, where ε¹⁰⁰Ru links late-accreted material in Earth’s mantle to meteorite groups.",
@@ -365,24 +364,17 @@ const LAYERS = {
 function volSentence(e) {
   const k = volKey(e), t = e.tc == null ? "" : fmtTc(e.tc);
   if (e.sym === "O") return "Only part of it condensed into rock-forming minerals at high temperature. Half of all oxygen condensed only as water ice, by " + t + ".";
+  if (e.sym === "Mg" || e.sym === "Si") return "Half of it had condensed by " + t + ", in the magnesium silicates that make up most planetary rock.";
+  if (e.sym === "Fe") return "Half of it had condensed by " + t + ", as metal grains alongside the magnesium silicates.";
   switch (k) {
-    case "refractory": return "It is refractory. As the gas around the young Sun cooled, half of it had condensed by " + t + ", among the first elements to become solid.";
-    case "common": return "Half of it had condensed by " + t + ", together with the magnesium silicates and iron metal that make up most planetary rock.";
-    case "volatile": return "It is volatile, with half condensed only by " + t + ", so bodies that formed hot or were heated later are often depleted in it.";
-    case "highly": return "It is highly volatile and stays in gas until " + t + ", so it is scarce in rocky bodies compared with the Sun.";
+    case "refractory": return "As the gas around the young Sun cooled, half of it had condensed by " + t + ", among the first elements to become solid.";
+    case "common": return "Half of it had condensed by " + t + ", together with the magnesium silicates and iron metal that make up most of the rock and metal in planets.";
+    case "volatile": return "Half of it condensed only after the gas cooled to " + t + ", so bodies that formed hot or were heated later are often depleted in it.";
+    case "highly": return "Half of it remained vapor until the gas cooled to " + t + ", so it is scarce in rocky bodies compared with the Sun.";
     default: return "";
   }
 }
 const isRad = i => i.hl != null && i.hl < 1e12;
-function isoSentence(e) {
-  const n = e.iso.length, nm = e.name.toLowerCase();
-  if (n === 0) return "It has no long-lived natural isotopes.";
-  const rad = e.iso.filter(isRad);
-  if (n === 1) { const i = e.iso[0]; return isRad(i) ? "Its only natural isotope, <sup>" + i.A + "</sup>" + e.sym + ", is radioactive." : "It has a single natural isotope, <sup>" + i.A + "</sup>" + e.sym + "."; }
-  let s = "Natural " + nm + " is a mix of " + (WORDS[n] || n) + " isotopes";
-  if (rad.length) s += ", including radioactive " + rad.map(i => "<sup>" + i.A + "</sup>" + e.sym).join(" and ");
-  return s + ".";
-}
 function fmtHL(y) {
   if (y == null) return "stable";
   if (y >= 1e12) { const ex = Math.floor(Math.log10(y)); const m = y / Math.pow(10, ex); return m.toFixed(2).replace(/\.?0+$/, "") + " × 10" + supU(ex) + " yr"; }
@@ -583,7 +575,7 @@ function isoTable(e) {
 function renderCard(e) {
   const sys = SYSTEMS[e.sym], gk = goldKey(e), vk = volKey(e), L = LAYERS[state.layer], tc = L.cats[L.key(e)];
   const chips = chip("gold", gk, GOLD[gk].label) + chip("vol", vk, VOL[vk].label + " · " + fmtTc(e.tc)) + chip("systems", sys.group, SYSG[sys.group].label);
-  const lead = [sys.summary, volSentence(e), isoSentence(e)].filter(Boolean).join(" ");
+  const lead = [sys.summary, volSentence(e)].filter(Boolean).join(" ");
   const dl = '<dl><dt>Notation</dt><dd>' + sys.notation + '</dd>' +
     '<dt>Goldschmidt class</dt><dd>' + GOLD[gk].label + ' (' + GOLD[gk].gloss + ')</dd>' + (MIXED[e.sym] ? '<dt>Class note</dt><dd>' + MIXED[e.sym] + '</dd>' : '') +
     '<dt>50% condensation T</dt><dd>' + fmtTc(e.tc) + ' at 10⁻⁴ bar</dd><dt>Volatility group</dt><dd>' + VOL[vk].label + ' (' + VOL[vk].range + ')</dd><dt>Atomic weight</dt><dd>' + fmtMass(e) + '</dd></dl>';
